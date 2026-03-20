@@ -5,3 +5,138 @@ body.markdown-preview-view {
 .markdown-rendered code {
   white-space: nowrap; // Prevent code blocks from wrapping
 }
+
+// --- Grayish accent, link, and selection colors (dark theme only) ---
+// Uses Obsidian Baseline's own color-base scale (defined in obsidian-base.scss)
+// for consistency with the theme's gray ramp:
+//   --color-base-60 (#999) idle  → ~5.3:1 contrast on #1e1e1e (passes AA)
+//   --color-base-70 (#b3b3b3) hover → ~8.1:1 contrast on #1e1e1e (passes AAA)
+.theme-dark {
+  --text-accent: var(--color-base-60, #999);
+  --text-accent-hover: var(--color-base-70, #b3b3b3);
+  --interactive-accent: var(--color-base-60, #999);
+  --interactive-accent-hover: var(--color-base-70, #b3b3b3);
+  --link-color: var(--color-base-60, #999);
+  --link-color-hover: var(--color-base-70, #b3b3b3);
+  --link-external-color: var(--color-base-60, #999);
+  --link-external-color-hover: var(--color-base-70, #b3b3b3);
+  --text-selection: rgba(153, 153, 153, 0.3);
+}
+
+// --- Responsive font sizes & spacing (px → rem) ---
+// Overrides digital-garden-base.scss and style.scss defaults.
+// Conversion: rem = px / 16 (browser default root).
+// Font sizes and text-relative spacing use rem.
+// Icon sizes use em to scale with adjacent text.
+// Borders, shadows, border-radius stay px (visual details).
+body {
+  // Heading scale — Major Third (1.25 ratio) from h1 = 3rem, h6 nudged above content font size
+  --h1-size: 3rem; // 48px
+  --h2-size: 2.4rem; // 38.4px
+  --h3-size: 1.92rem; // 30.7px
+  --h4-size: 1.536rem; // 24.6px
+  --h5-size: 1.229rem; // 19.7px
+  --h6-size: 1.07rem; // 17.1px
+
+  // Layout
+  --dg-content-font-size: 1.03rem; // 16.5px
+  --dg-content-padding-top: 5.625rem; // 90px
+  --dg-content-padding-top-mobile: 4.6875rem; // 75px
+  --dg-content-max-width: 43.75rem; // 700px
+
+  // Sidebar
+  --dg-sidebar-top: 4.6875rem; // 75px
+  --dg-sidebar-gap: 5rem; // 80px
+  --dg-sidebar-min-width: 1.5625rem; // 25px
+  --dg-sidebar-max-width: 21.875rem; // 350px
+  --dg-sidebar-container-padding: 1.25rem; // 20px
+
+  // Graph
+  --dg-graph-width: 15.625rem; // 250px
+  --dg-graph-height: 15.625rem; // 250px
+  --dg-graph-margin-bottom: 1.25rem; // 20px
+  --dg-graph-fullscreen-width: 37.5rem; // 600px
+  --dg-graph-fullscreen-height: 37.5rem; // 600px
+
+  // Filetree
+  --dg-filetree-width: 15.625rem; // 250px
+  --dg-filetree-min-width: 15.625rem; // 250px
+  --dg-filetree-padding: 0.625rem 1.25rem; // 10px 20px
+  --dg-filetree-gap: 5rem; // 80px
+  --dg-filetree-title-size: 2rem; // 32px
+
+  // TOC
+  --dg-toc-padding: 0.3125rem; // 5px
+  --dg-toc-max-height: 13.75rem; // 220px
+  --dg-toc-item-padding: 0.125rem 0 0.125rem 0.5rem; // 2px 0 2px 8px
+
+  // Backlinks
+  --dg-backlinks-margin-top: 0.625rem; // 10px
+  --dg-backlinks-max-height: 15.625rem; // 250px
+  --dg-backlinks-card-padding: 0.375rem 0; // 6px 0
+  --dg-backlinks-icon-size: 0.875em; // 14px — em to scale with text
+
+  // Search
+  --dg-search-box-width: 68.75rem; // 1100px
+  --dg-search-box-padding: 1rem; // 16px
+  --dg-search-input-padding: 0.75rem 1rem; // 12px 16px
+  --dg-search-results-max-height: 60vh;
+  --dg-search-btn-height: 2rem; // 32px
+  --dg-search-btn-padding: 0 0.625rem; // 0 10px
+  --dg-search-btn-gap: 0.5rem; // 8px
+  --dg-search-btn-icon-size: 0.875em; // 14px — em to scale with text
+
+  // Navbar
+  --dg-navbar-height: 3.75rem; // 60px
+  --dg-navbar-title-size-mobile: 1.125rem; // 18px
+  --dg-navbar-search-margin: 1.25rem; // 20px
+  --dg-navbar-search-min-width: 2.25rem; // 36px
+  --dg-logo-height: 2.5rem; // 40px
+  --dg-logo-height-mobile: 2rem; // 32px
+  --dg-logo-margin: 0.625rem 0.9375rem; // 10px 15px
+  --dg-filetree-logo-height: 4.375rem; // 70px
+
+  // Note links / file tree items
+  --dg-notelink-padding: 0.25rem 0.5rem 0.25rem 0.75rem; // 4px 8px 4px 12px
+  --dg-folder-margin: 0.25rem 0 0.25rem 0.125rem; // 4px 0 4px 2px
+  --dg-folder-icon-size: 0.875em; // 14px — em to scale with text
+  --dg-inner-folder-padding: 0.1875rem 0 0.1875rem 0; // 3px 0 3px 0
+  --dg-inner-folder-margin: 0.75rem; // 12px
+  --dg-filelist-margin: 0.5rem; // 8px
+
+  // Graph controls
+  --dg-graph-ctrl-padding: 0.375rem 0.625rem; // 6px 10px
+  --dg-graph-ctrl-margin: 0.625rem; // 10px
+  --dg-graph-ctrl-icon-size: 0.875em; // 14px — em to scale with text
+  --dg-graph-ctrl-gap: 0.625rem; // 10px
+  --dg-depth-slider-width: 3.125rem; // 50px
+
+  // Timestamps
+  --dg-timestamps-gap: 0.625rem; // 10px
+  --dg-timestamps-margin-top: 1.25rem; // 20px
+
+  // Misc
+  --dg-mermaid-padding: 0.625rem; // 10px
+  --dg-transclusion-padding: 0.5rem; // 8px
+  --dg-external-link-icon-size: 0.8125em; // 13px — em to scale with text
+  --dg-external-link-padding: 1rem; // 16px
+}
+
+// style.scss overrides (that file says "DO NOT MODIFY")
+:root {
+  --file-margins: 2rem; // 32px
+  --callout-padding: 0.75rem 0.75rem 0.75rem 1.5rem; // 12px 12px 12px 24px
+}
+
+button {
+  padding: 0.3125rem 0.9375rem; // 5px 15px
+}
+
+.font-bg {
+  font-size: 5.75rem; // 92px
+}
+
+blockquote {
+  margin: 1.5em 0.625rem; // 1.5em 10px
+  padding: 0.5em 0.625rem; // 0.5em 10px
+}
