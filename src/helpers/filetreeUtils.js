@@ -31,7 +31,7 @@ const naturalCompare = (a, b) => {
 };
 
 const sortTree = (unsorted) => {
-  //Sort by folder before file, then by name
+  //Sort by: pinned first, folders before files, then notes by created date (newest first)
   const orderedTree = Object.keys(unsorted)
     .sort((a, b) => {
 
@@ -54,6 +54,17 @@ const sortTree = (unsorted) => {
 
       if (!a_is_note && b_is_note) {
         return -1;
+      }
+
+      // Both are notes: sort by created date (newest first), fall back to name
+      if (a_is_note && b_is_note) {
+        const a_created = unsorted[a].created;
+        const b_created = unsorted[b].created;
+        if (a_created && b_created) {
+          return new Date(b_created) - new Date(a_created);
+        }
+        if (a_created) return -1;
+        if (b_created) return 1;
       }
 
       return naturalCompare(a, b);
@@ -118,7 +129,7 @@ function getPermalinkMeta(note, key) {
     //ignore
   }
 
-  return [{ permalink, name, noteIcon, hide, pinned }, folders];
+  return [{ permalink, name, noteIcon, hide, pinned, created: note.data.created || null }, folders];
 }
 
 function assignNested(obj, keyPath, value) {

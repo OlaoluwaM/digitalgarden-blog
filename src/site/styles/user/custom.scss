@@ -140,3 +140,28 @@ blockquote {
   margin: 1.5em 0.625rem; // 1.5em 10px
   padding: 0.5em 0.625rem; // 0.5em 10px
 }
+
+// Recent posts section on home page
+.recent-notes {
+  margin-top: 2rem;
+
+  ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  li {
+    margin-bottom: 1rem;
+  }
+
+  p {
+    margin: 0.25rem 0 0;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+  }
+
+  .human-date {
+    font-size: 0.8rem;
+    color: var(--text-faint);
+  }
+}
