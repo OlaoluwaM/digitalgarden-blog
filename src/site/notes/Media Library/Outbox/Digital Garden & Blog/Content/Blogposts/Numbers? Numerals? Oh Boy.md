@@ -1,5 +1,5 @@
 ---
-{"dg-publish":true,"dg-path":" Posts /Numbers? Numerals? Oh Boy.md","dg-permalink":"numbers-numerals-oh-boy","permalink":"/numbers-numerals-oh-boy/","metatags":{"description":"Ever wondered about the difference between numbers and numerals? Me neither, but here we are"},"created":"2026-03-20T15:09:00.012-05:00","updated":"2026-03-20T15:14:21.664-05:00"}
+{"dg-publish":true,"dg-path":" Posts /Numbers? Numerals? Oh Boy.md","dg-permalink":"numbers-numerals-oh-boy","permalink":"/numbers-numerals-oh-boy/","metatags":{"description":"Ever wondered about the difference between numbers and numerals? Me neither, but here we are"},"created":"2026-03-20T15:09:00.012-05:00","updated":"2026-03-20T15:39:27.065-05:00"}
 ---
 
 

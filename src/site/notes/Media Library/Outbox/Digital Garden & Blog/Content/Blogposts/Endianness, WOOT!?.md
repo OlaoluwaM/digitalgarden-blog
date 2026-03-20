@@ -1,5 +1,5 @@
 ---
-{"dg-publish":true,"dg-path":" Posts /Endianness, WOOT!?.md","dg-permalink":"endianness-woot","permalink":"/endianness-woot/","metatags":{"description":"Endian deez nuts"},"created":"2026-03-20T15:17:39.241-05:00","updated":"2026-03-20T15:33:30.855-05:00"}
+{"dg-publish":true,"dg-path":" Posts /Endianness, WOOT!?.md","dg-permalink":"endianness-woot","permalink":"/endianness-woot/","metatags":{"description":"Endian deez nuts"},"created":"2026-03-20T15:17:39.241-05:00","updated":"2026-03-20T15:39:35.108-05:00"}
 ---
 
 
@@ -8,25 +8,19 @@ So there I was programming some binary serialization and deserialization logic t
 `````ad-tldr
 title: TLDR
 
-Assuming the following sequence of bytes:
-`[0x01, 0x02, 0x03, 0x04]`
+Assuming the following sequence of bytes:<br/>`[0x01, 0x02, 0x03, 0x04]`
 
-**Big-endian** (most significant byte first):
-`0x01020304 = 16,909,060`
+**Big-endian** (most significant byte first):<br/>`0x01020304 = 16,909,060`
 
-**Little-endian** (least significant byte first):
-`0x04030201 = 67,305,985`
+**Little-endian** (least significant byte first):<br/>`0x04030201 = 67,305,985`
 
 Again,
 
-Reading a 16-bit value from a file:
-`bytes = [0x12, 0x34]`
+Reading a 16-bit value from a file:<br/>`bytes = [0x12, 0x34]`
 
-Big-endian system interprets this as:
-`value = 0x1234 // 4660`
+Big-endian system interprets this as:<br/>`value = 0x1234 // 4660`
 
-Little-endian system interprets this as:
-`value = 0x3412 // 13330`
+Little-endian system interprets this as:<br/>`value = 0x3412 // 13330`
 
 If that doesn't suffice as a complete and holistic explanation, read on
 `````
