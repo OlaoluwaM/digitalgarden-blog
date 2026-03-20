@@ -5,3 +5,20 @@ body.markdown-preview-view {
 .markdown-rendered code {
   white-space: nowrap; // Prevent code blocks from wrapping
 }
+
+// --- Grayish accent, link, and selection colors (dark theme only) ---
+// Uses Obsidian Baseline's own color-base scale (defined in obsidian-base.scss)
+// for consistency with the theme's gray ramp:
+//   --color-base-60 (#999) idle  → ~5.3:1 contrast on #1e1e1e (passes AA)
+//   --color-base-70 (#b3b3b3) hover → ~8.1:1 contrast on #1e1e1e (passes AAA)
+.theme-dark {
+  --text-accent: var(--color-base-60);
+  --text-accent-hover: var(--color-base-70);
+  --interactive-accent: var(--color-base-60);
+  --interactive-accent-hover: var(--color-base-70);
+  --link-color: var(--color-base-60);
+  --link-color-hover: var(--color-base-70);
+  --link-external-color: var(--color-base-60);
+  --link-external-color-hover: var(--color-base-70);
+  --text-selection: rgba(153, 153, 153, 0.3);
+}
