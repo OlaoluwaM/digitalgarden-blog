@@ -1,11 +1,12 @@
 ---
-{"dg-publish":true,"dg-path":" Posts /Endianness, WOOT!?.md","dg-permalink":"endianness-woot","permalink":"/endianness-woot/","metatags":{"description":"Endian deez nuts"},"created":"2026-03-20T15:17:39.241-05:00","updated":"2026-03-20T15:24:15.298-05:00"}
+{"dg-publish":true,"dg-path":" Posts /Endianness, WOOT!?.md","dg-permalink":"endianness-woot","permalink":"/endianness-woot/","metatags":{"description":"Endian deez nuts"},"created":"2026-03-20T15:17:39.241-05:00","updated":"2026-03-20T15:33:30.855-05:00"}
 ---
 
 
 So there I was programming some binary serialization and deserialization logic to add persistence to my Redis server. I was in the zone then the docs I was referencing began to mention this "endian" thing, what the heck does that mean? I mean, I know it has something to do with how bytes are parsed but the rest of that thought was a little fuzzy ngl. It is at this point, dear reader, that I wish to inform you that I did it, for you, I fell right into the rabbit hole so you don't have to. Here's what I learned:
 
 `````ad-tldr
+title: TLDR
 
 Assuming the following sequence of bytes:
 `[0x01, 0x02, 0x03, 0x04]`
