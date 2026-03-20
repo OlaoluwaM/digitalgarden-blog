@@ -53,6 +53,21 @@
         {% include imp %}
       {% endfor %}
       {{ content | hideDataview | taggify | link | safe}}
+
+      {% if recentNotes and recentNotes.length %}
+        <section class="recent-notes">
+          <h2>Recent Posts</h2>
+          <ul>
+            {% for note in recentNotes %}
+              <li>
+                <a href="{{ note.url }}" class="internal-link">{{ note.title }}</a>
+                {% if note.description %}<p>{{ note.description }}</p>{% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+        </section>
+      {% endif %}
+
       {% for imp in dynamics.common.afterContent %}
         {% include imp %}
       {% endfor %}
