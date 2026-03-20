@@ -13,6 +13,11 @@
 
 <script defer src="https://cdn.vercel-insights.com/v1/script.js"></script>
 
+<script type="module">
+  import { injectSpeedInsights } from '/_vercel/speed-insights/script.js';
+  injectSpeedInsights();
+</script>
+
 <script async type="module">
     import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
 </script>
