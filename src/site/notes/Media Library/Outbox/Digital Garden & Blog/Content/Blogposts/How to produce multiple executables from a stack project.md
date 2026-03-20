@@ -1,5 +1,5 @@
 ---
-{"dg-publish":true,"dg-path":" Posts /How to produce multiple executables from a stack project.md","dg-permalink":"how-to-produce-multiple-executables-from-a-stack-project","permalink":"/how-to-produce-multiple-executables-from-a-stack-project/","metatags":{"description":"To produce an executable"},"created":"2026-03-20T15:36:58.478-05:00","updated":"2026-03-20T15:39:49.272-05:00"}
+{"dg-publish":true,"dg-path":" Posts/How to produce multiple executables from a stack project.md","dg-permalink":"how-to-produce-multiple-executables-from-a-stack-project","permalink":"/how-to-produce-multiple-executables-from-a-stack-project/","metatags":{"description":"To produce an executable"},"created":"2026-03-20T15:36:58.478-05:00","updated":"2026-03-20T15:39:49.272-05:00"}
 ---
 
 

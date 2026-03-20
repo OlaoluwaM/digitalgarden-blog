@@ -1,5 +1,5 @@
 ---
-{"dg-publish":true,"dg-path":" Posts /Endianness, WOOT!?.md","dg-permalink":"endianness-woot","permalink":"/endianness-woot/","metatags":{"description":"Endian deez nuts"},"created":"2026-03-20T15:17:39.241-05:00","updated":"2026-03-20T15:39:35.108-05:00"}
+{"dg-publish":true,"dg-path":" Posts/Endianness, WOOT!?.md","dg-permalink":"endianness-woot","permalink":"/endianness-woot/","metatags":{"description":"Endian deez nuts"},"created":"2026-03-20T15:17:39.241-05:00","updated":"2026-03-20T15:39:35.108-05:00"}
 ---
 
 
