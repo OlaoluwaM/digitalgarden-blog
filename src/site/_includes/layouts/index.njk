@@ -62,7 +62,7 @@
               <li>
                 <a href="{{ note.url }}" class="internal-link">{{ note.title }}</a>
                 {% if note.description %}<p>{{ note.description }}</p>{% endif %}
-                <span class="human-date" data-date="{{ note.created }}"></span>
+                <span class="human-date" data-date="{{ note.created }}">{{ note.created }}</span>
               </li>
             {% endfor %}
           </ul>
@@ -84,6 +84,7 @@
     {% if settings.dgLinkPreview === true %}
       {%include "components/linkPreview.njk"%}
     {% endif %}
+    {% include "components/timestamps.njk" %}
     {% for imp in dynamics.common.footer %}
       {% include imp %}
     {% endfor %}
