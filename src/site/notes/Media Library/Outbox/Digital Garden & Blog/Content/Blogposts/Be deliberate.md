@@ -1,5 +1,5 @@
 ---
-{"dg-publish":true,"dg-path":" Posts/Be deliberate.md","permalink":"/posts/be-deliberate/","metatags":{"description":"Be deliberate"},"created":"2026-03-20T15:42:21.046-05:00","updated":"2026-03-20T16:12:29.518-05:00"}
+{"dg-publish":true,"dg-path":"Posts/Be deliberate.md","permalink":"/posts/be-deliberate/","metatags":{"description":"Be deliberate"},"created":"2026-03-20T15:42:21.046-05:00","updated":"2026-03-20T16:12:29.518-05:00"}
 ---
 
 
