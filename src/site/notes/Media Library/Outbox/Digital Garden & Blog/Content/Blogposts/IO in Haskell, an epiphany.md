@@ -1,5 +1,5 @@
 ---
-{"dg-publish":true,"permalink":"/media-library/outbox/digital-garden-and-blog/content/blogposts/io-in-haskell-an-epiphany/","created":"2026-03-20T11:31:55.215-05:00","updated":"2026-03-20T11:32:39.918-05:00"}
+{"dg-publish":true,"dg-path":" Posts /IO in Haskell, an epiphany.md","permalink":"/posts/io-in-haskell-an-epiphany/","created":"2026-03-20T11:31:55.215-05:00","updated":"2026-03-20T11:32:39.918-05:00"}
 ---
 
 It seems to me like `IO` is Haskell's way of modelling/representing the general concept of a statement (an action/impure operation, an operation with side effects that may or may not return a value). We know why statements are important. They allow our programs do useful things at the cost of non-determinism (changes to the world state tend not be consistent across invocations) and ordering (we tend to require that effects occur in a certain order).

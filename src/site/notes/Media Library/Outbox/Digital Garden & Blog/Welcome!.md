@@ -1,5 +1,5 @@
 ---
-{"dg-publish":true,"permalink":"/media-library/outbox/digital-garden-and-blog/welcome/","tags":["gardenEntry"],"created":"2026-03-20T10:00:59.811-05:00","updated":"2026-03-20T10:01:50.348-05:00"}
+{"dg-publish":true,"dg-path":"Welcome!.md","permalink":"/welcome/","tags":["gardenEntry"],"created":"2026-03-20T10:00:59.811-05:00","updated":"2026-03-20T10:01:50.348-05:00"}
 ---
 
 Lo there traveler, welcome to my space. Do enjoy your visit :)
