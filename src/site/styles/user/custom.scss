@@ -12,13 +12,13 @@ body.markdown-preview-view {
 //   --color-base-60 (#999) idle  → ~5.3:1 contrast on #1e1e1e (passes AA)
 //   --color-base-70 (#b3b3b3) hover → ~8.1:1 contrast on #1e1e1e (passes AAA)
 .theme-dark {
-  --text-accent: var(--color-base-60);
-  --text-accent-hover: var(--color-base-70);
-  --interactive-accent: var(--color-base-60);
-  --interactive-accent-hover: var(--color-base-70);
-  --link-color: var(--color-base-60);
-  --link-color-hover: var(--color-base-70);
-  --link-external-color: var(--color-base-60);
-  --link-external-color-hover: var(--color-base-70);
+  --text-accent: var(--color-base-60, #999);
+  --text-accent-hover: var(--color-base-70, #b3b3b3);
+  --interactive-accent: var(--color-base-60, #999);
+  --interactive-accent-hover: var(--color-base-70, #b3b3b3);
+  --link-color: var(--color-base-60, #999);
+  --link-color-hover: var(--color-base-70, #b3b3b3);
+  --link-external-color: var(--color-base-60, #999);
+  --link-external-color-hover: var(--color-base-70, #b3b3b3);
   --text-selection: rgba(153, 153, 153, 0.3);
 }

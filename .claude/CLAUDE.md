@@ -41,15 +41,16 @@ src/site/notes/*.md → gray-matter frontmatter → markdown-it (11 plugins) →
 
 ### Styling
 
-SCSS compiled to `dist/styles/`. Layers:
+SCSS compiled to `dist/styles/`. The core compiled bundle always includes:
 - `digital-garden-base.scss` — Framework base
-- `obsidian-base.scss` — Obsidian theme compat
 - `custom-style.scss` — User customization
 - `user/custom.scss` — Site-specific overrides
 
-Theme CSS is fetched at build time from a remote URL (configured in `.env` `THEME`). 60+ CSS custom properties for theming.
+Obsidian theme compatibility and the theme CSS are **conditional**:
+- `obsidian-base.scss` and the generated `_theme.*.css` are only linked in `pageheader.njk` when `meta.themeStyle` is present.
+- `meta.themeStyle` is set only when `THEME` is configured in `.env` and `npm run get-theme` (or the build scripts that invoke it) successfully fetch the remote theme CSS and write `src/site/styles/_theme.*.css`. The fetched theme defines 60+ CSS custom properties for theming.
 
-Custom color overrides live in `user/custom.scss` via `:root` — currently sets grayish accent/link/selection colors (`#a0a0a0` idle, `#c0c0c0` hover) chosen for WCAG AA accessibility against the dark background.
+Custom color overrides live in `user/custom.scss` inside a `.theme-dark { ... }` block — they use theme variables such as `var(--color-base-60)` / `var(--color-base-70)` for accent and link states (with `#999`/`#b3b3b3` as fallbacks), and `rgba(153,153,153,0.3)` for text selection, tuned for WCAG AA contrast on the dark background.
 
 ### Wiki-Link Resolution
 
