@@ -141,6 +141,23 @@ blockquote {
   padding: 0.5em 0.625rem; // 0.5em 10px
 }
 
+// Navbar: symmetric padding on mobile (when hamburger menu is shown)
+@media (max-width: 1000px) {
+  .navbar {
+    padding-left: 1.5625rem; // 25px
+    padding-right: 1.5625rem; // 25px
+
+    .search-button {
+      margin-left: 0;
+      margin-right: 0;
+    }
+  }
+
+  .navbar-inner > span {
+    margin-right: 0;
+  }
+}
+
 // Recent posts section on home page
 .recent-notes {
   margin-top: 2rem;
