@@ -1,4 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- White background -->
+  <rect width="64" height="64" rx="12" ry="12" fill="#fff"/>
   <!-- Left curly brace -->
   <path d="M20 6 Q14 6 14 14 L14 26 Q14 32 8 32 Q14 32 14 38 L14 50 Q14 58 20 58" fill="none" stroke="#000" stroke-width="4" stroke-linecap="round"/>
   <!-- Right curly brace -->
