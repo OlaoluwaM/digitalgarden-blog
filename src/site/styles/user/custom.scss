@@ -141,21 +141,45 @@ blockquote {
   padding: 0.5em 0.625rem; // 0.5em 10px
 }
 
+@media (max-width: 800px) {
+  .navbar .site-name-header {
+    font-size: 1.5rem !important; // 24px
+  }
+}
+
 // Navbar: symmetric padding on mobile (when hamburger menu is shown)
 @media (max-width: 1000px) {
   .navbar {
+    padding: 1rem; // 16px on all sides
     padding-left: 1.5625rem; // 25px
     padding-right: 1.5625rem; // 25px
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
 
     .search-button {
       margin-left: 0;
       margin-right: 0;
+      flex-grow: 0.025; // Keep search button small and prevent it from taking up too much space on mobile
+    }
+    .navbar-inner > span {
+      margin-right: 0;
+    }
+
+    .navbar-inner a {
+      flex-grow: 1;
+      text-align: left;
+
+      .site-name-header {
+        font-size: 2rem;
+      }
     }
   }
+}
 
-  .navbar-inner > span {
-    margin-right: 0;
-  }
+.search-button {
+  min-height: 2.5rem; // 40px
 }
 
 // Recent posts section on home page
