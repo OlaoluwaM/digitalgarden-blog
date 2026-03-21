@@ -186,6 +186,12 @@ blockquote {
 
 .filetree-sidebar {
   max-width: var(--dg-filetree-width);
+
+  @media (max-width: 800px) {
+    h1 {
+      display: revert;
+    }
+  }
 }
 
 // Recent posts section on home page
