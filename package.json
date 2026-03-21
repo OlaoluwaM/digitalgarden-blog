@@ -5,20 +5,20 @@
   "main": "index.js",
   "scripts": {
     "prebuild": "rimraf dist",
-    "start": "npm-run-all get-theme build:sass --parallel watch:*",
+    "start": "npm-run-all2 get-theme build:sass --parallel watch:*",
     "watch:sass": "sass --watch src/site/styles:dist/styles",
     "watch:eleventy": "cross-env ELEVENTY_ENV=dev eleventy --serve",
     "build:eleventy": "cross-env ELEVENTY_ENV=prod NODE_OPTIONS=--max-old-space-size=4096 eleventy",
     "build:sass": "sass src/site/styles:dist/styles --style compressed",
     "get-theme": "node src/site/get-theme.js",
-    "build": "npm-run-all get-theme build:*",
+    "build": "npm-run-all2 get-theme build:*",
     "test": "node --test"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "engines": {
-    "node": "22.x"
+    "node": "24.x"
   },
   "devDependencies": {
     "@11ty/eleventy": "^3.1.2",
@@ -48,7 +48,7 @@
     "markdown-it-mathjax3": "^4.3.1",
     "markdown-it-plantuml": "^1.4.1",
     "markdown-it-task-checkbox": "^1.0.6",
-    "npm-run-all": "^4.1.5",
+    "npm-run-all2": "^7.0.2",
     "rimraf": "^4.4.1",
     "shiki": "^4.0.2"
   }

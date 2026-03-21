@@ -14,7 +14,9 @@ An Eleventy 3.x digital garden blog ("Thunks & Thoughts" at thunk.blog), built o
 - **Eleventy only:** `npm run build:eleventy` / `npm run watch:eleventy`
 - **Fetch theme CSS:** `npm run get-theme`
 
-No test suite exists. Node 22.x required.
+- **Tests:** `npm test` (Node's built-in test runner)
+
+Node 24.x required.
 
 ## Architecture
 
@@ -59,6 +61,10 @@ The `link` filter and `getAnchorAttributes()` in `.eleventy.js` resolve `[[file|
 ### Canvas Support
 
 `.canvas` files (Obsidian's native diagram format) are registered as a custom Eleventy extension. They contain pre-compiled HTML; the `canvas-markdown` transform renders any embedded markdown text nodes at build time.
+
+### Custom Callouts
+
+Custom admonition types (colors + icons) are synced from the Obsidian vault via the `/sync-callouts` Claude Code skill, which regenerates `src/site/styles/user/callouts.scss`. Structural callout overrides (icon sizing, nested margins) live in `src/site/styles/user/callout-overrides.scss`.
 
 ### Deployment
 
