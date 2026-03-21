@@ -247,6 +247,7 @@ blockquote {
 
 // Fonts — Instrument family via Google Fonts
 // Wrapped in @media screen, print to scope these font overrides to visual media types
+// A bit of a mess but covers all basis for the various ways fonts can be applied in the theme and Obsidian (headings, body text, code blocks, interface elements, markdown preview, etc.)
 @media screen, print {
   body {
     --heading-font: "Instrument Serif", serif;
