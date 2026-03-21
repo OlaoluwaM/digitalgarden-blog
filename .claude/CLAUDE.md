@@ -14,7 +14,7 @@ An Eleventy 3.x digital garden blog ("Thunks & Thoughts" at thunk.blog), built o
 - **Eleventy only:** `npm run build:eleventy` / `npm run watch:eleventy`
 - **Fetch theme CSS:** `npm run get-theme`
 
-No test suite exists. Node 22.x required.
+No test suite exists. Node 24.x required.
 
 ## Architecture
 
