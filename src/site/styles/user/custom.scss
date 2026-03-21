@@ -1,3 +1,5 @@
+@use "../_fonts.scss";
+
 body.markdown-preview-view {
   height: 100%; // Ensure the preview view takes up the full height of the container and not fit-content
 }
@@ -242,5 +244,48 @@ blockquote {
 
   .navbar .navbar-inner {
     gap: 0.5rem; // 8px - reduce gap between logo and site name on mobile
+  }
+}
+
+// Fonts (defined in fonts.scss) Fonts are self-hosted
+// Wrapped in @media screen, print to scope these font overrides to visual media types
+// A bit of a mess but covers all basis for the various ways fonts can be applied in the theme and Obsidian (headings, body text, code blocks, interface elements, markdown preview, etc.)
+@media screen, print {
+  body {
+    --heading-font: "Instrument Serif", serif;
+    --h1-font: var(--heading-font);
+    --h2-font: var(--heading-font);
+    --h3-font: var(--heading-font);
+    --h4-font: var(--heading-font);
+    --h5-font: var(--heading-font);
+    --h6-font: var(--heading-font);
+    --inline-title-font: var(--heading-font);
+
+    --font-default:
+      "Instrument Sans", "Inter", ui-sans-serif, -apple-system,
+      BlinkMacSystemFont, system-ui, "Segoe UI", Roboto, sans-serif;
+    --font-text: var(--font-default);
+    --font-interface: var(--font-default);
+    --font-text-theme: var(--font-default);
+    --font-interface-theme: var(--font-default);
+
+    --font-code:
+      "JetBrains Mono", ui-monospace, SFMono-Regular, "Cascadia Mono",
+      "Roboto Mono", monospace;
+    --font-monospace: var(--font-code);
+    --font-monospace-theme: var(--font-code);
+  }
+
+  .markdown-preview-view {
+    --font-text: var(--font-default);
+    --font-interface: var(--font-default);
+    --font-text-theme: var(--font-default);
+    --font-interface-theme: var(--font-default);
+  }
+
+  code[class*="language-"] {
+    --font-monospace: var(--font-code);
+    --font-monospace-theme: var(--font-code);
+    font-weight: 600;
   }
 }
