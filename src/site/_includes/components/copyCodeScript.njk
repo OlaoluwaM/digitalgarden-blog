@@ -7,8 +7,9 @@
                 await navigator.clipboard.writeText(text);
                 return true;
             } catch (e) {
-                // Intentionally empty: swallow the error so execution falls
-                // through to the execCommand textarea fallback below.
+                // Swallow the error so execution falls through to the
+                // execCommand textarea fallback below.
+                console.error("navigator.clipboard.writeText failed:", e);
             }
         }
 
@@ -25,6 +26,7 @@
             document.body.removeChild(textarea);
             return successful;
         } catch (e) {
+            console.error("execCommand copy fallback failed:", e);
             return false;
         }
     }
