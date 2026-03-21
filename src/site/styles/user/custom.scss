@@ -141,10 +141,57 @@ blockquote {
   padding: 0.5em 0.625rem; // 0.5em 10px
 }
 
-// We want customize how the site name font size reduces on mobile, so we override the default responsive here
-@media (max-width: 800px) {
-  .navbar .site-name-header {
-    font-size: 1.5rem !important; // 24px
+// Search button: Slightly taller than default
+.search-button {
+  height: 2.3rem; // 36px
+}
+
+.filetree-sidebar {
+  max-width: var(--dg-filetree-width);
+
+  @media (max-width: 800px) {
+    h1 {
+      display: revert;
+    }
+  }
+}
+
+.navbar .navbar-inner {
+  display: flex;
+  align-items: center;
+  flex-grow: 1;
+  flex-direction: row;
+  gap: 2.05rem; // 40px
+
+  svg.svg-icon {
+    width: 1.65rem; // 26.4px
+
+    path {
+      transform: scaleX(
+        2.2
+      ); // Stretch the hamburger icon horizontally to make it more visible on mobile
+      transform-origin: right; // Keep the right edge of the icon anchored in place while stretching
+    }
+  }
+}
+
+// Recent posts section on home page
+.recent-notes {
+  margin-top: 2rem;
+
+  ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  li {
+    margin-bottom: 1rem;
+  }
+
+  p {
+    margin: 0.25rem 0 0;
+    color: var(--text-faint);
+    font-size: 0.9rem;
   }
 }
 
@@ -152,8 +199,7 @@ blockquote {
 @media (max-width: 1000px) {
   .navbar {
     padding: 0.4rem; // 6.4px
-    padding-left: 1.5625rem; // 25px
-    padding-right: 1.5625rem; // 25px
+    padding-inline: var(--file-margins);
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -179,37 +225,13 @@ blockquote {
   }
 }
 
-// Search button: Slightly taller than default
-.search-button {
-  height: 2.3rem; // 36px
-}
-
-.filetree-sidebar {
-  max-width: var(--dg-filetree-width);
-
-  @media (max-width: 800px) {
-    h1 {
-      display: revert;
-    }
-  }
-}
-
-// Recent posts section on home page
-.recent-notes {
-  margin-top: 2rem;
-
-  ul {
-    list-style: none;
-    padding: 0;
+// We want customize how the site name font size reduces on mobile, so we override the default responsive here
+@media (max-width: 800px) {
+  .navbar .site-name-header {
+    font-size: 1.5rem !important; // 24px
   }
 
-  li {
-    margin-bottom: 1rem;
-  }
-
-  p {
-    margin: 0.25rem 0 0;
-    color: var(--text-faint);
-    font-size: 0.9rem;
+  .navbar .navbar-inner {
+    gap: 0.5rem; // 8px - reduce gap between logo and site name on mobile
   }
 }
