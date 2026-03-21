@@ -194,6 +194,23 @@ blockquote {
   }
 }
 
+.navbar .navbar-inner {
+  display: flex;
+  align-items: center;
+  flex-grow: 1;
+  flex-direction: row;
+  gap: 1rem; // 16px
+
+  svg.svg-icon {
+    width: 1.65rem; // 26.4px
+
+    path {
+      transform: scaleX(2.5);
+      transform-origin: right;
+    }
+  }
+}
+
 // Recent posts section on home page
 .recent-notes {
   margin-top: 2rem;
