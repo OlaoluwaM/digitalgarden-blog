@@ -143,8 +143,16 @@ blockquote {
 
 // We want customize how the site name font size reduces on mobile, so we override the default responsive here
 @media (max-width: 800px) {
+  .navbar {
+    padding-inline: 1.8125rem; // 29px
+  }
+
   .navbar .site-name-header {
     font-size: 1.5rem !important; // 24px
+  }
+
+  .navbar .navbar-inner {
+    gap: 0.5rem; // 8px - reduce gap between logo and site name on mobile
   }
 }
 
@@ -152,8 +160,7 @@ blockquote {
 @media (max-width: 1000px) {
   .navbar {
     padding: 0.4rem; // 6.4px
-    padding-left: 1.5625rem; // 25px
-    padding-right: 1.5625rem; // 25px
+    padding-inline: 1.5625rem; // 25px
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -199,7 +206,7 @@ blockquote {
   align-items: center;
   flex-grow: 1;
   flex-direction: row;
-  gap: 1rem; // 16px
+  gap: 2.05rem; // 40px
 
   svg.svg-icon {
     width: 1.65rem; // 26.4px
