@@ -31,9 +31,8 @@ pre.shiki {
     font-size: 0.75rem;
     cursor: pointer;
     opacity: 0;
-    visibility: hidden;
     pointer-events: none;
-    transition: opacity 150ms ease, visibility 150ms ease;
+    transition: opacity 150ms ease;
 
     &:hover {
       background: rgba(255, 255, 255, 0.2);
@@ -42,7 +41,6 @@ pre.shiki {
 
     &:focus-visible {
       opacity: 1;
-      visibility: visible;
       pointer-events: auto;
     }
   }
@@ -52,7 +50,6 @@ pre.shiki {
   &:focus-within {
     .copy-code-btn {
       opacity: 1;
-      visibility: visible;
       pointer-events: auto;
     }
 
