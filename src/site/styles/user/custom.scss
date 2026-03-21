@@ -246,7 +246,7 @@ blockquote {
 }
 
 // Fonts — Instrument family via Google Fonts
-// Wrapped in @media screen,print to match the theme's specificity
+// Wrapped in @media screen, print to scope these font overrides to visual media types
 @media screen, print {
   body {
     --heading-font: "Instrument Serif", serif;
@@ -257,12 +257,24 @@ blockquote {
     --h5-font: var(--heading-font);
     --h6-font: var(--heading-font);
     --inline-title-font: var(--heading-font);
+    --font-default:
+      "Instrument Sans", "Inter", ui-sans-serif, -apple-system,
+      BlinkMacSystemFont, system-ui, "Segoe UI", Roboto, sans-serif;
+    --font-text: var(--font-default);
+    --font-interface: var(--font-default);
+    --font-code:
+      "JetBrains Mono", ui-monospace, SFMono-Regular, "Cascadia Mono",
+      "Roboto Mono", monospace;
+    --font-monospace: var(--font-code);
   }
 
   .markdown-preview-view {
-    --font-text:
-      "Instrument Sans", "Inter", ui-sans-serif, -apple-system,
-      BlinkMacSystemFont, system-ui, "Segoe UI", Roboto, sans-serif;
-    --font-interface: var(--font-text);
+    --font-text: var(--font-default);
+    --font-interface: var(--font-default);
+  }
+
+  code[class*="language-"] {
+    --font-monospace: var(--font-code);
+    font-weight: 600;
   }
 }
