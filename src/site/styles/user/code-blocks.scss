@@ -48,16 +48,12 @@ pre.shiki {
     cursor: pointer;
     visibility: hidden;
     pointer-events: none;
-    transition: opacity 150ms ease, visibility 150ms ease;
+    transition:
+      opacity 150ms ease,
+      visibility 150ms ease;
 
     &:hover {
       background: color-mix(in srgb, currentColor 20%, transparent);
-    }
-
-    &:focus-visible {
-      opacity: 1;
-      visibility: visible;
-      pointer-events: auto;
     }
 
     &:focus-visible {
