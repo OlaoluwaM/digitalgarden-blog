@@ -31,12 +31,12 @@
 
     window.addEventListener("load", () => {
         document.querySelectorAll("pre.shiki").forEach((pre) => {
-            const code = pre.querySelector("code");
             const btn = document.createElement("button");
             btn.className = "copy-code-btn";
             btn.type = "button";
             btn.textContent = "Copy";
             btn.addEventListener("click", async () => {
+                const code = pre.querySelector("code");
                 const originalText = btn.textContent;
                 const success = await copyTextToClipboard(code.textContent);
                 if (success) {
