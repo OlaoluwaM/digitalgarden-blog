@@ -244,3 +244,25 @@ blockquote {
     gap: 0.5rem; // 8px - reduce gap between logo and site name on mobile
   }
 }
+
+// Fonts — Instrument family via Google Fonts
+// Wrapped in @media screen,print to match the theme's specificity
+@media screen, print {
+  body {
+    --heading-font: "Instrument Serif", serif;
+    --h1-font: var(--heading-font);
+    --h2-font: var(--heading-font);
+    --h3-font: var(--heading-font);
+    --h4-font: var(--heading-font);
+    --h5-font: var(--heading-font);
+    --h6-font: var(--heading-font);
+    --inline-title-font: var(--heading-font);
+  }
+
+  .markdown-preview-view {
+    --font-text:
+      "Instrument Sans", "Inter", ui-sans-serif, -apple-system,
+      BlinkMacSystemFont, system-ui, "Segoe UI", Roboto, sans-serif;
+    --font-interface: var(--font-text);
+  }
+}
