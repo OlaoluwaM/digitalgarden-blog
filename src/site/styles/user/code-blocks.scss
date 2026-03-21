@@ -1,0 +1,74 @@
+// Code block enhancements: language label + copy button
+
+pre.shiki {
+  position: relative;
+  padding: 1rem 1rem 1rem 2.25rem;
+  border-radius: 8px;
+  overflow-x: auto;
+
+  // Line numbers
+  .line {
+    &::before {
+      content: attr(data-line);
+      display: inline-block;
+      width: 2rem;
+      margin-left: -2.5rem;
+      margin-right: 0.5rem;
+      text-align: right;
+      color: inherit;
+      opacity: 0.3;
+    }
+  }
+
+  // Language label (top-right)
+  &[data-language]::before {
+    content: attr(data-language);
+    position: absolute;
+    top: 0.5rem;
+    right: 0.75rem;
+    font-size: 0.75rem;
+    color: inherit;
+    opacity: 0.5;
+    text-transform: capitalize;
+    pointer-events: none;
+  }
+
+  // Copy button
+  .copy-code-btn {
+    position: absolute;
+    top: 0.4rem;
+    right: 0.5rem;
+    padding: 0.25rem 0.5rem;
+    border: none;
+    border-radius: 4px;
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    color: inherit;
+    opacity: 0;
+    font-size: 0.75rem;
+    cursor: pointer;
+    pointer-events: none;
+    transition: opacity 150ms ease;
+
+    &:hover {
+      background: color-mix(in srgb, currentColor 10%, transparent);
+    }
+
+    &:focus-visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+  }
+
+  // Show copy button on hover or focus, hide language label
+  &:hover,
+  &:focus-within {
+    .copy-code-btn {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    &[data-language]::before {
+      opacity: 0;
+    }
+  }
+}

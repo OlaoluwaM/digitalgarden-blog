@@ -4,6 +4,9 @@ body.markdown-preview-view {
 
 .markdown-rendered code {
   white-space: nowrap; // Prevent code blocks from wrapping
+  // Necessary with shiki. Shiki makes inline code blocks look weird without this
+  padding: 0.25rem 0.4rem;
+  border-radius: 6px;
 }
 
 // --- Grayish accent, link, and selection colors (dark theme only) ---
@@ -120,6 +123,12 @@ body {
   --dg-transclusion-padding: 0.5rem; // 8px
   --dg-external-link-icon-size: 0.8125em; // 13px — em to scale with text
   --dg-external-link-padding: 1rem; // 16px
+}
+
+// Restore keyboard focus indicators (obsidian-base.scss blankets :focus { outline: none })
+:focus-visible {
+  outline: 2px solid var(--text-accent, #999);
+  outline-offset: 0.3rem;
 }
 
 // style.scss overrides (that file says "DO NOT MODIFY")

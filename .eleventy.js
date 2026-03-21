@@ -8,7 +8,7 @@ const { parse } = require("node-html-parser");
 const htmlMinifier = require("html-minifier-terser");
 const pluginRss = require("@11ty/eleventy-plugin-rss");
 
-const { headerToId, namedHeadingsFilter } = require("./src/helpers/utils");
+const { headerToId, namedHeadingsFilter, toTitleCase } = require("./src/helpers/utils");
 const {
   userMarkdownSetup,
   userEleventySetup,
@@ -97,9 +97,27 @@ function getAnchorAttributes(filePath, linkTitle) {
 const tagRegex = /(^|\s|\>)(#[^\s!@#$%^&*()=+\.,\[{\]};:'"?><]+)(?!([^<]*>))/g;
 
 const markdownFileTypeRegex = /\.(md|markdown)$/i;
+const shikiTheme = "dark-plus";
 const isMarkdownPage = (inputPath) => inputPath && inputPath.match(markdownFileTypeRegex);
 
-module.exports = function(eleventyConfig) {
+module.exports = async function(eleventyConfig) {
+  // Shiki (ESM-only) — dynamic import in CJS
+  const { createHighlighter, bundledLanguages } = await import("shiki");
+  const { fromHighlighter } = await import("@shikijs/markdown-it");
+
+  const curatedLangs = [
+    "bash", "c", "cpp", "css", "diff", "docker", "go", "haskell", "html",
+    "java", "javascript", "json", "jsx", "kotlin", "lua", "markdown",
+    "nix", "plaintext", "powershell", "python", "rust", "scala", "scss",
+    "shell", "sql", "svelte", "swift", "toml", "tsx", "typescript",
+    "vue", "xml", "yaml",
+  ].filter(l => l in bundledLanguages);
+
+  const shikiHighlighter = await createHighlighter({
+    themes: [shikiTheme],
+    langs: curatedLangs,
+  });
+
   eleventyConfig.setLiquidOptions({
     dynamicPartials: true,
   });
@@ -140,6 +158,24 @@ module.exports = function(eleventyConfig) {
       closeMarker: "```",
     })
     .use(namedHeadingsFilter)
+    .use(fromHighlighter(shikiHighlighter, {
+      theme: shikiTheme,
+      transformers: [
+        {
+          // Add data-language attribute for the CSS language label
+          pre(node) {
+            const lang = this.options.lang;
+            if (lang) {
+              node.properties["data-language"] = lang;
+            }
+          },
+          // Add line number data attributes for CSS counter styling
+          line(node, line) {
+            node.properties["data-line"] = line;
+          },
+        },
+      ],
+    }))
     .use(function(md) {
       //https://github.com/DCsunset/markdown-it-mermaid-plugin
       const origFenceRule =
@@ -169,9 +205,10 @@ module.exports = function(eleventyConfig) {
           let nbLinesToSkip = 0
           for (let i = 0; i < 4; i++) {
             if (parts[i] && parts[i].trim()) {
-              let line = parts[i] && parts[i].trim().toLowerCase()
+              let raw = parts[i].trim()
+              let line = raw.toLowerCase()
               if (line.startsWith("title:")) {
-                titleLine = line.substring(6);
+                titleLine = raw.substring(6);
                 nbLinesToSkip++;
               } else if (line.startsWith("icon:")) {
                 icon = line.substring(5);
@@ -194,10 +231,11 @@ module.exports = function(eleventyConfig) {
               <polyline points="6 9 12 15 18 9"></polyline>
           </svg>
           </div>` : "";
-          const titleDiv = titleLine
-            ? `<div class="callout-title"><div class="callout-title-inner">${titleLine}</div>${foldDiv}</div>`
-            : "";
-          let collapseClasses = titleLine && collapsible ? 'is-collapsible' : ''
+          const calloutType = token.info.substring(3);
+          const defaultTitle = toTitleCase(calloutType);
+          const titleText = titleLine || defaultTitle;
+          const titleDiv = `<div class="callout-title"><div class="callout-title-inner">${titleText}</div>${foldDiv}</div>`;
+          let collapseClasses = collapsible ? 'is-collapsible' : ''
           if (collapsible && collapsed) {
             collapseClasses += " is-collapsed"
           }
@@ -424,9 +462,7 @@ module.exports = function(eleventyConfig) {
           isCollapsed = collapse === "-";
           const titleText = title.replace(/(<\/{0,1}\w+>)/, "")
             ? title
-            : `${callout.charAt(0).toUpperCase()}${callout
-              .substring(1)
-              .toLowerCase()}`;
+            : toTitleCase(callout);
           const fold = isCollapsable
             ? `<div class="callout-fold"><i icon-name="chevron-down"></i></div>`
             : ``;
