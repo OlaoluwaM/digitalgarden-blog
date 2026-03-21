@@ -49,7 +49,8 @@ const CALLOUT_TITLE_OVERRIDES = {
 };
 
 function toTitleCase(str) {
-    if (CALLOUT_TITLE_OVERRIDES[str]) return CALLOUT_TITLE_OVERRIDES[str];
+    const override = CALLOUT_TITLE_OVERRIDES[str.toLowerCase()];
+    if (override) return override;
     return str.replace(/-/g, " ").replace(/\w\S*/g, (word) =>
         word.charAt(0).toUpperCase() + word.substring(1).toLowerCase()
     );

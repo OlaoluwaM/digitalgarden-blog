@@ -105,9 +105,17 @@ module.exports = async function(eleventyConfig) {
   const { createHighlighter, bundledLanguages } = await import("shiki");
   const { fromHighlighter } = await import("@shikijs/markdown-it");
 
+  const curatedLangs = [
+    "bash", "c", "cpp", "css", "diff", "docker", "go", "haskell", "html",
+    "java", "javascript", "json", "jsx", "kotlin", "lua", "markdown",
+    "nix", "plaintext", "powershell", "python", "rust", "scala", "scss",
+    "shell", "sql", "svelte", "swift", "toml", "tsx", "typescript",
+    "vue", "xml", "yaml",
+  ].filter(l => l in bundledLanguages);
+
   const shikiHighlighter = await createHighlighter({
     themes: [shikiTheme],
-    langs: Object.keys(bundledLanguages),
+    langs: curatedLangs,
   });
 
   eleventyConfig.setLiquidOptions({
@@ -156,8 +164,10 @@ module.exports = async function(eleventyConfig) {
         {
           // Add data-language attribute for the CSS language label
           pre(node) {
-            const lang = this.options.lang || "";
-            node.properties["data-language"] = lang;
+            const lang = this.options.lang;
+            if (lang) {
+              node.properties["data-language"] = lang;
+            }
           },
         },
       ],

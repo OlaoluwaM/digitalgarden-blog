@@ -31,18 +31,29 @@ pre.shiki {
     font-size: 0.75rem;
     cursor: pointer;
     opacity: 0;
-    transition: opacity 150ms ease;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 150ms ease, visibility 150ms ease;
 
     &:hover {
       background: rgba(255, 255, 255, 0.2);
       color: var(--text-normal, rgba(255, 255, 255, 0.8));
     }
+
+    &:focus-visible {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
   }
 
-  // Show copy button on hover, hide language label
-  &:hover {
+  // Show copy button on hover or focus, hide language label
+  &:hover,
+  &:focus-within {
     .copy-code-btn {
       opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
     }
 
     &[data-language]::before {

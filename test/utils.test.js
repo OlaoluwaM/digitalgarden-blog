@@ -15,6 +15,10 @@ describe("toTitleCase", () => {
     assert.equal(toTitleCase("ai-text"), "AI Text");
   });
 
+  it("uses the override for AI-TEXT (case-insensitive lookup)", () => {
+    assert.equal(toTitleCase("AI-TEXT"), "AI Text");
+  });
+
   it("lowercases non-initial letters", () => {
     assert.equal(toTitleCase("WARNING"), "Warning");
   });
