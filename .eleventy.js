@@ -97,9 +97,19 @@ function getAnchorAttributes(filePath, linkTitle) {
 const tagRegex = /(^|\s|\>)(#[^\s!@#$%^&*()=+\.,\[{\]};:'"?><]+)(?!([^<]*>))/g;
 
 const markdownFileTypeRegex = /\.(md|markdown)$/i;
+const shikiTheme = "dark-plus";
 const isMarkdownPage = (inputPath) => inputPath && inputPath.match(markdownFileTypeRegex);
 
-module.exports = function(eleventyConfig) {
+module.exports = async function(eleventyConfig) {
+  // Shiki (ESM-only) — dynamic import in CJS
+  const { createHighlighter, bundledLanguages } = await import("shiki");
+  const { fromHighlighter } = await import("@shikijs/markdown-it");
+
+  const shikiHighlighter = await createHighlighter({
+    themes: [shikiTheme],
+    langs: Object.keys(bundledLanguages),
+  });
+
   eleventyConfig.setLiquidOptions({
     dynamicPartials: true,
   });
@@ -140,6 +150,18 @@ module.exports = function(eleventyConfig) {
       closeMarker: "```",
     })
     .use(namedHeadingsFilter)
+    .use(fromHighlighter(shikiHighlighter, {
+      theme: shikiTheme,
+      transformers: [
+        {
+          // Add data-language attribute for the CSS language label
+          pre(node) {
+            const lang = this.options.lang || "";
+            node.properties["data-language"] = lang;
+          },
+        },
+      ],
+    }))
     .use(function(md) {
       //https://github.com/DCsunset/markdown-it-mermaid-plugin
       const origFenceRule =
