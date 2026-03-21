@@ -205,8 +205,10 @@ blockquote {
     width: 1.65rem; // 26.4px
 
     path {
-      transform: scaleX(2.5);
-      transform-origin: right;
+      transform: scaleX(
+        2.2
+      ); // Stretch the hamburger icon horizontally to make it more visible on mobile
+      transform-origin: right; // Keep the right edge of the icon anchored in place while stretching
     }
   }
 }
