@@ -141,51 +141,6 @@ blockquote {
   padding: 0.5em 0.625rem; // 0.5em 10px
 }
 
-// We want customize how the site name font size reduces on mobile, so we override the default responsive here
-@media (max-width: 800px) {
-  .navbar {
-    padding-inline: 1.8125rem; // 29px
-  }
-
-  .navbar .site-name-header {
-    font-size: 1.5rem !important; // 24px
-  }
-
-  .navbar .navbar-inner {
-    gap: 0.5rem; // 8px - reduce gap between logo and site name on mobile
-  }
-}
-
-// Navbar: symmetric padding on mobile (when hamburger menu is shown)
-@media (max-width: 1000px) {
-  .navbar {
-    padding: 0.4rem; // 6.4px
-    padding-inline: 1.5625rem; // 25px
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-
-    .search-button {
-      margin-left: 0;
-      margin-right: 0;
-      flex-grow: 0.035; // Keep search button small and prevent it from taking up too much space on mobile
-    }
-    .navbar-inner > span {
-      margin-right: 0;
-    }
-
-    .navbar-inner a {
-      flex-grow: 1;
-      text-align: left;
-
-      .site-name-header {
-        font-size: 2rem;
-      }
-    }
-  }
-}
-
 // Search button: Slightly taller than default
 .search-button {
   height: 2.3rem; // 36px
@@ -237,5 +192,50 @@ blockquote {
     margin: 0.25rem 0 0;
     color: var(--text-faint);
     font-size: 0.9rem;
+  }
+}
+
+// Navbar: symmetric padding on mobile (when hamburger menu is shown)
+@media (max-width: 1000px) {
+  .navbar {
+    padding: 0.4rem; // 6.4px
+    padding-inline: 1.5625rem; // 25px
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
+    .search-button {
+      margin-left: 0;
+      margin-right: 0;
+      flex-grow: 0.035; // Keep search button small and prevent it from taking up too much space on mobile
+    }
+    .navbar-inner > span {
+      margin-right: 0;
+    }
+
+    .navbar-inner a {
+      flex-grow: 1;
+      text-align: left;
+
+      .site-name-header {
+        font-size: 2rem;
+      }
+    }
+  }
+}
+
+// We want customize how the site name font size reduces on mobile, so we override the default responsive here
+@media (max-width: 800px) {
+  .navbar {
+    padding-inline: 1.8125rem; // 29px
+  }
+
+  .navbar .site-name-header {
+    font-size: 1.5rem !important; // 24px
+  }
+
+  .navbar .navbar-inner {
+    gap: 0.5rem; // 8px - reduce gap between logo and site name on mobile
   }
 }
