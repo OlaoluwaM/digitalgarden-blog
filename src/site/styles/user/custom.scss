@@ -141,6 +141,59 @@ blockquote {
   padding: 0.5em 0.625rem; // 0.5em 10px
 }
 
+// We want customize how the site name font size reduces on mobile, so we override the default responsive here
+@media (max-width: 800px) {
+  .navbar .site-name-header {
+    font-size: 1.5rem !important; // 24px
+  }
+}
+
+// Navbar: symmetric padding on mobile (when hamburger menu is shown)
+@media (max-width: 1000px) {
+  .navbar {
+    padding: 0.4rem; // 6.4px
+    padding-left: 1.5625rem; // 25px
+    padding-right: 1.5625rem; // 25px
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
+    .search-button {
+      margin-left: 0;
+      margin-right: 0;
+      flex-grow: 0.035; // Keep search button small and prevent it from taking up too much space on mobile
+    }
+    .navbar-inner > span {
+      margin-right: 0;
+    }
+
+    .navbar-inner a {
+      flex-grow: 1;
+      text-align: left;
+
+      .site-name-header {
+        font-size: 2rem;
+      }
+    }
+  }
+}
+
+// Search button: Slightly taller than default
+.search-button {
+  height: 2.3rem; // 36px
+}
+
+.filetree-sidebar {
+  max-width: var(--dg-filetree-width);
+
+  @media (max-width: 800px) {
+    h1 {
+      display: revert;
+    }
+  }
+}
+
 // Recent posts section on home page
 .recent-notes {
   margin-top: 2rem;
