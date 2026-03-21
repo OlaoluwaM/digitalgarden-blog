@@ -169,6 +169,10 @@ module.exports = async function(eleventyConfig) {
               node.properties["data-language"] = lang;
             }
           },
+          // Add line number data attributes for CSS counter styling
+          line(node, line) {
+            node.properties["data-line"] = line;
+          },
         },
       ],
     }))

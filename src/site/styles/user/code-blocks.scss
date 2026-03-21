@@ -2,9 +2,23 @@
 
 pre.shiki {
   position: relative;
-  padding: 1rem;
+  padding: 1rem 1rem 1rem 2.25rem;
   border-radius: 8px;
   overflow-x: auto;
+
+  // Line numbers
+  .line {
+    &::before {
+      content: attr(data-line);
+      display: inline-block;
+      width: 2rem;
+      margin-left: -2.5rem;
+      margin-right: 0.5rem;
+      text-align: right;
+      color: inherit;
+      opacity: 0.3;
+    }
+  }
 
   // Language label (top-right)
   &[data-language]::before {
@@ -13,7 +27,8 @@ pre.shiki {
     top: 0.5rem;
     right: 0.75rem;
     font-size: 0.75rem;
-    color: var(--text-muted, rgba(255, 255, 255, 0.5));
+    color: inherit;
+    opacity: 0.5;
     text-transform: capitalize;
     pointer-events: none;
   }
@@ -26,18 +41,23 @@ pre.shiki {
     padding: 0.25rem 0.5rem;
     border: none;
     border-radius: 4px;
-    background: rgba(255, 255, 255, 0.1);
-    color: var(--text-muted, rgba(255, 255, 255, 0.5));
+    background: color-mix(in srgb, currentColor 10%, transparent);
+    color: inherit;
+    opacity: 0;
     font-size: 0.75rem;
     cursor: pointer;
-    opacity: 0;
     visibility: hidden;
     pointer-events: none;
     transition: opacity 150ms ease, visibility 150ms ease;
 
     &:hover {
-      background: rgba(255, 255, 255, 0.2);
-      color: var(--text-normal, rgba(255, 255, 255, 0.8));
+      background: color-mix(in srgb, currentColor 20%, transparent);
+    }
+
+    &:focus-visible {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
     }
 
     &:focus-visible {

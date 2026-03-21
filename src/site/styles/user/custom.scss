@@ -4,6 +4,9 @@ body.markdown-preview-view {
 
 .markdown-rendered code {
   white-space: nowrap; // Prevent code blocks from wrapping
+  // Necessary with shiki. Shiki makes inline code blocks look weird without this
+  padding: 0.25rem 0.4rem;
+  border-radius: 6px;
 }
 
 // --- Grayish accent, link, and selection colors (dark theme only) ---
