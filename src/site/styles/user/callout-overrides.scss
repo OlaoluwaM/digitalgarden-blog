@@ -1,5 +1,10 @@
 // Callout structural overrides (not auto-generated — safe to edit manually).
 
+// Prevent spurious vertical scrollbars on text-heavy callouts.
+.callout-content {
+  overflow-y: hidden;
+}
+
 // Scale icons to match title text size (Lucide defaults to 24x24)
 .callout-icon svg {
   width: 1em;
