@@ -1,0 +1,12 @@
+// Callout structural overrides (not auto-generated — safe to edit manually).
+
+// Scale icons to match title text size (Lucide defaults to 24x24)
+.callout-icon svg {
+  width: 1em;
+  height: 1em;
+}
+
+// Add breathing room when a callout is the first child inside another callout's content
+.callout .callout-content > .callout:first-child {
+  margin-top: 1.2em;
+}

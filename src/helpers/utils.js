@@ -44,8 +44,20 @@ function setAttr(token, attr, value, options) {
 }
 
 //https://github.com/rstacruz/markdown-it-named-headings/blob/master/index.js
+const CALLOUT_TITLE_OVERRIDES = {
+    "ai-text": "AI Text",
+};
+
+function toTitleCase(str) {
+    if (CALLOUT_TITLE_OVERRIDES[str]) return CALLOUT_TITLE_OVERRIDES[str];
+    return str.replace(/-/g, " ").replace(/\w\S*/g, (word) =>
+        word.charAt(0).toUpperCase() + word.substring(1).toLowerCase()
+    );
+}
+
 exports.namedHeadingsFilter = function (md, options) {
     md.core.ruler.push('named_headings', namedHeadings.bind(null, md));
 }
 
 exports.headerToId = headerToId;
+exports.toTitleCase = toTitleCase;
