@@ -228,7 +228,7 @@ blockquote {
 // We want customize how the site name font size reduces on mobile, so we override the default responsive here
 @media (max-width: 800px) {
   .navbar {
-    padding-inline: 1.8125rem; // 29px
+    padding-inline: 1.95rem; // 31.2px
   }
 
   .navbar .site-name-header {
