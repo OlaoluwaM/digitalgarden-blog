@@ -6,7 +6,7 @@ Markdown notes from an Obsidian vault are compiled into a static site with wiki-
 
 ## Setup
 
-Requires **Node 22.x**.
+Requires **Node 24.x**.
 
 ```sh
 npm install
