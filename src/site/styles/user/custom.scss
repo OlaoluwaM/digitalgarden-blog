@@ -1,3 +1,5 @@
+@use "../fonts.scss";
+
 body.markdown-preview-view {
   height: 100%; // Ensure the preview view takes up the full height of the container and not fit-content
 }
@@ -245,7 +247,7 @@ blockquote {
   }
 }
 
-// Fonts — Instrument family via Google Fonts
+// Fonts (defined in fonts.scss) Fonts are self-hosted
 // Wrapped in @media screen, print to scope these font overrides to visual media types
 // A bit of a mess but covers all basis for the various ways fonts can be applied in the theme and Obsidian (headings, body text, code blocks, interface elements, markdown preview, etc.)
 @media screen, print {
@@ -264,20 +266,26 @@ blockquote {
       BlinkMacSystemFont, system-ui, "Segoe UI", Roboto, sans-serif;
     --font-text: var(--font-default);
     --font-interface: var(--font-default);
+    --font-text-theme: var(--font-default);
+    --font-interface-theme: var(--font-default);
 
     --font-code:
       "JetBrains Mono", ui-monospace, SFMono-Regular, "Cascadia Mono",
       "Roboto Mono", monospace;
     --font-monospace: var(--font-code);
+    --font-monospace-theme: var(--font-code);
   }
 
   .markdown-preview-view {
     --font-text: var(--font-default);
     --font-interface: var(--font-default);
+    --font-text-theme: var(--font-default);
+    --font-interface-theme: var(--font-default);
   }
 
   code[class*="language-"] {
     --font-monospace: var(--font-code);
+    --font-monospace-theme: var(--font-code);
     font-weight: 600;
   }
 }

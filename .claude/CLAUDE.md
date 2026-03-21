@@ -46,13 +46,27 @@ src/site/notes/*.md → gray-matter frontmatter → markdown-it (11 plugins) →
 SCSS compiled to `dist/styles/`. The core compiled bundle always includes:
 - `digital-garden-base.scss` — Framework base
 - `custom-style.scss` — User customization
-- `user/custom.scss` — Site-specific overrides
+- `user/custom.scss` — Site-specific overrides (imports `fonts.scss` via `@use`)
+
+**Dynamic styles:** All `.scss` files in `src/site/styles/user/` are auto-discovered by `src/site/_data/dynamics.js` and loaded as separate `<link>` tags in `pageheader.njk`. Files loaded via `@use` from another stylesheet (like `fonts.scss`) should live outside `user/` to avoid double-loading.
 
 Obsidian theme compatibility and the theme CSS are **conditional**:
 - `obsidian-base.scss` and the generated `_theme.*.css` are only linked in `pageheader.njk` when `meta.themeStyle` is present.
 - `meta.themeStyle` is set only when `THEME` is configured in `.env` and `npm run get-theme` (or the build scripts that invoke it) successfully fetch the remote theme CSS and write `src/site/styles/_theme.*.css`. The fetched theme defines 60+ CSS custom properties for theming.
+- The theme wraps its variable declarations in `@media screen, print { body { ... } }`. To override theme variables (especially fonts), use the same `@media screen, print` wrapper for equal specificity — last-loaded wins.
 
 Custom color overrides live in `user/custom.scss` inside a `.theme-dark { ... }` block — they use theme variables such as `var(--color-base-60)` / `var(--color-base-70)` for accent and link states (with `#999`/`#b3b3b3` as fallbacks), and `rgba(153,153,153,0.3)` for text selection, tuned for WCAG AA contrast on the dark background.
+
+### Fonts
+
+Self-hosted variable WOFF2 fonts in `src/site/fonts/` (copied to `dist/fonts/` via Eleventy passthrough):
+- **Instrument Serif** (400) — Headings (h1–h6, inline title)
+- **Instrument Sans** (400–700) — Body text, interface
+- **JetBrains Mono** (100–800) — Code blocks
+
+`@font-face` declarations live in `src/site/styles/fonts.scss`, imported by `custom.scss` via `@use`. Font variable overrides (the `--h*-font`, `--font-text`, `--font-monospace` etc. mappings) are in `custom.scss` inside a `@media screen, print` block to override theme defaults.
+
+The Obsidian theme's font variable chain is: `--font-text-override` → `--font-text-theme` → `--font-default` → `--font-text`. To ensure custom fonts take priority, override `--font-text` and `--font-text-theme` directly rather than just `--font-text-override`.
 
 ### Wiki-Link Resolution
 
