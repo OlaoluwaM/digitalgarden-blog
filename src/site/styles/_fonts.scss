@@ -1,4 +1,5 @@
 // Self-hosted Instrument Sans, Instrument Serif, and JetBrains Mono (Latin, WOFF2)
+// Partial (_) so it's only loaded via @use in custom.scss, not auto-discovered by dynamics.js which would double-load it as a separate <link> tag.
 
 @font-face {
   font-family: "Instrument Sans";
