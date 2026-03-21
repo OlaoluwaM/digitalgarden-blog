@@ -42,6 +42,10 @@
             btn.textContent = "Copy";
             btn.addEventListener("click", async () => {
                 const code = pre.querySelector("code");
+                if (!code || code === "") {
+                    btn.textContent = "No code"
+                    return;
+                }
                 const originalText = btn.textContent;
                 const success = await copyTextToClipboard(code.textContent);
                 if (success) {
