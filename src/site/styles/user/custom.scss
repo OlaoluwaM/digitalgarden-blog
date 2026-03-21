@@ -258,11 +258,13 @@ blockquote {
     --h5-font: var(--heading-font);
     --h6-font: var(--heading-font);
     --inline-title-font: var(--heading-font);
+
     --font-default:
       "Instrument Sans", "Inter", ui-sans-serif, -apple-system,
       BlinkMacSystemFont, system-ui, "Segoe UI", Roboto, sans-serif;
     --font-text: var(--font-default);
     --font-interface: var(--font-default);
+
     --font-code:
       "JetBrains Mono", ui-monospace, SFMono-Regular, "Cascadia Mono",
       "Roboto Mono", monospace;
