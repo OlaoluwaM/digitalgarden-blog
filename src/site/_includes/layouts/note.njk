@@ -15,7 +15,7 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
   </head>
   <body class="theme-{{meta.baseTheme}} markdown-preview-view markdown-rendered markdown-preview-section {% if settings.dgShowFileTree !== true %}no-filetree{% endif %} {% if settings.dgHomeLink === true and settings.dgShowFileTree !== true %}has-navbar{% endif %} {{meta.bodyClasses}}">
     {%include "components/notegrowthhistory.njk"%}
-    
+
     {% if settings.dgShowFileTree !== true %}
       {%include "components/navbar.njk"%}
     {%else%}
@@ -68,6 +68,11 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
         {% include imp %}
       {% endfor %}
       {{ content | hideDataview | taggify | link | safe}}
+      {% if 'gardenEntry' not in tags %}
+      <footer class="post-cta">
+        <p>That's all folks, now go do stuff!! If you like what you see, feel free to connect with me on <a href="https://www.linkedin.com/in/olaoluwam/" target="_blank" rel="noopener noreferrer">LinkedIn</a> or follow me on <a href="https://x.com/ola_musta" target="_blank" rel="noopener noreferrer">X</a> or <a href="https://bsky.app/profile/olamusta.bsky.social" target="_blank" rel="noopener noreferrer">Bluesky</a>. I also stream on <a href="https://www.twitch.tv/ola_musta" target="_blank" rel="noopener noreferrer">Twitch</a> and <a href="https://www.youtube.com/@ola_musta" target="_blank" rel="noopener noreferrer">Youtube</a> sometimes, so stop by when you can!</p>
+      </footer>
+      {% endif %}
       {% for imp in dynamics.common.afterContent %}
         {% include imp %}
       {% endfor %}
