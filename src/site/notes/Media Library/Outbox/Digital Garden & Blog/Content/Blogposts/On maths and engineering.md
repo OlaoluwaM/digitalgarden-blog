@@ -1,5 +1,5 @@
 ---
-{"dg-publish":true,"dg-path":" Posts/On maths and engineering.md","permalink":"/posts/on-maths-and-engineering/","metatags":{"description":"Computer science is applied maths or some such"},"tags":["computer-science","mathematics"],"created":"2026-03-22T12:59:19.926-05:00","updated":"2026-03-22T12:59:55.804-05:00"}
+{"dg-publish":true,"dg-path":" Posts/On maths and engineering.md","permalink":"/posts/on-maths-and-engineering/","metatags":{"description":"Computer science is applied maths or some such"},"tags":["computer-science","mathematics"],"created":"2026-03-22T12:59:19.926-05:00","updated":"2026-03-22T14:55:34.803-05:00"}
 ---
 
 
@@ -40,7 +40,7 @@ Some scrutiny suggests that the invariant we care about here is that "$p$ always
 - At termination, that is, when $i = 0$, $p = a_n*x^{n} + a_{n-1}*x^{n-1} + a_{n-2}*x^{n-2} + a_{n-3}*x^{n-3} + \ldots + a_0$. This is equivalent to our invariant, so the invariant holds all through.
 
 ```ad-aside
-Note that $a_i$ is the last term since only after the last iteration is its value fixed at 0. Using it as the index in any other term wouldn't be correct once we start adding more terms. So, on the first iteration, $a_n*x + a_i$ is correct because on the first iteration $i = n - 1$. However, it would be incorrect to say $p = a_n*x^2 + a_i*x^1 + a_{i - 1}$ for the second iteration because now $i = n - 1 - 1$, so the indexes for the second and third terms of our polynomial would be wrong. Instead we want to reference $n$ directly somehow, since $n$'s value never changes with each iteration.
+Note that $a_i$ is the last term since only after the last iteration is $i$ fixed at 0. Using it as the index in any other term wouldn't be correct once we start adding more terms. So, on the first iteration, $a_n*x + a_i$ is correct because on the first iteration $i = n - 1$. However, it would be incorrect to say $p = a_n*x^2 + a_i*x^1 + a_{i - 1}$ for the second iteration because now $i = n - 1 - 1$, so the indexes for the second and third terms of our polynomial would be wrong. Instead we want to reference $n$ directly somehow, since $n$'s value never changes with each iteration.
 ```
 `````
 
