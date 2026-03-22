@@ -26,6 +26,14 @@ body.markdown-preview-view {
   --link-external-color: var(--color-base-60, #999);
   --link-external-color-hover: var(--color-base-70, #b3b3b3);
   --text-selection: rgba(153, 153, 153, 0.3);
+
+  // Tags — override the purple-tinted accent-hsl defaults to match the gray scheme
+  --tag-background: rgba(153, 153, 153, 0.1);
+  --tag-background-hover: rgba(153, 153, 153, 0.15);
+  --tag-border-color: rgba(153, 153, 153, 0.2);
+  --tag-border-color-hover: rgba(153, 153, 153, 0.3);
+  --tag-color: var(--color-base-60, #999);
+  --tag-color-hover: var(--color-base-70, #b3b3b3);
 }
 
 // --- Responsive font sizes & spacing (px → rem) ---
@@ -205,6 +213,18 @@ blockquote {
         color: var(--text-normal);
       }
     }
+  }
+}
+
+.header-tags {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+
+  a.tag {
+    --tag-border-width: 1.8px;
+    --tag-radius: 0.4rem;
   }
 }
 
