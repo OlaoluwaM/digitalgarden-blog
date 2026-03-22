@@ -20,15 +20,43 @@
             }
         });
 
+        // Auto-make top-level callouts collapsible (nested callouts use explicit +/- syntax)
+        document.querySelectorAll(".callout").forEach((elem) => {
+            const hasCalloutAncestor = elem.parentElement && elem.parentElement.closest(".callout");
+            // Only auto-add collapse to top-level callouts — nested ones require explicit opt-in via +/- in the Obsidian source.
+            // Skip any already marked is-collapsible, since the build-time transform adds that class when +/- is present.
+            if (!hasCalloutAncestor && !elem.classList.contains("is-collapsible")) {
+                elem.classList.add("is-collapsible");
+                const calloutTitle = elem.querySelector(".callout-title");
+                if (calloutTitle) {
+                    const fold = document.createElement("div");
+                    fold.className = "callout-fold";
+                    const icon = document.createElement("i");
+                    icon.setAttribute("data-lucide", "chevron-down");
+                    fold.appendChild(icon);
+                    calloutTitle.appendChild(fold);
+                }
+            }
+        });
+
         lucide.createIcons();
 
         // Collapse callouts
         Array.from(document.querySelectorAll(".callout.is-collapsible")).forEach((elem) => {
-            elem.querySelector('.callout-title').addEventListener("click", (event) => {
-                if (elem.classList.contains("is-collapsed")) {
-                    elem.classList.remove("is-collapsed");
-                } else {
-                    elem.classList.add("is-collapsed");
+            const title = elem.querySelector('.callout-title');
+            if (!title) return;
+            title.setAttribute("tabindex", "0");
+            title.setAttribute("role", "button");
+
+            function toggle() {
+                elem.classList.toggle("is-collapsed");
+            }
+
+            title.addEventListener("click", toggle);
+            title.addEventListener("keydown", (event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    toggle();
                 }
             });
         });

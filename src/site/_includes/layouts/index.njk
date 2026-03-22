@@ -31,9 +31,9 @@
           <div class="header-tags">
             {% for tag in tags %}
               {% if tag != 'gardenEntry' and tag !='note' %}
-                <a class="tag" onclick="toggleTagSearch(this)">
+                <button class="tag" onclick="toggleTagSearch(this)">
                   #{{tag}}
-                </a>
+                </button>
               {% endif %}
             {% endfor %}
           </div>

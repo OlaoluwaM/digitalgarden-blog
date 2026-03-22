@@ -5,6 +5,11 @@
   overflow-y: hidden;
 }
 
+// style.scss sets cursor: default on collapsible titles — override so the whole title is clickable.
+.callout.is-collapsible .callout-title {
+  cursor: pointer;
+}
+
 // Scale icons to match title text size (Lucide defaults to 24x24)
 .callout-icon svg {
   width: 1em;
