@@ -31,7 +31,7 @@
           <div class="header-tags">
             {% for tag in tags %}
               {% if tag != 'gardenEntry' and tag !='note' %}
-                <a class="tag" onclick="toggleTagSearch(this)">
+                <a class="tag" role="button" tabindex="0" onclick="toggleTagSearch(this)">
                   #{{tag}}
                 </a>
               {% endif %}
