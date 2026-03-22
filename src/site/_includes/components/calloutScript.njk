@@ -21,8 +21,11 @@
         });
 
         // Auto-make top-level callouts collapsible (nested callouts use explicit +/- syntax)
-        document.querySelectorAll(".callout:not(.callout .callout)").forEach((elem) => {
-            if (!elem.classList.contains("is-collapsible")) {
+        document.querySelectorAll(".callout").forEach((elem) => {
+            const hasCalloutAncestor = elem.parentElement && elem.parentElement.closest(".callout");
+            // Only auto-add collapse to top-level callouts — nested ones require explicit opt-in via +/- in the Obsidian source.
+            // Skip any already marked is-collapsible, since the build-time transform adds that class when +/- is present.
+            if (!hasCalloutAncestor && !elem.classList.contains("is-collapsible")) {
                 elem.classList.add("is-collapsible");
                 const calloutTitle = elem.querySelector(".callout-title");
                 if (calloutTitle) {
@@ -41,6 +44,7 @@
         // Collapse callouts
         Array.from(document.querySelectorAll(".callout.is-collapsible")).forEach((elem) => {
             const title = elem.querySelector('.callout-title');
+            if (!title) return;
             title.setAttribute("tabindex", "0");
             title.setAttribute("role", "button");
 

@@ -27,7 +27,8 @@
 
     // Space on tags — <a> without href doesn't fire click on either key natively
     document.addEventListener("keydown", (event) => {
-        // Adding "Enter" key support seems to be be hindering search
+        // Adding "Enter" key support seems to be be hindering search,
+        // causing the search popup to close immediately after opening
         if (event.key === " " && event.target.classList.contains("tag")) {
             event.preventDefault();
             window.toggleTagSearch(event.target);
