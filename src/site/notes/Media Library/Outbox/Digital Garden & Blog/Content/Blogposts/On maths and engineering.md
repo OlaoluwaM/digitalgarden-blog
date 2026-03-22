@@ -1,5 +1,5 @@
 ---
-{"dg-publish":true,"dg-path":" Posts/On maths and engineering.md","permalink":"/posts/on-maths-and-engineering/","metatags":{"description":"Computer science is applied maths or some such"},"tags":["computer-science","mathematics"],"created":"2026-03-22T12:59:19.926-05:00","updated":"2026-03-22T14:55:34.803-05:00"}
+{"dg-publish":true,"dg-path":" Posts/On maths and engineering.md","permalink":"/posts/on-maths-and-engineering/","metatags":{"description":"Computer science is applied maths or some such"},"tags":["computer-science","mathematics"],"created":"2026-03-22T12:59:19.926-05:00","updated":"2026-03-22T15:17:16.974-05:00"}
 ---
 
 
@@ -9,7 +9,7 @@ When I was just starting out, I didn't really think much of this gap. I was more
 
 Oddly enough, I *have* taken a Calculus class, Calculus I specifically, back in community college (CC). However, since I wasn't able to complete a Bachelor's degree immediately after CC, I haven't taken a discrete math class. Well, that's not entirely true. I did do some study in the semester before my hiatus at WGU. Needless to say, for all intents and purposes, I haven't *really* taken a discrete math class, so I'm just gonna do that.
 
-Before putting my WGU degree on hiatus to focus on getting good at interviewing (DSA & System design), I found out that the textbook the discrete math course was using was *Discrete Mathematics with Applications* by Susanna S. Epp. I've started reading it and it's been fantastic so far, super accessible, and I hope to get through it cover-to-cover or close enough to achieve my ends. In parallel, though, I am also reading *The Algorithm Design Manual* for DSA practice. Yes, sure I *could* just take one of the many DSA/Leetcode courses geared specifically towards getting a person interview-ready, and I did start with that, but I guess I wanted something a little more comprehensive? I also wanted to make progress on this [curriculum](https://teachyourselfcs.com/), so I figured reading TADM would be killing two birds with one stone.
+I've found the textbook, *Discrete Mathematics with Applications* by Susanna S. Epp, to be fantastic so far. Super accessible, and I hope to get through it cover-to-cover or close enough to achieve my ends. In parallel, I am also reading *The Algorithm Design Manual* for DSA practice. Yes, sure I *could* just take one of the many DSA/Leetcode courses geared specifically towards getting a person interview-ready, and I did start with that, but I guess I wanted something a little more comprehensive? I also wanted to make progress on this [curriculum](https://teachyourselfcs.com/), so I figured reading TADM would be killing two birds with one stone.
 
 I'm in a pretty good spot to dive into this, I think. Let's just hope it stays that way long enough for me to get to where I want to go.
 
