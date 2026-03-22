@@ -1,4 +1,4 @@
-// Self-hosted Instrument Sans, Instrument Serif, and Commit Mono (Latin, WOFF2)
+// Self-hosted Instrument Sans, Instrument Serif, Commit Mono, and JetBrains Mono (Latin, WOFF2)
 // Partial (_) so it's only loaded via @use in custom.scss, not auto-discovered by dynamics.js which would double-load it as a separate <link> tag.
 
 @font-face {
@@ -31,6 +31,22 @@
   font-weight: 400;
   font-display: swap;
   src: url("/fonts/instrument-serif-italic.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "JetBrains Mono";
+  font-style: normal;
+  font-weight: 100 800;
+  font-display: swap;
+  src: url("/fonts/jetbrains-mono.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "JetBrains Mono";
+  font-style: italic;
+  font-weight: 100 800;
+  font-display: swap;
+  src: url("/fonts/jetbrains-mono-italic.woff2") format("woff2");
 }
 
 @font-face {
