@@ -216,15 +216,42 @@ blockquote {
   }
 }
 
+// Tags are now <button> elements — replicate a.tag styles from obsidian-base.scss
+// and reset browser button defaults so they render identically.
+button.tag {
+  appearance: none;
+  font-family: inherit;
+  cursor: pointer !important;
+
+  background-color: var(--tag-background);
+  border: var(--tag-border-width) solid var(--tag-border-color);
+  border-radius: var(--tag-radius);
+  color: var(--tag-color);
+  font-size: var(--tag-size);
+  font-weight: var(--tag-weight);
+  text-decoration: var(--tag-decoration);
+  padding: var(--tag-padding-y) var(--tag-padding-x);
+  line-height: 1;
+
+  @media (hover: hover) {
+    &:hover {
+      background-color: var(--tag-background-hover);
+      border-color: var(--tag-border-color-hover);
+      color: var(--tag-color-hover);
+      text-decoration: var(--tag-decoration-hover);
+    }
+  }
+}
+
 .header-tags {
   display: flex;
   flex-direction: row;
   gap: 0.5rem;
   flex-wrap: wrap;
 
-  a.tag {
-    --tag-border-width: 1.8px;
-    --tag-radius: 0.4rem;
+  button.tag {
+    --tag-border-width: 0px;
+    --tag-radius: 0.45rem;
   }
 }
 
