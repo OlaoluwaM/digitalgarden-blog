@@ -20,6 +20,22 @@
             }
         });
 
+        // Auto-make top-level callouts collapsible (nested callouts use explicit +/- syntax)
+        document.querySelectorAll(".callout:not(.callout .callout)").forEach((elem) => {
+            if (!elem.classList.contains("is-collapsible")) {
+                elem.classList.add("is-collapsible");
+                const calloutTitle = elem.querySelector(".callout-title");
+                if (calloutTitle) {
+                    const fold = document.createElement("div");
+                    fold.className = "callout-fold";
+                    const icon = document.createElement("i");
+                    icon.setAttribute("data-lucide", "chevron-down");
+                    fold.appendChild(icon);
+                    calloutTitle.appendChild(fold);
+                }
+            }
+        });
+
         lucide.createIcons();
 
         // Collapse callouts
