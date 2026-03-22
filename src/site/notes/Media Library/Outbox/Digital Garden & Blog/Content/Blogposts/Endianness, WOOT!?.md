@@ -1,5 +1,5 @@
 ---
-{"dg-publish":true,"dg-path":"Posts/Endianness, WOOT!?.md","dg-permalink":"/posts/endianness-woot","permalink":"/posts/endianness-woot/","metatags":{"description":"Endian deez nuts"},"created":"2026-03-20T15:17:39.241-05:00","updated":"2026-03-20T16:49:16.959-05:00"}
+{"dg-publish":true,"dg-path":" Posts/Endianness, WOOT!?.md","dg-permalink":"/posts/endianness-woot","permalink":"/posts/endianness-woot/","metatags":{"description":"Endian deez nuts"},"tags":["software-engineering","computer-science"],"created":"2026-03-20T15:17:39.241-05:00","updated":"2026-03-22T09:41:35.329-05:00"}
 ---
 
 

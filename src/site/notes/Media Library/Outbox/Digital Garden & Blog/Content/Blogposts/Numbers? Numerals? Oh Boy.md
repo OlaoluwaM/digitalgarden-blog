@@ -1,5 +1,5 @@
 ---
-{"dg-publish":true,"dg-path":"Posts/Numbers? Numerals? Oh Boy.md","dg-permalink":"/posts/numbers-numerals-oh-boy","permalink":"/posts/numbers-numerals-oh-boy/","metatags":{"description":"Ever wondered about the difference between numbers and numerals? Me neither, but here we are"},"created":"2026-03-20T15:09:00.012-05:00","updated":"2026-03-20T16:49:04.842-05:00"}
+{"dg-publish":true,"dg-path":" Posts/Numbers? Numerals? Oh Boy.md","dg-permalink":"/posts/numbers-numerals-oh-boy","permalink":"/posts/numbers-numerals-oh-boy/","metatags":{"description":"Ever wondered about the difference between numbers and numerals? Me neither, but here we are"},"tags":["software-engineering","computer-science"],"created":"2026-03-20T15:09:00.012-05:00","updated":"2026-03-22T09:42:02.062-05:00"}
 ---
 
 
