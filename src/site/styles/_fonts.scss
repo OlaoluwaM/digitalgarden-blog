@@ -1,4 +1,4 @@
-// Self-hosted Instrument Sans, Instrument Serif, and JetBrains Mono (Latin, WOFF2)
+// Self-hosted Instrument Sans, Instrument Serif, Commit Mono, and JetBrains Mono (Latin, WOFF2)
 // Partial (_) so it's only loaded via @use in custom.scss, not auto-discovered by dynamics.js which would double-load it as a separate <link> tag.
 
 @font-face {
@@ -47,4 +47,68 @@
   font-weight: 100 800;
   font-display: swap;
   src: url("/fonts/jetbrains-mono-italic.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Commit Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/commit-mono-400.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Commit Mono";
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/commit-mono-400-italic.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Commit Mono";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("/fonts/commit-mono-500.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Commit Mono";
+  font-style: italic;
+  font-weight: 500;
+  font-display: swap;
+  src: url("/fonts/commit-mono-500-italic.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Commit Mono";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/fonts/commit-mono-600.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Commit Mono";
+  font-style: italic;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/fonts/commit-mono-600-italic.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Commit Mono";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/commit-mono-700.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Commit Mono";
+  font-style: italic;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/commit-mono-700-italic.woff2") format("woff2");
 }

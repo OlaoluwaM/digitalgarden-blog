@@ -270,8 +270,8 @@ blockquote {
     --font-interface-theme: var(--font-default);
 
     --font-code:
-      "JetBrains Mono", ui-monospace, SFMono-Regular, "Cascadia Mono",
-      "Roboto Mono", monospace;
+      "Commit Mono", "JetBrains Mono", ui-monospace, SFMono-Regular,
+      "Cascadia Mono", "Roboto Mono", monospace;
     --font-monospace: var(--font-code);
     --font-monospace-theme: var(--font-code);
   }
