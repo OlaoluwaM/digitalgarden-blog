@@ -143,7 +143,6 @@ button {
 .content {
   header > h1 {
     margin-block-end: 2.75rem;
-    letter-spacing: -0.02em; /* Tighter letter spacing for display sizes — adjust as needed for your font choice */
   }
 
   h1 {
@@ -347,7 +346,6 @@ button.hamburger-btn {
   align-items: center;
   line-height: 1;
   box-shadow: none;
-  background: none;
   justify-content: center;
 
   svg.svg-icon {

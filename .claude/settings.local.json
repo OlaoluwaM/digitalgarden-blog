@@ -1,7 +1,5 @@
 {
   "permissions": {
-    "allow": [
-      "Bash(ls /home/olaolu/Desktop/labs/digitalgarden-blog/src/site/styles/_theme*)"
-    ]
+    "allow": ["Bash(ls ./src/site/styles/_theme*)"]
   }
 }
