@@ -62,6 +62,9 @@
               <li>
                 <a href="{{ note.url }}" class="internal-link">{{ note.title }}</a>
                 {% if note.description %}<p>{{ note.description }}</p>{% endif %}
+                {% if note.created %}
+                  <time class="human-date recent-note-date" datetime="{{ note.created | dateToZulu }}" data-date="{{ note.created | dateToZulu }}">{{ note.created | dateToZulu }}</time>
+                {% endif %}
               </li>
             {% endfor %}
           </ul>
@@ -90,5 +93,6 @@
       {% include imp %}
     {% endfor %}
     {%include "components/lucideIcons.njk"%}
+    {%include "components/timestamps.njk"%}
     </body>
   </html>

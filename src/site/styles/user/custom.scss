@@ -1,21 +1,15 @@
 @use "../_fonts.scss";
 
 body.markdown-preview-view {
-  height: 100%; // Ensure the preview view takes up the full height of the container and not fit-content
+  height: 100%; /* Ensure the preview view takes up the full height of the container and not fit-content */
 }
 
-.markdown-rendered code {
-  white-space: nowrap; // Prevent code blocks from wrapping
-  // Necessary with shiki. Shiki makes inline code blocks look weird without this
-  padding: 0.25rem 0.4rem;
-  border-radius: 6px;
-}
-
-// --- Grayish accent, link, and selection colors (dark theme only) ---
-// Uses Obsidian Baseline's own color-base scale (defined in obsidian-base.scss)
-// for consistency with the theme's gray ramp:
-//   --color-base-60 (#999) idle  → ~5.3:1 contrast on #1e1e1e (passes AA)
-//   --color-base-70 (#b3b3b3) hover → ~8.1:1 contrast on #1e1e1e (passes AAA)
+/* --- Grayish accent, link, and selection colors (dark theme only) ---
+  Uses Obsidian Baseline's own color-base scale (defined in obsidian-base.scss)
+  for consistency with the theme's gray ramp:
+    --color-base-60 (#999) idle  → ~5.3:1 contrast on #1e1e1e (passes AA)
+    --color-base-70 (#b3b3b3) hover → ~8.1:1 contrast on #1e1e1e (passes AAA)
+*/
 .theme-dark {
   --text-accent: var(--color-base-60, #999);
   --text-accent-hover: var(--color-base-70, #b3b3b3);
@@ -27,7 +21,7 @@ body.markdown-preview-view {
   --link-external-color-hover: var(--color-base-70, #b3b3b3);
   --text-selection: rgba(153, 153, 153, 0.3);
 
-  // Tags — override the purple-tinted accent-hsl defaults to match the gray scheme
+  /* Tags — override the purple-tinted accent-hsl defaults to match the gray scheme */
   --tag-background: rgba(153, 153, 153, 0.1);
   --tag-background-hover: rgba(153, 153, 153, 0.15);
   --tag-border-color: rgba(153, 153, 153, 0.2);
@@ -36,14 +30,8 @@ body.markdown-preview-view {
   --tag-color-hover: var(--color-base-70, #b3b3b3);
 }
 
-// --- Responsive font sizes & spacing (px → rem) ---
-// Overrides digital-garden-base.scss and style.scss defaults.
-// Conversion: rem = px / 16 (browser default root).
-// Font sizes and text-relative spacing use rem.
-// Icon sizes use em to scale with adjacent text.
-// Borders, shadows, border-radius stay px (visual details).
 body {
-  // Heading scale — Major Third (1.25 ratio) from h1 = 3rem, h6 nudged above content font size
+  /* Heading scale — Major Third (1.25 ratio) from h1 = 3rem, h6 nudged above content font size */
   --h1-size: 3rem; // 48px
   --h2-size: 2.4rem; // 38.4px
   --h3-size: 1.92rem; // 30.7px
@@ -51,150 +39,79 @@ body {
   --h5-size: 1.229rem; // 19.7px
   --h6-size: 1.07rem; // 17.1px
 
-  // Layout
-  --dg-content-font-size: 1.03rem; // 16.5px
-  --dg-content-padding-top: 5.625rem; // 90px
-  --dg-content-padding-top-mobile: 4.6875rem; // 75px
-  --dg-content-max-width: 43.75rem; // 700px
+  --dg-content-font-size: 1.03rem; // 16.5px — base is 18px
 
-  // Sidebar
-  --dg-sidebar-top: 4.6875rem; // 75px
-  --dg-sidebar-gap: 5rem; // 80px
-  --dg-sidebar-min-width: 1.5625rem; // 25px
-  --dg-sidebar-max-width: 21.875rem; // 350px
-  --dg-sidebar-container-padding: 1.25rem; // 20px
-
-  // Graph
-  --dg-graph-width: 15.625rem; // 250px
-  --dg-graph-height: 15.625rem; // 250px
-  --dg-graph-margin-bottom: 1.25rem; // 20px
-  --dg-graph-fullscreen-width: 37.5rem; // 600px
-  --dg-graph-fullscreen-height: 37.5rem; // 600px
-
-  // Filetree
-  --dg-filetree-width: 15.625rem; // 250px
-  --dg-filetree-min-width: 15.625rem; // 250px
-  --dg-filetree-padding: 0.625rem 1.25rem; // 10px 20px
-  --dg-filetree-gap: 5rem; // 80px
-  --dg-filetree-title-size: 2rem; // 32px
-
-  // TOC
-  --dg-toc-padding: 0.3125rem; // 5px
-  --dg-toc-max-height: 13.75rem; // 220px
-  --dg-toc-item-padding: 0.125rem 0 0.125rem 0.5rem; // 2px 0 2px 8px
-
-  // Backlinks
-  --dg-backlinks-margin-top: 0.625rem; // 10px
-  --dg-backlinks-max-height: 15.625rem; // 250px
-  --dg-backlinks-card-padding: 0.375rem 0; // 6px 0
-  --dg-backlinks-icon-size: 0.875em; // 14px — em to scale with text
-
-  // Search
-  --dg-search-box-width: 68.75rem; // 1100px
-  --dg-search-box-padding: 1rem; // 16px
-  --dg-search-input-padding: 0.75rem 1rem; // 12px 16px
-  --dg-search-results-max-height: 60vh;
-  --dg-search-btn-height: 2rem; // 32px
-  --dg-search-btn-padding: 0 0.625rem; // 0 10px
-  --dg-search-btn-gap: 0.5rem; // 8px
-  --dg-search-btn-icon-size: 0.875em; // 14px — em to scale with text
-
-  // Navbar
-  --dg-navbar-height: 3.75rem; // 60px
-  --dg-navbar-title-size-mobile: 1.125rem; // 18px
-  --dg-navbar-search-margin: 1.25rem; // 20px
-  --dg-navbar-search-min-width: 2.25rem; // 36px
-  --dg-logo-height: 2.5rem; // 40px
-  --dg-logo-height-mobile: 2rem; // 32px
-  --dg-logo-margin: 0.625rem 0.9375rem; // 10px 15px
-  --dg-filetree-logo-height: 4.375rem; // 70px
-
-  // Note links / file tree items
-  --dg-notelink-padding: 0.25rem 0.5rem 0.25rem 0.75rem; // 4px 8px 4px 12px
-  --dg-folder-margin: 0.25rem 0 0.25rem 0.125rem; // 4px 0 4px 2px
-  --dg-folder-icon-size: 0.875em; // 14px — em to scale with text
-  --dg-inner-folder-padding: 0.1875rem 0 0.1875rem 0; // 3px 0 3px 0
-  --dg-inner-folder-margin: 0.75rem; // 12px
-  --dg-filelist-margin: 0.5rem; // 8px
-
-  // Graph controls
-  --dg-graph-ctrl-padding: 0.375rem 0.625rem; // 6px 10px
-  --dg-graph-ctrl-margin: 0.625rem; // 10px
-  --dg-graph-ctrl-icon-size: 0.875em; // 14px — em to scale with text
-  --dg-graph-ctrl-gap: 0.625rem; // 10px
-  --dg-depth-slider-width: 3.125rem; // 50px
-
-  // Timestamps
-  --dg-timestamps-gap: 0.625rem; // 10px
-  --dg-timestamps-margin-top: 1.25rem; // 20px
-
-  // Misc
-  --dg-mermaid-padding: 0.625rem; // 10px
-  --dg-transclusion-padding: 0.5rem; // 8px
-  --dg-external-link-icon-size: 0.8125em; // 13px — em to scale with text
-  --dg-external-link-padding: 1rem; // 16px
+  /* Icon sizes — em so they scale with adjacent text (base uses px) */
+  --dg-backlinks-icon-size: 0.875em;
+  --dg-search-btn-icon-size: 0.875em;
+  --dg-folder-icon-size: 0.875em;
+  --dg-graph-ctrl-icon-size: 0.875em;
+  --dg-external-link-icon-size: 0.8125em;
 }
 
-// Restore keyboard focus indicators (obsidian-base.scss blankets :focus { outline: none })
+/* Restore keyboard focus indicators (obsidian-base.scss blankets :focus { outline: none }) */
 :focus-visible {
   outline: 2px solid var(--text-accent, #999);
   outline-offset: 0.3rem;
 }
 
-// style.scss overrides (that file says "DO NOT MODIFY")
-:root {
-  --file-margins: 2rem; // 32px
-  --callout-padding: 0.75rem 0.75rem 0.75rem 1.5rem; // 12px 12px 12px 24px
-}
-
+/* Normalize default button padding to keep text-based controls visually consistent across the site */
 button {
-  padding: 0.3125rem 0.9375rem; // 5px 15px
+  padding: 0.3125rem 0.9375rem;
 }
 
-.font-bg {
-  font-size: 5.75rem; // 92px
-}
-
-blockquote {
-  margin: 1.5em 0.625rem; // 1.5em 10px
-  padding: 0.5em 0.625rem; // 0.5em 10px
-}
-
-// Search button: Slightly taller than default
+/* Search button: Slightly taller than default */
 .search-button {
-  height: 2.3rem; // 36px
+  height: 2.3rem;
 }
 
 .filetree-sidebar {
-  max-width: var(--dg-filetree-width);
+  max-width: 17.5rem;
+  width: auto;
+  min-width: var(--dg-filetree-width);
+  flex-grow: 1;
+  flex-shrink: 1;
+
+  .foldername-wrapper {
+    svg {
+      margin-right: 2px;
+    }
+  }
+
+  h1 {
+    width: 8ch; /* I always want the sitename to wrap */
+    margin-inline: auto; /* Center the site name title in the sidebar */
+  }
 
   @media (max-width: 800px) {
     h1 {
+      /* Don't hide site name title on mobile when it's in the sidebar */
       display: revert;
     }
   }
 }
 
-.navbar .navbar-inner {
-  display: flex;
-  align-items: center;
-  flex-grow: 1;
-  flex-direction: row;
-  gap: 2.05rem; // 40px
+.navbar {
+  .navbar-inner {
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+    gap: 2.05rem;
 
-  svg.svg-icon {
-    width: 1.65rem; // 26.4px
+    svg.svg-icon {
+      width: 1.65rem;
 
-    path {
-      transform: scaleX(
-        2.2
-      ); // Stretch the hamburger icon horizontally to make it more visible on mobile
-      transform-origin: right; // Keep the right edge of the icon anchored in place while stretching
+      path {
+        transform: scaleX(
+          2.2
+        ); /* Stretch the hamburger icon horizontally to make it more visible on mobile */
+        transform-origin: right; /* Keep the right edge of the icon anchored in place while stretching */
+      }
     }
   }
 }
 
-// Call to action footer on notes
+/* Call to action footer on notes */
 .post-cta {
   margin-top: 3rem;
   padding-top: 1.25rem;
@@ -202,7 +119,7 @@ blockquote {
 
   p {
     font-size: 0.8rem;
-    color: var(--text-muted);
+    color: var(--text-faint);
     margin: 0;
 
     a {
@@ -216,8 +133,22 @@ blockquote {
   }
 }
 
-// Tags are now <button> elements — replicate a.tag styles from obsidian-base.scss
-// and reset browser button defaults so they render identically.
+.content {
+  header > h1 {
+    margin-block-end: 2.75rem;
+  }
+
+  h2 {
+    margin-top: 1.75em;
+  }
+
+  h3 {
+    margin-top: 1.5em;
+  }
+}
+
+/* Tags are now <button> elements — replicate a.tag styles from obsidian-base.scss
+   and reset browser button defaults so they render identically. */
 button.tag {
   appearance: none;
   font-family: inherit;
@@ -259,7 +190,7 @@ button.tag {
   scale: 0.95;
 }
 
-// Recent posts section on home page
+/* Recent posts section on home page */
 .recent-notes {
   margin-top: 2rem;
 
@@ -269,7 +200,19 @@ button.tag {
   }
 
   li {
-    margin-bottom: 1rem;
+    margin-bottom: 1.25rem;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    .recent-note-date {
+      display: block;
+      margin-top: 0.4rem;
+      color: var(--text-faint);
+      font-size: 0.8rem;
+      font-style: normal;
+    }
   }
 
   p {
@@ -279,10 +222,10 @@ button.tag {
   }
 }
 
-// Navbar: symmetric padding on mobile (when hamburger menu is shown)
+/* Navbar: symmetric padding on mobile (when hamburger menu is shown) */
 @media (max-width: 1000px) {
   .navbar {
-    padding: 0.4rem; // 6.4px
+    padding: 0.4rem;
     padding-inline: var(--file-margins);
     display: flex;
     flex-direction: row;
@@ -292,7 +235,7 @@ button.tag {
     .search-button {
       margin-left: 0;
       margin-right: 0;
-      flex-grow: 0.035; // Keep search button small and prevent it from taking up too much space on mobile
+      flex-grow: 0.035; /* Keep search button small and prevent it from taking up too much space on mobile */
     }
     .navbar-inner > span {
       margin-right: 0;
@@ -309,14 +252,14 @@ button.tag {
   }
 }
 
-// We want customize how the site name font size reduces on mobile, so we override the default responsive here
+/* We want customize how the site name font size reduces on mobile, so we override the default responsive here */
 @media (max-width: 800px) {
   .navbar .site-name-header {
-    font-size: 1.5rem !important; // 24px
+    font-size: 1.5rem !important;
   }
 
   .navbar .navbar-inner {
-    gap: 0.5rem; // 8px - reduce gap between logo and site name on mobile
+    gap: 0.5rem; /* 8px - reduce gap between logo and site name on mobile */
   }
 }
 
@@ -324,9 +267,10 @@ button.tag {
   scale: 0.9;
 }
 
-// Fonts (defined in fonts.scss) Fonts are self-hosted
-// Wrapped in @media screen, print to scope these font overrides to visual media types
-// A bit of a mess but covers all basis for the various ways fonts can be applied in the theme and Obsidian (headings, body text, code blocks, interface elements, markdown preview, etc.)
+/* Fonts (defined in fonts.scss) Fonts are self-hosted
+   Wrapped in @media screen, print to scope these font overrides to visual media types
+   A bit of a mess but covers all basis for the various ways fonts can be applied in the theme and Obsidian (headings, body text, code blocks, interface elements, markdown preview, etc.)
+*/
 @media screen, print {
   body {
     --heading-font: "Instrument Serif", serif;
