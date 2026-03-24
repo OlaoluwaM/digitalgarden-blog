@@ -1,4 +1,9 @@
-<div class="search-button align-icon" onclick="toggleSearch()">
+<div class="search-button align-icon"
+     role="button"
+     tabindex="0"
+     aria-label="{{ meta.uiStrings.searchButtonText }}"
+     onclick="toggleSearch()"
+     onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleSearch()}">
     <span class="search-icon">
         <i data-lucide="search"></i>
     </span>

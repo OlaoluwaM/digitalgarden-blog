@@ -47,9 +47,11 @@
             if (!title) return;
             title.setAttribute("tabindex", "0");
             title.setAttribute("role", "button");
+            title.setAttribute("aria-expanded", elem.classList.contains("is-collapsed") ? "false" : "true");
 
             function toggle() {
-                elem.classList.toggle("is-collapsed");
+                const isCollapsed = elem.classList.toggle("is-collapsed");
+                title.setAttribute("aria-expanded", isCollapsed ? "false" : "true");
             }
 
             title.addEventListener("click", toggle);

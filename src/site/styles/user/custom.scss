@@ -39,7 +39,16 @@ body {
   --h5-size: 1.229rem; // 19.7px
   --h6-size: 1.07rem; // 17.1px
 
+  /* Heading line-heights — tighter leading for display sizes (theme default is 1.6 for all) */
+  --h1-line-height: 1.1;
+  --h2-line-height: 1.2;
+  --h3-line-height: 1.3;
+  --h4-line-height: 1.35;
+
   --dg-content-font-size: 1.03rem; // 16.5px — base is 18px
+  --dg-content-line-height: 1.65; // Slightly looser than default 1.5 for light-on-dark readability
+
+  font-kerning: normal;
 
   /* Icon sizes — em so they scale with adjacent text (base uses px) */
   --dg-backlinks-icon-size: 0.875em;
@@ -47,6 +56,13 @@ body {
   --dg-folder-icon-size: 0.875em;
   --dg-graph-ctrl-icon-size: 0.875em;
   --dg-external-link-icon-size: 0.8125em;
+
+  --dg-search-highlight-bg: rgba(
+    153,
+    153,
+    153,
+    0.35
+  ); /* Gray background for search highlights in markdown preview, using the same gray as text-accent with some transparency */
 }
 
 /* Restore keyboard focus indicators (obsidian-base.scss blankets :focus { outline: none }) */
@@ -81,6 +97,7 @@ button {
   h1 {
     width: 8ch; /* I always want the sitename to wrap */
     margin-inline: auto; /* Center the site name title in the sidebar */
+    text-align: center;
   }
 
   @media (max-width: 800px) {
@@ -97,17 +114,6 @@ button {
     align-items: center;
     flex-grow: 1;
     gap: 2.05rem;
-
-    svg.svg-icon {
-      width: 1.65rem;
-
-      path {
-        transform: scaleX(
-          2.2
-        ); /* Stretch the hamburger icon horizontally to make it more visible on mobile */
-        transform-origin: right; /* Keep the right edge of the icon anchored in place while stretching */
-      }
-    }
   }
 }
 
@@ -125,6 +131,7 @@ button {
     a {
       color: var(--text-accent-hover, #b3b3b3);
       text-decoration: underline;
+      transition: color 150ms ease;
 
       &:hover {
         color: var(--text-normal);
@@ -136,15 +143,27 @@ button {
 .content {
   header > h1 {
     margin-block-end: 2.75rem;
+    letter-spacing: -0.02em; /* Tighter letter spacing for display sizes — adjust as needed for your font choice */
+  }
+
+  h1 {
+    letter-spacing: -0.02em; /* Tighter letter spacing for display sizes — adjust as needed for your font choice */
   }
 
   h2 {
     margin-top: 1.75em;
+    letter-spacing: -0.015em; /* Slightly tighter letter spacing for headings, adjust as needed for your font choice */
   }
 
   h3 {
     margin-top: 1.5em;
+    letter-spacing: -0.01em; /* Slightly tighter letter spacing for headings, adjust as needed for your font choice */
   }
+}
+
+/* Tabular numbers for timestamps so date parts don't shift width */
+.timestamps {
+  font-variant-numeric: tabular-nums;
 }
 
 /* Tags are now <button> elements — replicate a.tag styles from obsidian-base.scss
@@ -163,6 +182,10 @@ button.tag {
   text-decoration: var(--tag-decoration);
   padding: var(--tag-padding-y) var(--tag-padding-x);
   line-height: 1;
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease,
+    color 150ms ease;
 
   @media (hover: hover) {
     &:hover {
@@ -308,5 +331,41 @@ button.tag {
     --font-monospace: var(--font-code);
     --font-monospace-theme: var(--font-code);
     font-weight: 600;
+  }
+}
+
+/* Hamburger button — reset browser button defaults, replicate original span sizing */
+button.hamburger-btn {
+  appearance: none;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-size: 1.5rem;
+  color: inherit;
+  display: flex;
+  align-items: center;
+  line-height: 1;
+  box-shadow: none;
+  background: none;
+  justify-content: center;
+
+  svg.svg-icon {
+    width: 1.45rem;
+
+    path {
+      transform: scaleX(
+        1.5
+      ); /* Stretch the hamburger icon horizontally to make it more visible on mobile */
+      transform-origin: center;
+    }
+  }
+}
+
+/* Respect reduced motion — disable transitions for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  button.tag,
+  .post-cta p a {
+    transition: none;
   }
 }

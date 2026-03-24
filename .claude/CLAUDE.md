@@ -83,3 +83,7 @@ Custom admonition types (colors + icons) are synced from the Obsidian vault via 
 ### Deployment
 
 Configured for both Vercel (`vercel.json`) and Netlify (`netlify.toml`). Output directory: `dist/`.
+
+## Design Context
+
+See `.impeccable.md` in the project root for the full design context (users, brand personality, aesthetic direction, and design principles). All design skills read this file automatically.
