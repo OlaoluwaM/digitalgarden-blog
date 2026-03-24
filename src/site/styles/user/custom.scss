@@ -79,6 +79,13 @@ button {
 /* Search button: Slightly taller than default */
 .search-button {
   height: 2.3rem;
+
+  .search-keys {
+    padding: 3px 6px;
+    @media (max-width: 1000px) {
+      padding: 3.5px 6px;
+    }
+  }
 }
 
 .filetree-sidebar {
