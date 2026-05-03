@@ -1,12 +1,12 @@
 ---
-{"dg-publish":true,"dg-path":" Posts/Dotfiles Reorg.md","dg-permalink":"/posts/dotfiles-reorg-a-journey","permalink":"/posts/dotfiles-reorg-a-journey/","title":"Dotfiles Reorg: A Journey","metatags":{"description":"Change is inevitable"},"tags":["linux","software-engineering"],"created":"2026-05-03T17:12:45.954-05:00","updated":"2026-05-03T18:18:33.329-05:00","dg-note-properties":{"tags":["linux","software-engineering"],"title":"Dotfiles Reorg: A Journey"}}
+{"dg-publish":true,"dg-path":" Posts/Dotfiles Reorg.md","dg-permalink":"/posts/dotfiles-reorg-a-journey","permalink":"/posts/dotfiles-reorg-a-journey/","title":"Dotfiles Reorg: A Journey","metatags":{"description":"Change is inevitable"},"tags":["linux","software-engineering"],"created":"2026-05-03T17:12:45.954-05:00","updated":"2026-05-03T18:25:46.550-05:00","dg-note-properties":{"tags":["linux","software-engineering"],"title":"Dotfiles Reorg: A Journey"}}
 ---
 
-[Did some spring-cleaning on my dotfiles](https://github.com/OlaoluwaM/dotfiles/pull/3). Since I am planning on moving to NixOS, I figured now was as good a time as any to renovate. I've had this structure for a long time, and it has served me well, but nothing lasts forever, I suppose.
+[I did some spring-cleaning on my dotfiles](https://github.com/OlaoluwaM/dotfiles/pull/3). Since I am planning on moving to NixOS, I figured now was as good a time as any to renovate. I've had this structure for a long time, and it has served me well, but nothing lasts forever, I suppose.
 
 The layout up to this point was basically an answer to "what's the simplest thing I could do?", a question I like to ask myself when trying to do pretty much anything. I first opted to have all my dotfiles grouped by function and listed out at the top-level. Then I adopted having a `.config` parent directory.
 
-It was all well and good until I joined Freckle and got a Mac. I then had to scope my dotfiles by OS: one for `mac` and one for `fedora`. I've deleted the `mac` directory in this PR since I don't work at Freckle anymore. Now I just have an out-of-place top-level `nixos` directory I still use it on my work Framework. It shouldn't be too much effort to move that over, though I'd need to give it a name.
+It was all well and good until I joined Freckle and got a Mac. I then had to scope my dotfiles by OS: one for `mac` and one for `fedora`. I've deleted the `mac` directory in this PR since I don't work at Freckle anymore. Now I just have an out-of-place top-level `nixos` directory because I still use it on my work Framework. It shouldn't be too much effort to move that over, though I'd need to give it a name.
 
 In any case, if you take a look at the PR, you'll notice that `boreas` is a top-level directory with a `fedora` and `nixos` sub-directory. This is me embracing the Nix convention of organizing configuration per-host.
 
@@ -17,4 +17,4 @@ Moving forward, each host directory will have sub-directories for each OS used o
 
 One interesting thing I did with this renovation was make sure to use "relative" symlinks. That way, the symlinks are never tied to any one host filesystem. It makes them portable and independent of the structure of the filesystem outside the repository.
 
-All in all, I'm happy with how it's all turned out and hope to get myself over to NixOS soon. Lots of things to learn. Let's see how it goes
+All in all, I'm happy with how it's all turned out and hope to get myself over to NixOS soon. Lots of things to learn. Let's see how it goes.
