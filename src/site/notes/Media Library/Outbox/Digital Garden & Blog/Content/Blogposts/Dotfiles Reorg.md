@@ -1,5 +1,5 @@
 ---
-{"dg-publish":true,"dg-path":" Posts/Dotfiles Reorg.md","dg-permalink":"/posts/dotfiles-reorg-a-journey","permalink":"/posts/dotfiles-reorg-a-journey/","title":"Dotfiles Reorg: A Journey","metatags":{"description":"Change is inevitable"},"tags":["linux","software-engineering"],"created":"2026-05-03T17:12:45.954-05:00","updated":"2026-05-03T18:25:46.550-05:00","dg-note-properties":{"tags":["linux","software-engineering"],"title":"Dotfiles Reorg: A Journey"}}
+{"dg-publish":true,"dg-path":" Posts/Dotfiles Reorg.md","dg-permalink":"/posts/dotfiles-reorg-a-journey","permalink":"/posts/dotfiles-reorg-a-journey/","title":"Dotfiles Reorg: A Journey","metatags":{"description":"Onwards to NixOS"},"tags":["linux","software-engineering"],"created":"2026-05-03T17:12:45.954-05:00","updated":"2026-05-03T18:48:10.371-05:00","dg-note-properties":{"tags":["linux","software-engineering"],"title":"Dotfiles Reorg: A Journey"}}
 ---
 
 [I did some spring-cleaning on my dotfiles](https://github.com/OlaoluwaM/dotfiles/pull/3). Since I am planning on moving to NixOS, I figured now was as good a time as any to renovate. I've had this structure for a long time, and it has served me well, but nothing lasts forever, I suppose.
