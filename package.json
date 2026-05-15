@@ -48,7 +48,7 @@
     "markdown-it-mathjax3": "^4.3.1",
     "markdown-it-plantuml": "^1.4.1",
     "markdown-it-task-checkbox": "^1.0.6",
-    "npm-run-all2": "^7.0.2",
+    "npm-run-all2": "^8.0.4",
     "rimraf": "^4.4.1",
     "shiki": "^4.0.2"
   }
