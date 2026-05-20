@@ -1,5 +1,5 @@
 ---
-{"dg-publish":true,"dg-path":" Posts/NixOS, the journey continues (part 2).md","dg-permalink":"/posts/nixos-the-journey-continues-part-2","permalink":"/posts/nixos-the-journey-continues-part-2/","title":"NixOS: The journey continues (part 2)","metatags":{"description":"Putting a GUI on this thang"},"tags":["linux","software-engineering"],"created":"2026-05-06T08:04:58.543-05:00","updated":"2026-05-07T14:01:50.692-05:00","dg-note-properties":{"tags":["linux","software-engineering"],"title":"NixOS: The journey continues (part 2)"}}
+{"dg-publish":true,"dg-path":" Posts/NixOS, the journey continues (part 2).md","dg-permalink":"/posts/nixos-the-journey-continues-part-2","permalink":"/posts/nixos-the-journey-continues-part-2/","title":"NixOS: The journey continues (part 2)","metatags":{"description":"Putting a GUI on this thang"},"tags":["linux","software-engineering"],"created":"2026-05-06T08:04:58.543-05:00","updated":"2026-05-20T17:43:55.383-05:00","dg-note-properties":{"tags":["linux","software-engineering"],"title":"NixOS: The journey continues (part 2)"}}
 ---
 
 Since [[Media Library/Outbox/Digital Garden & Blog/Content/Blogposts/NixOS, the start of something new (part 1)\|part 1]], I have done work to configure and make configurable the GUI for my budding NixOS setup. If you're interested in the code, the PR for it can be found [here](https://github.com/OlaoluwaM/nixos-config/pull/3). Comments and feedback welcome!
@@ -23,3 +23,5 @@ The work behind the PR also taught me a few things:
 - Nix flakes have this requirement where files/modules must be checked into Git before they are evaluated. To circumvent this, you can use the `git add -N` command, which signals the intent to check in a file.
 
 From here, I plan on creating modules for integrating with NVIDIA GPUs, AMD hardware (CPU & GPU), and Intel. I think that will be the last major piece before I start testing this in my VM. Let's see how it goes. Till next time!
+
+[[Media Library/Outbox/Digital Garden & Blog/Content/Blogposts/NixOS, the last milestone (part 3)\|Part 3]]
