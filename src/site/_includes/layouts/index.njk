@@ -23,7 +23,7 @@
     <main class="content cm-s-obsidian print {{contentClasses}}">
       <header>
       {% if settings.dgShowInlineTitle === true %}
-        <h1>{{ noteTitle  }}</h1>
+        <h1>{% if title %}{{ title }}{% else %}{{ page.fileSlug }}{% endif %}</h1>
       {% endif %}
 
       <div class="header-meta">
@@ -31,9 +31,9 @@
           <div class="header-tags">
             {% for tag in tags %}
               {% if tag != 'gardenEntry' and tag !='note' %}
-                <button class="tag" onclick="toggleTagSearch(this)">
+                <a class="tag" onclick="toggleTagSearch(this)">
                   #{{tag}}
-                </button>
+                </a>
               {% endif %}
             {% endfor %}
           </div>
@@ -53,24 +53,6 @@
         {% include imp %}
       {% endfor %}
       {{ content | hideDataview | taggify | link | safe}}
-
-      {% if recentNotes and recentNotes.length %}
-        <section class="recent-notes">
-          <h2>Recent Posts</h2>
-          <ul>
-            {% for note in recentNotes %}
-              <li>
-                <a href="{{ note.url }}" class="internal-link">{{ note.title }}</a>
-                {% if note.description %}<p>{{ note.description }}</p>{% endif %}
-                {% if note.created %}
-                  <time class="human-date recent-note-date" datetime="{{ note.created | dateToZulu }}" data-date="{{ note.created | dateToZulu }}">{{ note.created | dateToZulu }}</time>
-                {% endif %}
-              </li>
-            {% endfor %}
-          </ul>
-        </section>
-      {% endif %}
-
       {% for imp in dynamics.common.afterContent %}
         {% include imp %}
       {% endfor %}
@@ -79,7 +61,7 @@
       {% endfor %}
     </main>
 
-    {% if settings.dgShowBacklinks === true or settings.dgShowLocalGraph === true or settings.dgShowToc === true%}
+    {% if settings.dgShowBacklinks === true or settings.dgShowLocalGraph === true or settings.dgShowToc === true or dynamics.sidebar.top.length > 0 or dynamics.sidebar.bottom.length > 0%}
       {%include "components/sidebar.njk" %}
     {%endif%}
 
@@ -93,6 +75,6 @@
       {% include imp %}
     {% endfor %}
     {%include "components/lucideIcons.njk"%}
-    {%include "components/timestamps.njk"%}
+    {%include "components/basesScript.njk"%}
     </body>
   </html>
