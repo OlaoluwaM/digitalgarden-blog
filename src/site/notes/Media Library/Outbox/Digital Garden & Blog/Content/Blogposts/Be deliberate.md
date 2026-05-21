@@ -1,5 +1,5 @@
 ---
-{"dg-publish":true,"dg-path":" Posts/Be deliberate.md","permalink":"/posts/be-deliberate/","metatags":{"description":"Be deliberate"},"tags":["non-technical","self-development"],"created":"2026-03-20T15:42:21.046-05:00","updated":"2026-03-22T09:41:26.267-05:00","dg-note-properties":{"tags":["non-technical","self-development"]}}
+{"dg-publish":true,"dg-path":" Posts/Be deliberate.md","permalink":"/posts/be-deliberate/","metatags":{"description":"Be deliberate"},"tags":["non-technical","self-development"],"created":"2026-03-20T15:42","updated":"2026-05-21T11:02","dg-note-properties":{"tags":["non-technical","self-development"],"Updated At":"2026-05-21T11:02","Created At":"2026-03-20T15:42"}}
 ---
 
 
