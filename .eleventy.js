@@ -2,17 +2,31 @@ const slugify = require("@sindresorhus/slugify");
 const markdownIt = require("markdown-it");
 const fs = require("fs");
 const matter = require("gray-matter");
+// Obsidian writes [[Page\|Alias]] in frontmatter, but \| is an invalid YAML
+// escape sequence. This custom engine strips \| before parsing. Shared between
+// Eleventy's own frontmatter parser and the manual matter() call in
+// getAnchorAttributes so that wikilink resolution can read the permalink.
+const jsYamlForMatter = require(require.resolve("js-yaml", { paths: [require.resolve("gray-matter")] }));
+const matterOptions = {
+  engines: {
+    yaml: {
+      parse: (str) => jsYamlForMatter.load(str.replace(/\\\|/g, "|")),
+      stringify: (obj) => jsYamlForMatter.dump(obj),
+    },
+  },
+};
 const faviconsPlugin = require("eleventy-plugin-gen-favicons");
 const tocPlugin = require("eleventy-plugin-nesting-toc");
 const { parse } = require("node-html-parser");
 const htmlMinifier = require("html-minifier-terser");
 const pluginRss = require("@11ty/eleventy-plugin-rss");
 
-const { headerToId, namedHeadingsFilter, toTitleCase } = require("./src/helpers/utils");
+const { headerToId, namedHeadingsFilter } = require("./src/helpers/utils");
 const {
   userMarkdownSetup,
   userEleventySetup,
 } = require("./src/helpers/userSetup");
+const { basesPlugin } = require("./src/helpers/basesPlugin");
 
 const Image = require("@11ty/eleventy-img");
 function transformImage(src, cls, alt, sizes, widths = ["500", "700", "auto"]) {
@@ -56,7 +70,7 @@ function getAnchorAttributes(filePath, linkTitle) {
       fullPath = `${startPath}${fileName}.md`;
     }
     const file = fs.readFileSync(fullPath, "utf8");
-    const frontMatter = matter(file);
+    const frontMatter = matter(file, matterOptions);
     if (frontMatter.data.permalink) {
       permalink = frontMatter.data.permalink;
     }
@@ -97,30 +111,14 @@ function getAnchorAttributes(filePath, linkTitle) {
 const tagRegex = /(^|\s|\>)(#[^\s!@#$%^&*()=+\.,\[{\]};:'"?><]+)(?!([^<]*>))/g;
 
 const markdownFileTypeRegex = /\.(md|markdown)$/i;
-const shikiTheme = "dark-plus";
 const isMarkdownPage = (inputPath) => inputPath && inputPath.match(markdownFileTypeRegex);
 
-module.exports = async function(eleventyConfig) {
-  // Shiki (ESM-only) — dynamic import in CJS
-  const { createHighlighter, bundledLanguages } = await import("shiki");
-  const { fromHighlighter } = await import("@shikijs/markdown-it");
-
-  const curatedLangs = [
-    "bash", "c", "cpp", "css", "diff", "docker", "go", "haskell", "html",
-    "java", "javascript", "json", "jsx", "kotlin", "lua", "markdown",
-    "nix", "plaintext", "powershell", "python", "rust", "scala", "scss",
-    "shell", "sql", "svelte", "swift", "toml", "tsx", "typescript",
-    "vue", "xml", "yaml",
-  ].filter(l => l in bundledLanguages);
-
-  const shikiHighlighter = await createHighlighter({
-    themes: [shikiTheme],
-    langs: curatedLangs,
-  });
-
+module.exports = function(eleventyConfig) {
   eleventyConfig.setLiquidOptions({
     dynamicPartials: true,
   });
+
+  eleventyConfig.setFrontMatterParsingOptions(matterOptions);
   let markdownLib = markdownIt({
     breaks: true,
     html: true,
@@ -158,24 +156,7 @@ module.exports = async function(eleventyConfig) {
       closeMarker: "```",
     })
     .use(namedHeadingsFilter)
-    .use(fromHighlighter(shikiHighlighter, {
-      theme: shikiTheme,
-      transformers: [
-        {
-          // Add data-language attribute for the CSS language label
-          pre(node) {
-            const lang = this.options.lang;
-            if (lang) {
-              node.properties["data-language"] = lang;
-            }
-          },
-          // Add line number data attributes for CSS counter styling
-          line(node, line) {
-            node.properties["data-line"] = line;
-          },
-        },
-      ],
-    }))
+    .use(basesPlugin)
     .use(function(md) {
       //https://github.com/DCsunset/markdown-it-mermaid-plugin
       const origFenceRule =
@@ -193,6 +174,26 @@ module.exports = async function(eleventyConfig) {
           const code = token.content.trim();
           return `<div class="transclusion">${md.render(code)}</div>`;
         }
+        if (token.info === "gist") {
+          const code = token.content.trim();
+          // Support multiple gist references, one per line
+          const gistLines = code.split('\n').filter(line => line.trim());
+
+          const scripts = gistLines.map(line => {
+            line = line.trim();
+            // Parse format: [username/]gist-id[#filename]
+            const parts = line.split('#');
+            const gistPath = parts[0];
+            const filename = parts[1] || '';
+
+            // Build the GitHub Gist embed URL
+            const gistUrl = `https://gist.github.com/${gistPath}.js`;
+            const scriptUrl = filename ? `${gistUrl}?file=${encodeURIComponent(filename)}` : gistUrl;
+
+            return `<script src="${scriptUrl}"></script>`;
+          });
+          return scripts.join('\n');
+        }
         if (token.info.startsWith("ad-")) {
           const code = token.content.trim();
           const parts = code.split("\n")
@@ -205,10 +206,9 @@ module.exports = async function(eleventyConfig) {
           let nbLinesToSkip = 0
           for (let i = 0; i < 4; i++) {
             if (parts[i] && parts[i].trim()) {
-              let raw = parts[i].trim()
-              let line = raw.toLowerCase()
+              let line = parts[i] && parts[i].trim().toLowerCase()
               if (line.startsWith("title:")) {
-                titleLine = raw.substring(6);
+                titleLine = line.substring(6);
                 nbLinesToSkip++;
               } else if (line.startsWith("icon:")) {
                 icon = line.substring(5);
@@ -231,11 +231,10 @@ module.exports = async function(eleventyConfig) {
               <polyline points="6 9 12 15 18 9"></polyline>
           </svg>
           </div>` : "";
-          const calloutType = token.info.substring(3);
-          const defaultTitle = toTitleCase(calloutType);
-          const titleText = titleLine || defaultTitle;
-          const titleDiv = `<div class="callout-title"><div class="callout-title-inner">${titleText}</div>${foldDiv}</div>`;
-          let collapseClasses = collapsible ? 'is-collapsible' : ''
+          const titleDiv = titleLine
+            ? `<div class="callout-title"><div class="callout-title-inner">${titleLine}</div>${foldDiv}</div>`
+            : "";
+          let collapseClasses = titleLine && collapsible ? 'is-collapsible' : ''
           if (collapsible && collapsed) {
             collapseClasses += " is-collapsed"
           }
@@ -378,6 +377,13 @@ module.exports = async function(eleventyConfig) {
     );
   });
 
+  eleventyConfig.addFilter("stripForSearch", function(content) {
+    return content
+      .replace(/<[^>]*>/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+  });
+
   eleventyConfig.addFilter("searchableTags", function(str) {
     let tags;
     let match = str && str.match(tagRegex);
@@ -462,7 +468,9 @@ module.exports = async function(eleventyConfig) {
           isCollapsed = collapse === "-";
           const titleText = title.replace(/(<\/{0,1}\w+>)/, "")
             ? title
-            : toTitleCase(callout);
+            : `${callout.charAt(0).toUpperCase()}${callout
+              .substring(1)
+              .toLowerCase()}`;
           const fold = isCollapsable
             ? `<div class="callout-fold"><i icon-name="chevron-down"></i></div>`
             : ``;
@@ -687,8 +695,23 @@ module.exports = async function(eleventyConfig) {
     return content;
   });
 
+  eleventyConfig.addTransform("jsonMinifier", async (content, outputPath) => {
+    if (
+      (process.env.NODE_ENV === "production" || process.env.ELEVENTY_ENV === "prod") &&
+      outputPath &&
+      outputPath.endsWith(".json")
+    ) {
+      try {
+        return JSON.stringify(JSON.parse(content));
+      } catch {
+        // If the JSON minifying fails for some reason due to malformed JSON, just return the content as is.
+        return content;
+      }
+    }
+    return content;
+  });
+
   eleventyConfig.addPassthroughCopy("src/site/img");
-  eleventyConfig.addPassthroughCopy("src/site/fonts");
   eleventyConfig.addPassthroughCopy("src/site/scripts");
   eleventyConfig.addPassthroughCopy("src/site/styles/_theme.*.css");
   eleventyConfig.addPassthroughCopy({ "src/site/logo.*": "/" });
@@ -703,7 +726,7 @@ module.exports = async function(eleventyConfig) {
     read: true,
     compile: async function(inputContent, inputPath) {
       // Extract content after frontmatter (canvas HTML is already compiled by plugin)
-      const parsed = matter(inputContent);
+      const parsed = matter(inputContent, matterOptions);
       return async (data) => {
         // Return the HTML content directly without markdown processing
         return parsed.content;
