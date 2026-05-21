@@ -1,5 +1,5 @@
 ---
-{"dg-publish":true,"dg-path":" Posts/On maths and engineering.md","permalink":"/posts/on-maths-and-engineering/","metatags":{"description":"Computer science is applied maths or some such"},"tags":["computer-science","mathematics"],"created":"2026-03-22T12:59","updated":"2026-05-21T11:05","dg-note-properties":{"tags":["computer-science","mathematics"],"Updated At":"2026-05-21T11:05","Created At":"2026-03-22T12:59"}}
+{"dg-publish":true,"dg-path":" Posts/On maths and engineering.md","permalink":"/posts/on-maths-and-engineering/","metatags":{"description":"Computer science is applied maths or some such"},"tags":["computer-science","mathematics"],"created":"2026-03-22T12:59","updated":"2026-05-21T11:44","dg-note-properties":{"tags":["computer-science","mathematics"],"created":"2026-03-22T12:59","updated":"2026-05-21T11:44"}}
 ---
 
 
@@ -31,7 +31,7 @@ What is/are the invariant(s) that directly assert on the expected end result of 
 
 Some scrutiny suggests that the invariant we care about here is that "$p$ always contains the evaluated polynomial up to $a_i$".
 
-- At initialization, $p = a_n$ which adheres to our invariant since, at this point, $i$ is not initialized, there is no $i$ but $p$ holds the first term of the polynomial. 
+- At initialization, $p = a_n$ which adheres to our invariant since, at this point, $i$ is not initialized, there is no $i$ but $p$ holds the first term of the polynomial.
 - After each iteration, we can see that our invariant holds true as with every iteration, $p$ still contains an evaluated polynomial up to $a_i$.
 	- For iteration 1, we are 1 away from $n$, so $n-1$. Thus, $p = (a_n * x) + a_{n-1} = a_n*x + a_{n-1}$. Since at this iteration $i = n-1$, $p$ is also equal to $a_n*x + a_i$, matching our invariant
 	- For iteration 2, we are 2 away from $n$, so $n-2$. Thus $p = (((a_n * x) + a_{n-1}) * x) + a_{n-2} = a_n*x^2 + a_{n-1}*x + a_{n-2}$. Again, because at this iteration we are at $n-2$, $i = n-1-1 = n-2$, thus $p = a_n*x^2 + a_{n-1}*x + a_{i}$, matching our invariant

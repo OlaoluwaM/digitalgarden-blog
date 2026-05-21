@@ -1,5 +1,5 @@
 ---
-{"dg-publish":true,"dg-path":" Posts/Docker Compose variable interpolation...weirdness.md","dg-permalink":"/posts/docker-compose-variable-interpolation-weirdness","permalink":"/posts/docker-compose-variable-interpolation-weirdness/","metatags":{"description":"Ok then."},"tags":["software-engineering","devops"],"created":"2026-03-20T15:40","updated":"2026-05-21T11:03","dg-note-properties":{"tags":["software-engineering","devops"],"Created At":"2026-03-20T15:40","Updated At":"2026-05-21T11:03"}}
+{"dg-publish":true,"dg-path":" Posts/Docker Compose variable interpolation...weirdness.md","dg-permalink":"/posts/docker-compose-variable-interpolation-weirdness","permalink":"/posts/docker-compose-variable-interpolation-weirdness/","metatags":{"description":"Ok then."},"tags":["software-engineering","devops"],"created":"2026-03-20T15:40","updated":"2026-05-21T11:46","dg-note-properties":{"tags":["software-engineering","devops"],"created":"2026-03-20T15:40","updated":"2026-05-21T11:46"}}
 ---
 
 

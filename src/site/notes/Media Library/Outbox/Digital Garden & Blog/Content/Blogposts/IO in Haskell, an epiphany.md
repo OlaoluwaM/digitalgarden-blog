@@ -1,5 +1,5 @@
 ---
-{"dg-publish":true,"dg-path":" Posts/IO in Haskell, an epiphany.md","permalink":"/posts/io-in-haskell-an-epiphany/","metatags":{"description":"IO! IO! IO!"},"tags":["software-engineering","haskell"],"created":"2026-03-20T11:31","updated":"2026-05-21T11:04","dg-note-properties":{"tags":["software-engineering","haskell"],"Updated At":"2026-05-21T11:04","Created At":"2026-03-20T11:31"}}
+{"dg-publish":true,"dg-path":" Posts/IO in Haskell, an epiphany.md","permalink":"/posts/io-in-haskell-an-epiphany/","metatags":{"description":"IO! IO! IO!"},"tags":["software-engineering","haskell"],"created":"2026-03-20T11:31","updated":"2026-05-21T11:45","dg-note-properties":{"tags":["software-engineering","haskell"],"created":"2026-03-20T11:31","updated":"2026-05-21T11:45"}}
 ---
 
 
