@@ -50,6 +50,8 @@
     "markdown-it-task-checkbox": "^1.0.6",
     "npm-run-all2": "^7.0.2",
     "rimraf": "^4.4.1",
-    "shiki": "^4.0.2"
+    "shiki": "^4.0.2",
+    "jsep": "^1.4.0",
+    "yaml": "^2.8.3"
   }
 }

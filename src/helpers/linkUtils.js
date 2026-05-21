@@ -4,6 +4,17 @@ const internalLinkRegex = /href="\/(.*?)"/g;
 // Format: <iframe src="/path/" class="canvas-file-iframe" ...>
 // Use non-greedy [^>]*? to avoid over-matching
 const iframeSrcRegex = /<iframe[^>]*?src="(\/[^"#]*)"[^>]*?class="canvas-file-iframe"/g;
+// Match ```base code blocks to extract links from bases queries.
+const basesBlockRegex = /```base\n([\s\S]*?)```/g;
+
+let basesEngine = null;
+let clearRenderCache = null;
+try {
+  basesEngine = require("./bases-engine");
+  clearRenderCache = require("./basesPlugin").clearRenderCache;
+} catch {
+  // Bases support is optional so link extraction can still run without it.
+}
 
 function extractLinks(content) {
   // Extract iframe sources for canvas embeds
@@ -42,6 +53,38 @@ function extractLinks(content) {
   ];
 }
 
+// Cache bases query results, keyed by YAML content. Built once per build.
+const basesQueryCache = new Map();
+
+function extractBasesLinks(content, basesNotes) {
+  if (!basesEngine) return [];
+
+  const links = [];
+  let match;
+  basesBlockRegex.lastIndex = 0;
+  while ((match = basesBlockRegex.exec(content)) !== null) {
+    const yamlContent = match[1];
+
+    if (!basesQueryCache.has(yamlContent)) {
+      try {
+        const result = basesEngine.executeBaseQuery(yamlContent, basesNotes);
+        const urls = [];
+        for (const view of result.views) {
+          for (const row of view.rows) {
+            if (row.url) urls.push(row.url);
+          }
+        }
+        basesQueryCache.set(yamlContent, urls);
+      } catch {
+        basesQueryCache.set(yamlContent, []);
+      }
+    }
+
+    links.push(...basesQueryCache.get(yamlContent));
+  }
+  return links;
+}
+
 async function getGraph(data) {
   let nodes = {};
   let links = [];
@@ -50,6 +93,12 @@ async function getGraph(data) {
 
   // Process notes sequentially to handle async reads
   const notes = data.collections.note || [];
+  const noteContents = [];
+
+  // Clear caches from any previous build, which matters in --watch mode.
+  basesQueryCache.clear();
+  if (clearRenderCache) clearRenderCache();
+
   for (let idx = 0; idx < notes.length; idx++) {
     const v = notes[idx];
     let fpath = v.filePathStem.replace("/notes/", "");
@@ -62,6 +111,7 @@ async function getGraph(data) {
     // Use async read() method instead of accessing frontMatter directly
     const templateContent = await v.template.read();
     const content = templateContent?.content || "";
+    noteContents.push(content);
 
     nodes[v.url] = {
       id: idx,
@@ -108,6 +158,38 @@ async function getGraph(data) {
     nodes[k].backLinks = Array.from(nodes[k].backLinks);
     nodes[k].size = nodes[k].neighbors.length;
   });
+
+  const basesNotes = notes.map((item) => {
+    const node = nodes[item.url] || {};
+    return {
+      path: item.filePathStem.replace("/notes/", ""),
+      url: item.url,
+      metadata: item.data,
+      fileSlug: item.fileSlug,
+      _links: node.outBound || [],
+      _backlinks: node.backLinks || [],
+    };
+  });
+
+  for (let idx = 0; idx < notes.length; idx++) {
+    const node = nodes[notes[idx].url];
+    const basesLinks = extractBasesLinks(noteContents[idx], basesNotes);
+    for (const link of basesLinks) {
+      if (node.outBound.includes(link)) continue;
+      node.outBound.push(link);
+      const linkedNode = nodes[link];
+      if (linkedNode) {
+        if (!linkedNode.backLinks.includes(node.url)) linkedNode.backLinks.push(node.url);
+        if (!linkedNode.neighbors.includes(node.url)) linkedNode.neighbors.push(node.url);
+        if (!node.neighbors.includes(link)) node.neighbors.push(link);
+        links.push({ source: node.id, target: linkedNode.id });
+      }
+    }
+    node.size = node.neighbors.length;
+  }
+
+  exports._basesNotesWithLinks = basesNotes;
+
   return {
     homeAlias,
     nodes,
@@ -119,3 +201,4 @@ exports.wikiLinkRegex = wikiLinkRegex;
 exports.internalLinkRegex = internalLinkRegex;
 exports.extractLinks = extractLinks;
 exports.getGraph = getGraph;
+exports._basesNotesWithLinks = null;
