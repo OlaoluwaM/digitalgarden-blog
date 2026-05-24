@@ -5,7 +5,7 @@ const internalLinkRegex = /href="\/(.*?)"/g;
 // Use non-greedy [^>]*? to avoid over-matching
 const iframeSrcRegex = /<iframe[^>]*?src="(\/[^"#]*)"[^>]*?class="canvas-file-iframe"/g;
 // Match ```base code blocks to extract links from bases queries.
-const basesBlockRegex = /```base\n([\s\S]*?)```/g;
+const basesBlockRegex = /```base[^\n\r]*\r?\n([\s\S]*?)```/g;
 
 let basesEngine = null;
 let clearRenderCache = null;

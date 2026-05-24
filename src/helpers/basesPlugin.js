@@ -43,12 +43,19 @@ function basesPlugin(md) {
 
 /**
  * Build a fingerprint from the notes array that changes when notes are
- * added, removed, or modified. Uses buildId + count + paths hash.
+ * added, removed, or modified. Uses buildId + count + a metadata-aware hash.
  */
 function notesFingerprint(notes) {
   let hash = 0;
   for (const note of notes) {
-    const s = (note.url || note.fileSlug || "");
+    const s = JSON.stringify({
+      url: note.url || "",
+      fileSlug: note.fileSlug || "",
+      path: note.path || "",
+      metadata: note.metadata || null,
+      links: note._links || [],
+      backlinks: note._backlinks || [],
+    });
     for (let i = 0; i < s.length; i++) {
       hash = ((hash << 5) - hash + s.charCodeAt(i)) | 0;
     }
