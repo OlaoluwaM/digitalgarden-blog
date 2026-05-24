@@ -3,8 +3,8 @@ document.addEventListener("DOMContentLoaded", function() {
   var containers = document.querySelectorAll(".obsidian-bases-views");
 
   function closeDropdown(container) {
-    var toggle = container.querySelector(".obsidian-bases-active-view");
-    var dropdown = container.querySelector(".obsidian-bases-dropdown");
+    const toggle = container.querySelector(".obsidian-bases-active-view");
+    const dropdown = container.querySelector(".obsidian-bases-dropdown");
     if (!toggle || !dropdown) return;
     dropdown.style.display = "none";
     toggle.setAttribute("aria-expanded", "false");
