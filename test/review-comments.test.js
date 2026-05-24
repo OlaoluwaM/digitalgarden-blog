@@ -5,12 +5,37 @@ const path = require("node:path");
 const markdownIt = require("markdown-it");
 
 const { parseExpression } = require("../src/helpers/bases-engine/exprParser");
-const { evalExpr } = require("../src/helpers/bases-engine/exprEval");
+const {
+	evalExpr,
+	__testables: {
+		getNoteFolder,
+		normalizeFolderPath,
+		normalizeLinkPath,
+	},
+} = require("../src/helpers/bases-engine/exprEval");
 const { executeBaseQuery, renderViews } = require("../src/helpers/bases-engine");
 const { basesPlugin, clearRenderCache } = require("../src/helpers/basesPlugin");
 const { getGraph } = require("../src/helpers/linkUtils");
 
 describe("bases expression review fixes", () => {
+	it("extracts a normalized folder path from note paths", () => {
+		assert.equal(getNoteFolder("/notes/projects/demo.md"), "notes/projects");
+		assert.equal(getNoteFolder("demo.md"), "");
+		assert.equal(getNoteFolder(""), "");
+	});
+
+	it("normalizes folder inputs for inFolder comparisons", () => {
+		assert.equal(normalizeFolderPath("/notes/projects/"), "notes/projects");
+		assert.equal(normalizeFolderPath("notes\\projects\\"), "notes/projects");
+		assert.equal(normalizeFolderPath(null), "");
+	});
+
+	it("normalizes link inputs for hasLink comparisons", () => {
+		assert.equal(normalizeLinkPath("/foo/"), "/foo");
+		assert.equal(normalizeLinkPath("\\foo\\bar\\"), "/foo/bar");
+		assert.equal(normalizeLinkPath("   "), "");
+	});
+
 	it("evaluates logical expressions parsed by jsep as LogicalExpression nodes", () => {
 		const ast = parseExpression('status == "open" && priority > 1');
 		const result = evalExpr(ast, {

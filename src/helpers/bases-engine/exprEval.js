@@ -536,4 +536,12 @@ function evalFilter(expression, note, formulas) {
 	}
 }
 
-module.exports = { evalExpr, evalFilter };
+module.exports = {
+	evalExpr,
+	evalFilter,
+	__testables: {
+		getNoteFolder,
+		normalizeFolderPath,
+		normalizeLinkPath,
+	},
+};
