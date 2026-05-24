@@ -1,6 +1,23 @@
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-  document.querySelectorAll(".obsidian-bases-views").forEach(function(container) {
+  var containers = document.querySelectorAll(".obsidian-bases-views");
+
+  function closeDropdown(container) {
+    var toggle = container.querySelector(".obsidian-bases-active-view");
+    var dropdown = container.querySelector(".obsidian-bases-dropdown");
+    if (!toggle || !dropdown) return;
+    dropdown.style.display = "none";
+    toggle.setAttribute("aria-expanded", "false");
+  }
+
+  document.addEventListener("click", function(event) {
+    containers.forEach(function(container) {
+      if (container.contains(event.target)) return;
+      closeDropdown(container);
+    });
+  });
+
+  containers.forEach(function(container) {
     var toggle = container.querySelector(".obsidian-bases-active-view");
     var dropdown = container.querySelector(".obsidian-bases-dropdown");
     var items = container.querySelectorAll(".obsidian-bases-dropdown-item");
@@ -16,12 +33,6 @@ document.addEventListener("DOMContentLoaded", function() {
       var open = dropdown.style.display !== "none";
       dropdown.style.display = open ? "none" : "block";
       toggle.setAttribute("aria-expanded", !open);
-    });
-
-    // Close dropdown on outside click
-    document.addEventListener("click", function() {
-      dropdown.style.display = "none";
-      toggle.setAttribute("aria-expanded", "false");
     });
 
     // Switch view on item click
@@ -50,10 +61,8 @@ document.addEventListener("DOMContentLoaded", function() {
           var rows = target.querySelectorAll("tbody tr:not(.obsidian-base-group-row), .obsidian-base-card, .obsidian-base-list li");
           countEl.textContent = rows.length;
         }
-
         // Close dropdown
-        dropdown.style.display = "none";
-        toggle.setAttribute("aria-expanded", "false");
+        closeDropdown(container);
       });
     });
   });

@@ -63,6 +63,7 @@ function escapeHtml(str) {
  * Internal keys to skip during column auto-detection.
  */
 const INTERNAL_KEY_PATTERN = /^(tags|dg-.*|__formulas)$/;
+const SYSTEM_TAGS = new Set(["note", "gardenEntry"]);
 
 /**
  * Determine the list of columns for a view.
@@ -141,7 +142,7 @@ function getCellValue(row, column) {
 		return row._backlinks || [];
 	}
 	if (column === "file.tags") {
-		return (row.metadata && row.metadata.tags) || [];
+		return ((row.metadata && row.metadata.tags) || []).filter((tag) => !SYSTEM_TAGS.has(tag));
 	}
 	// Handle formula.* columns
 	if (column.startsWith("formula.")) {

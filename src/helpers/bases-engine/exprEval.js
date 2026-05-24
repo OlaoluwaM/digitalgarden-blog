@@ -62,6 +62,25 @@ function resolveFileProperty(prop, note) {
 	}
 }
 
+function getNoteFolder(notePath) {
+	if (!notePath) return "";
+	const normalizedPath = String(notePath).replace(/\\/g, "/").replace(/^\/+/, "");
+	const lastSlash = normalizedPath.lastIndexOf("/");
+	return lastSlash === -1 ? "" : normalizedPath.substring(0, lastSlash);
+}
+
+function normalizeFolderPath(folder) {
+	if (folder == null) return "";
+	return String(folder).replace(/\\/g, "/").replace(/^\/+|\/+$/g, "");
+}
+
+function normalizeLinkPath(link) {
+	if (link == null) return "";
+	const normalized = String(link).trim().replace(/\\/g, "/");
+	if (!normalized) return "";
+	return normalized.replace(/\/+$/g, "") || "/";
+}
+
 /**
  * Resolve a file filter function call.
  */
@@ -76,19 +95,23 @@ function resolveFileMethod(method, args, note) {
 			);
 		}
 		case "inFolder": {
-			const folder = args[0];
-			const normalised = String(folder).replace(/\/$/, "");
-			return note.path.startsWith(normalised + "/");
+			if (!note.path) return false;
+			const normalised = normalizeFolderPath(args[0]);
+			const noteFolder = getNoteFolder(note.path);
+			if (normalised === "") {
+				return noteFolder === "";
+			}
+			return noteFolder === normalised || noteFolder.startsWith(normalised + "/");
 		}
 		case "hasProperty": {
 			const prop = args[0];
 			return hasUserProperty(note.metadata, prop);
 		}
 		case "hasLink": {
-			const link = args[0];
+			const link = normalizeLinkPath(args[0]);
+			if (!link) return false;
 			const links = note._links || (note.metadata && note.metadata.links) || [];
-			// Check both full URL paths and stem paths
-			return links.some((l) => l === link || l.includes(link));
+			return links.some((l) => normalizeLinkPath(l) === link);
 		}
 		default:
 			return undefined;
@@ -360,8 +383,22 @@ function evalExpr(ast, note, formulas, context) {
 			return undefined;
 		}
 
+		case "LogicalExpression":
+			if (ast.operator === "&&") {
+				return (
+					evalExpr(ast.left, note, formulas, context) &&
+					evalExpr(ast.right, note, formulas, context)
+				);
+			}
+			if (ast.operator === "||") {
+				return (
+					evalExpr(ast.left, note, formulas, context) ||
+					evalExpr(ast.right, note, formulas, context)
+				);
+			}
+			return undefined;
+
 		case "BinaryExpression": {
-			// Short-circuit for logical operators
 			if (ast.operator === "&&") {
 				return (
 					evalExpr(ast.left, note, formulas, context) &&
