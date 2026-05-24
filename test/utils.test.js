@@ -1,37 +1,39 @@
-const { describe, it } = require("node:test");
-const assert = require("node:assert/strict");
+import { createRequire } from "node:module";
+import { describe, expect, it } from "vitest";
+
+const require = createRequire(import.meta.url);
 const { toTitleCase } = require("../src/helpers/utils");
 
 describe("toTitleCase", () => {
   it("capitalizes a single word", () => {
-    assert.equal(toTitleCase("aside"), "Aside");
+    expect(toTitleCase("aside")).toBe("Aside");
   });
 
   it("title-cases a hyphenated type, replacing hyphens with spaces", () => {
-    assert.equal(toTitleCase("book-open"), "Book Open");
+    expect(toTitleCase("book-open")).toBe("Book Open");
   });
 
   it("uses the override for ai-text", () => {
-    assert.equal(toTitleCase("ai-text"), "AI Text");
+    expect(toTitleCase("ai-text")).toBe("AI Text");
   });
 
   it("uses the override for AI-TEXT (case-insensitive lookup)", () => {
-    assert.equal(toTitleCase("AI-TEXT"), "AI Text");
+    expect(toTitleCase("AI-TEXT")).toBe("AI Text");
   });
 
   it("lowercases non-initial letters", () => {
-    assert.equal(toTitleCase("WARNING"), "Warning");
+    expect(toTitleCase("WARNING")).toBe("Warning");
   });
 
   it("handles multi-hyphen types", () => {
-    assert.equal(toTitleCase("my-cool-callout"), "My Cool Callout");
+    expect(toTitleCase("my-cool-callout")).toBe("My Cool Callout");
   });
 
   it("passes through an already title-cased string", () => {
-    assert.equal(toTitleCase("Note"), "Note");
+    expect(toTitleCase("Note")).toBe("Note");
   });
 
   it("handles an empty string", () => {
-    assert.equal(toTitleCase(""), "");
+    expect(toTitleCase("")).toBe("");
   });
 });

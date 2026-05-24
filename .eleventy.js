@@ -21,7 +21,7 @@ const { parse } = require("node-html-parser");
 const htmlMinifier = require("html-minifier-terser");
 const pluginRss = require("@11ty/eleventy-plugin-rss");
 
-const { headerToId, namedHeadingsFilter } = require("./src/helpers/utils");
+const { headerToId, namedHeadingsFilter, toTitleCase } = require("./src/helpers/utils");
 const {
   userMarkdownSetup,
   userEleventySetup,
@@ -206,9 +206,10 @@ module.exports = function(eleventyConfig) {
           let nbLinesToSkip = 0
           for (let i = 0; i < 4; i++) {
             if (parts[i] && parts[i].trim()) {
-              let line = parts[i] && parts[i].trim().toLowerCase()
+              const rawLine = parts[i].trim();
+              let line = rawLine.toLowerCase()
               if (line.startsWith("title:")) {
-                titleLine = line.substring(6);
+                titleLine = rawLine.substring(6).trim();
                 nbLinesToSkip++;
               } else if (line.startsWith("icon:")) {
                 icon = line.substring(5);
@@ -231,10 +232,10 @@ module.exports = function(eleventyConfig) {
               <polyline points="6 9 12 15 18 9"></polyline>
           </svg>
           </div>` : "";
-          const titleDiv = titleLine
-            ? `<div class="callout-title"><div class="callout-title-inner">${titleLine}</div>${foldDiv}</div>`
-            : "";
-          let collapseClasses = titleLine && collapsible ? 'is-collapsible' : ''
+          const calloutType = token.info.substring(3);
+          const titleText = titleLine || toTitleCase(calloutType);
+          const titleDiv = `<div class="callout-title"><div class="callout-title-inner">${titleText}</div>${foldDiv}</div>`;
+          let collapseClasses = collapsible ? 'is-collapsible' : ''
           if (collapsible && collapsed) {
             collapseClasses += " is-collapsed"
           }
@@ -712,6 +713,7 @@ module.exports = function(eleventyConfig) {
   });
 
   eleventyConfig.addPassthroughCopy("src/site/img");
+  eleventyConfig.addPassthroughCopy("src/site/fonts");
   eleventyConfig.addPassthroughCopy("src/site/scripts");
   eleventyConfig.addPassthroughCopy("src/site/styles/_theme.*.css");
   eleventyConfig.addPassthroughCopy({ "src/site/logo.*": "/" });

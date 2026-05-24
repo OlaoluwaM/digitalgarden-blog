@@ -47,6 +47,9 @@ function executeBaseQuery(yamlContent, notes) {
  * Process a single view definition.
  */
 function processView(viewDef, notes, globalFilters, formulas, globalSummaries) {
+	const summaries = (globalSummaries || viewDef.summaries)
+		? { ...(globalSummaries || {}), ...(viewDef.summaries || {}) }
+		: null;
 	const config = {
 		type: viewDef.type || "table",
 		name: viewDef.name || "Untitled",
@@ -54,7 +57,7 @@ function processView(viewDef, notes, globalFilters, formulas, globalSummaries) {
 		groupBy: viewDef.groupBy || null,
 		order: viewDef.order || null,
 		sort: viewDef.sort || null,
-		summaries: viewDef.summaries || null,
+		summaries: summaries,
 		// Cards-specific options
 		image: viewDef.image || null,
 		imageFit: viewDef.imageFit || null,

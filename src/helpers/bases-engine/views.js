@@ -267,14 +267,14 @@ function renderTable(view, properties) {
 			}
 		}
 		html += "</tbody></table>";
-		html += buildSummaryBar(columns, computedSummaries, config.summaries);
+		html += buildSummaryBar(columns, computedSummaries, config.summaries, properties);
 		html += "</div>";
 		return html;
 	}
 
 	let html = '<div class="obsidian-base-table-wrapper">';
 	html += buildTable(columns, rows, properties);
-	html += buildSummaryBar(columns, computedSummaries, config.summaries);
+	html += buildSummaryBar(columns, computedSummaries, config.summaries, properties);
 	html += "</div>";
 	return html;
 }
@@ -301,7 +301,7 @@ function buildTable(columns, rows, properties) {
 /**
  * Build a summary bar that sits outside and below the table.
  */
-function buildSummaryBar(columns, computedSummaries, summaryConfig) {
+function buildSummaryBar(columns, computedSummaries, summaryConfig, properties) {
 	if (!computedSummaries || Object.keys(computedSummaries).length === 0) {
 		return "";
 	}
@@ -310,7 +310,7 @@ function buildSummaryBar(columns, computedSummaries, summaryConfig) {
 	for (const col of columns) {
 		if (computedSummaries[col] !== undefined) {
 			const label = (summaryConfig && summaryConfig[col]) || "";
-			const displayName = getDisplayName(col);
+			const displayName = getDisplayName(col, properties);
 			html += `<div class="obsidian-base-summary-item"><span class="obsidian-base-summary-col">${escapeHtml(displayName)}</span> <span class="obsidian-base-summary-label">${escapeHtml(String(label))}</span> <span class="obsidian-base-summary-value">${escapeHtml(String(computedSummaries[col]))}</span></div>`;
 		}
 	}
