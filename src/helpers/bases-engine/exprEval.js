@@ -223,7 +223,6 @@ function callMethod(obj, method, args) {
 					.replace("mm", String(obj.getMinutes()).padStart(2, "0"))
 					.replace("ss", String(obj.getSeconds()).padStart(2, "0"));
 			}
-			// falls through not possible due to return above
 			case "date":
 				return new Date(
 					obj.getFullYear(),

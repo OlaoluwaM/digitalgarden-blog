@@ -100,6 +100,8 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
     {% if contentClasses and "canvas-page" in contentClasses %}
       {%include "components/canvasScript.njk"%}
     {% endif %}
-    {% include "components/basesScript.njk" %}
+    {% if content and "obsidian-bases-views" in content %}
+      {% include "components/basesScript.njk" %}
+    {% endif %}
   </body>
 </html>

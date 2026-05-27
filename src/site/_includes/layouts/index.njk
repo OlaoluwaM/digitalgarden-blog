@@ -94,6 +94,8 @@
     {% endfor %}
     {%include "components/lucideIcons.njk"%}
     {%include "components/timestamps.njk"%}
-    {%include "components/basesScript.njk"%}
+    {% if content and "obsidian-bases-views" in content %}
+      {%include "components/basesScript.njk"%}
+    {% endif %}
     </body>
   </html>
