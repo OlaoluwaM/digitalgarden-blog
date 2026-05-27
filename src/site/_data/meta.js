@@ -1,4 +1,4 @@
-require("dotenv").config();
+require("dotenv").config({ quiet: true });
 const { globSync } = require("glob");
 
 module.exports = async (data) => {
