@@ -19,5 +19,6 @@ module.exports = {
   graph: async (data) => await getGraph(data),
   filetree: (data) => getFileTree(data),
   recentNotes: (data) => getRecentNotes(data),
-  userComputed: (data) => userComputed(data)
+  userComputed: (data) => userComputed(data),
+  noteProps: (data) => data["dg-note-properties"]
 };

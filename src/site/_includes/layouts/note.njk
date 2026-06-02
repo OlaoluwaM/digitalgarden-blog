@@ -70,7 +70,7 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
       {{ content | hideDataview | taggify | link | safe}}
       {% if 'gardenEntry' not in tags %}
       <footer class="post-cta">
-        <p>That's all folks. If you like what you see, feel free to connect with me on <a href="https://www.linkedin.com/in/olaoluwam/" target="_blank" rel="noopener noreferrer">LinkedIn</a> or follow me on <a href="https://x.com/ola_musta" target="_blank" rel="noopener noreferrer">X</a> or <a href="https://bsky.app/profile/olamusta.bsky.social" target="_blank" rel="noopener noreferrer">Bluesky</a>. I also stream sometimes @ola_musta on <a href="https://www.twitch.tv/ola_musta" target="_blank" rel="noopener noreferrer">Twitch</a> and <a href="https://www.youtube.com/@ola_musta" target="_blank" rel="noopener noreferrer">Youtube</a> too. Till next time!!</p>
+        <p>That's all folks. If you like what you see, feel free to connect with me on <a href="https://www.linkedin.com/in/olaoluwam/" target="_blank" rel="noopener noreferrer">LinkedIn</a> or follow me on <a href="https://x.com/ola_musta" target="_blank" rel="noopener noreferrer">X</a> or <a href="https://bsky.app/profile/olamusta.bsky.social" target="_blank" rel="noopener noreferrer">Bluesky</a>. I also stream sometimes @ola_musta on <a href="https://www.twitch.tv/ola_musta" target="_blank" rel="noopener noreferrer">Twitch</a> and <a href="https://www.youtube.com/@ola_musta" target="_blank" rel="noopener noreferrer">Youtube</a> too!</p>
       </footer>
       {% endif %}
       {% for imp in dynamics.common.afterContent %}
@@ -81,7 +81,14 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
       {% endfor %}
     </main>
 
-    {% if settings.dgShowBacklinks === true or settings.dgShowLocalGraph === true or settings.dgShowToc === true%}
+    {% set hasSidebarContent =
+      settings.dgShowBacklinks === true
+      or settings.dgShowLocalGraph === true
+      or settings.dgShowToc === true
+      or (dynamics.sidebar.top and dynamics.sidebar.top.length > 0)
+      or (dynamics.sidebar.bottom and dynamics.sidebar.bottom.length > 0)
+    %}
+    {% if hasSidebarContent %}
       {%include "components/sidebar.njk"%}
     {% endif %}
 
@@ -99,6 +106,9 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
     {%include "components/lucideIcons.njk"%}
     {% if contentClasses and "canvas-page" in contentClasses %}
       {%include "components/canvasScript.njk"%}
+    {% endif %}
+    {% if content and "obsidian-bases-views" in content %}
+      {% include "components/basesScript.njk" %}
     {% endif %}
   </body>
 </html>

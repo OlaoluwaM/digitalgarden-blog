@@ -79,7 +79,14 @@
       {% endfor %}
     </main>
 
-    {% if settings.dgShowBacklinks === true or settings.dgShowLocalGraph === true or settings.dgShowToc === true%}
+    {% set hasSidebarContent =
+      settings.dgShowBacklinks === true
+      or settings.dgShowLocalGraph === true
+      or settings.dgShowToc === true
+      or (dynamics.sidebar.top and dynamics.sidebar.top.length > 0)
+      or (dynamics.sidebar.bottom and dynamics.sidebar.bottom.length > 0)
+    %}
+    {% if hasSidebarContent %}
       {%include "components/sidebar.njk" %}
     {%endif%}
 
@@ -94,5 +101,8 @@
     {% endfor %}
     {%include "components/lucideIcons.njk"%}
     {%include "components/timestamps.njk"%}
+    {% if content and "obsidian-bases-views" in content %}
+      {%include "components/basesScript.njk"%}
+    {% endif %}
     </body>
   </html>
