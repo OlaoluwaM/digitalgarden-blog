@@ -30,54 +30,80 @@ const naturalCompare = (a, b) => {
   return 0;
 };
 
-const sortTree = (unsorted) => {
-  //Sort by: pinned first, folders before files, then notes by created date (newest first)
-  const orderedTree = Object.keys(unsorted)
-    .sort((a, b) => {
+const sortTree = (unsorted, navigationOrder, currentPath) => {
+  const orderList = navigationOrder && navigationOrder[currentPath];
 
-      let a_pinned = unsorted[a].pinned || false;
-      let b_pinned = unsorted[b].pinned || false;
-      if (a_pinned != b_pinned) {
-        if (a_pinned) {
-          return -1;
-        } else {
-          return 1;
-        }
-      }
-
-      const a_is_note = a.indexOf(".md") > -1;
-      const b_is_note = b.indexOf(".md") > -1;
-
-      if (a_is_note && !b_is_note) {
+  // Sort by: pinned first, folders before files, then notes by created date (newest first).
+  const defaultCompare = (a, b) => {
+    let a_pinned = unsorted[a].pinned || false;
+    let b_pinned = unsorted[b].pinned || false;
+    if (a_pinned != b_pinned) {
+      if (a_pinned) {
+        return -1;
+      } else {
         return 1;
       }
+    }
 
-      if (!a_is_note && b_is_note) {
-        return -1;
+    const a_is_note = a.indexOf(".md") > -1;
+    const b_is_note = b.indexOf(".md") > -1;
+
+    if (a_is_note && !b_is_note) {
+      return 1;
+    }
+
+    if (!a_is_note && b_is_note) {
+      return -1;
+    }
+
+    // Both are notes: sort by created date (newest first), fall back to name
+    if (a_is_note && b_is_note) {
+      const a_created = unsorted[a].created;
+      const b_created = unsorted[b].created;
+      if (a_created && b_created) {
+        return new Date(b_created) - new Date(a_created);
       }
+      if (a_created) return -1;
+      if (b_created) return 1;
+    }
 
-      // Both are notes: sort by created date (newest first), fall back to name
-      if (a_is_note && b_is_note) {
-        const a_created = unsorted[a].created;
-        const b_created = unsorted[b].created;
-        if (a_created && b_created) {
-          return new Date(b_created) - new Date(a_created);
-        }
-        if (a_created) return -1;
-        if (b_created) return 1;
+    return naturalCompare(a, b);
+  };
+
+  let orderedKeys;
+  if (orderList && Array.isArray(orderList)) {
+    const existingKeys = new Set(Object.keys(unsorted));
+    const resolveKey = (name) => {
+      if (existingKeys.has(name)) return name;
+      if (existingKeys.has(`${name}.md`)) return `${name}.md`;
+      return null;
+    };
+    const resolvedOrdered = [];
+    const resolvedSet = new Set();
+    for (const name of orderList) {
+      const key = resolveKey(name);
+      if (key && !resolvedSet.has(key)) {
+        resolvedOrdered.push(key);
+        resolvedSet.add(key);
       }
+    }
+    const unorderedKeys = Object.keys(unsorted)
+      .filter((key) => !resolvedSet.has(key))
+      .sort(defaultCompare);
+    orderedKeys = [...resolvedOrdered, ...unorderedKeys];
+  } else {
+    orderedKeys = Object.keys(unsorted).sort(defaultCompare);
+  }
 
-      return naturalCompare(a, b);
-    })
-    .reduce((obj, key) => {
-      obj[key] = unsorted[key];
-
-      return obj;
-    }, {});
+  const orderedTree = orderedKeys.reduce((obj, key) => {
+    obj[key] = unsorted[key];
+    return obj;
+  }, {});
 
   for (const key of Object.keys(orderedTree)) {
     if (orderedTree[key].isFolder) {
-      orderedTree[key] = sortTree(orderedTree[key]);
+      const childPath = currentPath === "/" ? `/${key}` : `${currentPath}/${key}`;
+      orderedTree[key] = sortTree(orderedTree[key], navigationOrder, childPath);
     }
   }
 
@@ -150,7 +176,8 @@ function getFileTree(data) {
     const [meta, folders] = getPermalinkMeta(note);
     assignNested(tree, folders, { isNote: true, ...meta });
   });
-  const fileTree = sortTree(tree);
+  const navigationOrder = data.navigationOrder || null;
+  const fileTree = sortTree(tree, navigationOrder, "/");
   return fileTree;
 }
 
