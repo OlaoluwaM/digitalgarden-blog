@@ -24,7 +24,8 @@ function basesPlugin(md) {
   md.renderer.rules.fence = (tokens, idx, options, env, self) => {
     const token = tokens[idx];
 
-    if (token.info.trim() === "base") {
+    const fenceType = token.info.trim().split(/\s+/)[0];
+    if (fenceType === "base") {
       try {
         // Prefer enriched notes with links/backlinks (from graph builder),
         // fall back to plain notes from the data cascade

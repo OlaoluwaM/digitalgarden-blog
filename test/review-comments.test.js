@@ -156,6 +156,32 @@ describe("bases rendering review fixes", () => {
 		assert.doesNotMatch(secondRender, /Open/);
 	});
 
+	it("renders base fences that include trailing info text", () => {
+		const md = markdownIt();
+		basesPlugin(md);
+		const content = [
+			"```base {.wide}",
+			"views:",
+			"  - type: table",
+			"    order: [file.name]",
+			"```",
+		].join("\n");
+
+		const html = md.render(content, {
+			basesNotes: [
+				{
+					path: "demo.md",
+					url: "/demo/",
+					fileSlug: "demo",
+					metadata: {},
+				},
+			],
+		});
+
+		assert.match(html, /obsidian-bases-views/);
+		assert.doesNotMatch(html, /language-base/);
+	});
+
 	it("keeps a single delegated document click handler in the bases script", () => {
 		const script = fs.readFileSync(
 			path.join(
