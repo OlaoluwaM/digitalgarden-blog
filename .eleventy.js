@@ -411,6 +411,10 @@ module.exports = async function(eleventyConfig) {
     );
   });
 
+  eleventyConfig.addFilter("stripForSearch", function(str) {
+    return str && str.replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim();
+  });
+
   eleventyConfig.addFilter("searchableTags", function(str) {
     let tags;
     let match = str && str.match(tagRegex);
