@@ -47,6 +47,11 @@
 
 {% favicons './src/site/favicon.svg', appleIconBgColor='#123' %}
 
+{# Advertise the Atom feed so readers/aggregators can auto-discover it. Mirrors feed.njk's siteBaseUrl guard. #}
+{%- if meta.siteBaseUrl -%}
+<link rel="alternate" type="application/atom+xml" title="{{ meta.siteName }}" href="{{ meta.siteBaseUrl }}/feed.xml">
+{%- endif -%}
+
 {% if meta.styleSettingsCss %}
     <style>
         {{ meta.styleSettingsCss | safe }}
