@@ -374,3 +374,25 @@ button.hamburger-btn {
     transition: none;
   }
 }
+
+/* Center standalone images in paragraphs across modern and older browsers */
+@supports selector(p:has(picture:has(img))) {
+  p:has(picture:has(img)) {
+    display: flex;
+    justify-content: center;
+  }
+}
+
+/* Fallback for browsers without :has() support */
+@supports not selector(p:has(picture:has(img))) {
+  p > picture:only-child,
+  p > img:only-child {
+    display: block;
+    margin-inline: auto;
+  }
+
+  p > picture:only-child img {
+    display: block;
+    margin-inline: auto;
+  }
+}
