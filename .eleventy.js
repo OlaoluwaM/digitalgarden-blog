@@ -16,12 +16,19 @@ const matterOptions = {
   },
 };
 const faviconsPlugin = require("eleventy-plugin-gen-favicons");
+const normalizeFavicon = require("./src/site/normalize-favicon.js");
+const { convertMdHrefs } = require("./src/helpers/linkUtils");
+const nodePath = require("path");
+
+const FAVICON_SOURCE = "./src/site/favicon.svg";
+const FAVICON_NORMALIZED = "./.cache/favicon.normalized.svg";
+normalizeFavicon(FAVICON_SOURCE, FAVICON_NORMALIZED);
 const tocPlugin = require("eleventy-plugin-nesting-toc");
 const { parse } = require("node-html-parser");
 const htmlMinifier = require("html-minifier-terser");
 const pluginRss = require("@11ty/eleventy-plugin-rss");
 
-const { headerToId, namedHeadingsFilter, toTitleCase } = require("./src/helpers/utils");
+const { headerToId, namedHeadingsFilter } = require("./src/helpers/utils");
 const {
   userMarkdownSetup,
   userEleventySetup,
@@ -29,7 +36,23 @@ const {
 const { basesPlugin } = require("./src/helpers/basesPlugin");
 
 const Image = require("@11ty/eleventy-img");
-function transformImage(src, cls, alt, sizes, widths = ["500", "700", "auto"]) {
+const { isDecodableImage } = require("./src/helpers/imageFormat.js");
+
+// Build containers have few CPUs and little memory; the default queue
+// concurrency of 10 holds ~10 decoded images in memory at once without
+// finishing any faster. Sharp already parallelizes within each job.
+Image.concurrency = 2;
+
+// Image generation is started fire-and-forget during transforms (the markup
+// only needs statsSync), but every pending job is awaited in the
+// eleventy.after hook below so the build doesn't linger — or get killed —
+// doing invisible work after Eleventy reports completion.
+const pendingImageJobs = [];
+
+// Note: fillPictureSourceSets only references the first two widths; the
+// full-size original is served via the <img src> fallback, so a full
+// resolution "auto" rendition would never be referenced by the markup.
+function transformImage(src, cls, alt, sizes, widths = ["500", "700"]) {
   let options = {
     widths: widths,
     formats: ["webp", "jpeg"],
@@ -37,8 +60,13 @@ function transformImage(src, cls, alt, sizes, widths = ["500", "700", "auto"]) {
     urlPath: "/img/optimized",
   };
 
-  // generate images, while this is async we don’t wait
-  Image(src, options);
+  // A rejection here (e.g. a corrupt file) must not become an unhandled
+  // rejection, which would fail the whole build.
+  pendingImageJobs.push(
+    Image(src, options).catch((err) => {
+      console.warn(`[image] Skipping optimization of ${src}: ${err.message}`);
+    })
+  );
   let metadata = Image.statsSync(src, options);
   return metadata;
 }
@@ -52,14 +80,14 @@ function getAnchorAttributes(filePath, linkTitle) {
   let fileName = filePath.replaceAll("&amp;", "&");
   let header = "";
   let headerLinkPath = "";
-  if (filePath.includes("#")) {
-    [fileName, header] = filePath.split("#");
+  if (fileName.includes("#")) {
+    [fileName, header] = fileName.split("#");
     headerLinkPath = `#${headerToId(header)}`;
   }
 
   let noteIcon = process.env.NOTE_ICON_DEFAULT;
   const title = linkTitle ? linkTitle : fileName;
-  let permalink = `/notes/${slugify(filePath)}`;
+  let permalink = `/notes/${slugify(fileName)}`;
   let deadLink = false;
   try {
     const startPath = "./src/site/notes/";
@@ -111,32 +139,14 @@ function getAnchorAttributes(filePath, linkTitle) {
 const tagRegex = /(^|\s|\>)(#[^\s!@#$%^&*()=+\.,\[{\]};:'"?><]+)(?!([^<]*>))/g;
 
 const markdownFileTypeRegex = /\.(md|markdown)$/i;
-const shikiTheme = "dark-plus";
 const isMarkdownPage = (inputPath) => inputPath && inputPath.match(markdownFileTypeRegex);
 
-module.exports = async function(eleventyConfig) {
-  // Shiki (ESM-only) — dynamic import in CJS
-  const { createHighlighter, bundledLanguages } = await import("shiki");
-  const { fromHighlighter } = await import("@shikijs/markdown-it");
-
-  const curatedLangs = [
-    "bash", "c", "cpp", "css", "diff", "docker", "go", "haskell", "html",
-    "java", "javascript", "json", "jsx", "kotlin", "lua", "markdown",
-    "nix", "plaintext", "powershell", "python", "rust", "scala", "scss",
-    "shell", "sql", "svelte", "swift", "toml", "tsx", "typescript",
-    "vue", "xml", "yaml",
-  ].filter(l => l in bundledLanguages);
-
-  const shikiHighlighter = await createHighlighter({
-    themes: [shikiTheme],
-    langs: curatedLangs,
-  });
-
+module.exports = function(eleventyConfig) {
   eleventyConfig.setLiquidOptions({
     dynamicPartials: true,
   });
-  eleventyConfig.setFrontMatterParsingOptions(matterOptions);
 
+  eleventyConfig.setFrontMatterParsingOptions(matterOptions);
   let markdownLib = markdownIt({
     breaks: true,
     html: true,
@@ -174,24 +184,6 @@ module.exports = async function(eleventyConfig) {
       closeMarker: "```",
     })
     .use(namedHeadingsFilter)
-    .use(fromHighlighter(shikiHighlighter, {
-      theme: shikiTheme,
-      transformers: [
-        {
-          // Add data-language attribute for the CSS language label
-          pre(node) {
-            const lang = this.options.lang;
-            if (lang) {
-              node.properties["data-language"] = lang;
-            }
-          },
-          // Add line number data attributes for CSS counter styling
-          line(node, line) {
-            node.properties["data-line"] = line;
-          },
-        },
-      ],
-    }))
     .use(basesPlugin)
     .use(function(md) {
       //https://github.com/DCsunset/markdown-it-mermaid-plugin
@@ -212,19 +204,23 @@ module.exports = async function(eleventyConfig) {
         }
         if (token.info === "gist") {
           const code = token.content.trim();
-          // Support multiple gist references, one per line.
-          const gistLines = code.split("\n").filter(line => line.trim());
+          // Support multiple gist references, one per line
+          const gistLines = code.split('\n').filter(line => line.trim());
 
           const scripts = gistLines.map(line => {
             line = line.trim();
             // Parse format: [username/]gist-id[#filename]
-            const [gistPath, filename = ""] = line.split("#");
+            const parts = line.split('#');
+            const gistPath = parts[0];
+            const filename = parts[1] || '';
+
+            // Build the GitHub Gist embed URL
             const gistUrl = `https://gist.github.com/${gistPath}.js`;
             const scriptUrl = filename ? `${gistUrl}?file=${encodeURIComponent(filename)}` : gistUrl;
+
             return `<script src="${scriptUrl}"></script>`;
           });
-
-          return scripts.join("\n");
+          return scripts.join('\n');
         }
         if (token.info.startsWith("ad-")) {
           const code = token.content.trim();
@@ -238,10 +234,9 @@ module.exports = async function(eleventyConfig) {
           let nbLinesToSkip = 0
           for (let i = 0; i < 4; i++) {
             if (parts[i] && parts[i].trim()) {
-              let raw = parts[i].trim()
-              let line = raw.toLowerCase()
+              let line = parts[i] && parts[i].trim().toLowerCase()
               if (line.startsWith("title:")) {
-                titleLine = raw.substring(6);
+                titleLine = line.substring(6);
                 nbLinesToSkip++;
               } else if (line.startsWith("icon:")) {
                 icon = line.substring(5);
@@ -264,11 +259,10 @@ module.exports = async function(eleventyConfig) {
               <polyline points="6 9 12 15 18 9"></polyline>
           </svg>
           </div>` : "";
-          const calloutType = token.info.substring(3);
-          const defaultTitle = toTitleCase(calloutType);
-          const titleText = titleLine || defaultTitle;
-          const titleDiv = `<div class="callout-title"><div class="callout-title-inner">${titleText}</div>${foldDiv}</div>`;
-          let collapseClasses = collapsible ? 'is-collapsible' : ''
+          const titleDiv = titleLine
+            ? `<div class="callout-title"><div class="callout-title-inner">${titleLine}</div>${foldDiv}</div>`
+            : "";
+          let collapseClasses = titleLine && collapsible ? 'is-collapsible' : ''
           if (collapsible && collapsed) {
             collapseClasses += " is-collapsed"
           }
@@ -402,6 +396,40 @@ module.exports = async function(eleventyConfig) {
     );
   });
 
+  // Resolve markdown-style relative links to .md files (e.g. [X](../a/b.md))
+  // to their real permalinks. Obsidian resolves these in-app, but they reach
+  // the rendered HTML untouched, where trailing-slash page URLs make the
+  // browser resolve them one directory too deep.
+  // pageInputPath overrides this.page for contexts like the feed, where the
+  // rendered content belongs to a looped-over note rather than the current page.
+  eleventyConfig.addFilter("resolveMdLinks", function(str, pageInputPath) {
+    const inputPath = pageInputPath || (this.page && this.page.inputPath);
+    if (!str || !inputPath) {
+      return str;
+    }
+    const notesRoot = "src/site/notes/";
+    const normalizedInput = inputPath.replace(/^\.\//, "");
+    const rootIndex = normalizedInput.indexOf(notesRoot);
+    if (rootIndex === -1) {
+      return str;
+    }
+    const vaultFilePath = normalizedInput.slice(rootIndex + notesRoot.length);
+    const sourceDir = nodePath.posix.dirname(vaultFilePath);
+    return convertMdHrefs(str, sourceDir === "." ? "" : sourceDir, (candidates) => {
+      let firstAttempt = null;
+      for (const vaultPath of candidates) {
+        const { attributes } = getAnchorAttributes(vaultPath);
+        if (!attributes.class.includes("is-unresolved")) {
+          return attributes;
+        }
+        firstAttempt = firstAttempt || attributes;
+      }
+      // Unresolved targets keep getAnchorAttributes' /404 behavior, matching
+      // how dead wikilinks are handled.
+      return firstAttempt;
+    });
+  });
+
   eleventyConfig.addFilter("taggify", function(str) {
     return (
       str &&
@@ -411,8 +439,11 @@ module.exports = async function(eleventyConfig) {
     );
   });
 
-  eleventyConfig.addFilter("stripForSearch", function(str) {
-    return str && str.replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim();
+  eleventyConfig.addFilter("stripForSearch", function(content) {
+    return content
+      .replace(/<[^>]*>/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
   });
 
   eleventyConfig.addFilter("searchableTags", function(str) {
@@ -499,7 +530,9 @@ module.exports = async function(eleventyConfig) {
           isCollapsed = collapse === "-";
           const titleText = title.replace(/(<\/{0,1}\w+>)/, "")
             ? title
-            : toTitleCase(callout);
+            : `${callout.charAt(0).toUpperCase()}${callout
+              .substring(1)
+              .toLowerCase()}`;
           const fold = isCollapsable
             ? `<div class="callout-fold"><i icon-name="chevron-down"></i></div>`
             : ``;
@@ -571,7 +604,7 @@ module.exports = async function(eleventyConfig) {
   }
 
 
-  eleventyConfig.addTransform("picture", function(str) {
+  eleventyConfig.addTransform("picture", async function(str) {
     if (!isMarkdownPage(this.page.inputPath)) {
       return str;
     }
@@ -582,6 +615,15 @@ module.exports = async function(eleventyConfig) {
     for (const imageTag of parsed.querySelectorAll(".cm-s-obsidian img")) {
       const src = imageTag.getAttribute("src");
       if (src && src.startsWith("/") && !src.endsWith(".svg")) {
+        // Files sharp can't decode (e.g. HEIC or a truncated AVIF renamed
+        // to .jpg) keep their original <img> tag instead of a <picture>
+        // pointing at optimized files that will never exist. This must be
+        // a real decode probe, not just a header check: feeding an
+        // undecodable file to eleventy-img fails the whole build via
+        // unhandled promise rejections in its internals.
+        if (!(await isDecodableImage("./src/site" + decodeURI(src)))) {
+          continue;
+        }
         const cls = imageTag.classList.value;
         const alt = imageTag.getAttribute("alt");
         const width = imageTag.getAttribute("width") || '';
@@ -733,6 +775,7 @@ module.exports = async function(eleventyConfig) {
       try {
         return JSON.stringify(JSON.parse(content));
       } catch {
+        // If the JSON minifying fails for some reason due to malformed JSON, just return the content as is.
         return content;
       }
     }
@@ -740,10 +783,21 @@ module.exports = async function(eleventyConfig) {
   });
 
   eleventyConfig.addPassthroughCopy("src/site/img");
-  eleventyConfig.addPassthroughCopy("src/site/fonts");
   eleventyConfig.addPassthroughCopy("src/site/scripts");
   eleventyConfig.addPassthroughCopy("src/site/styles/_theme.*.css");
   eleventyConfig.addPassthroughCopy({ "src/site/logo.*": "/" });
+  eleventyConfig.on("eleventy.before", () => {
+    normalizeFavicon(FAVICON_SOURCE, FAVICON_NORMALIZED);
+  });
+  eleventyConfig.on("eleventy.after", async () => {
+    if (pendingImageJobs.length > 0) {
+      console.log(`[image] Waiting for ${pendingImageJobs.length} image optimization jobs...`);
+      await Promise.all(pendingImageJobs);
+      console.log(`[image] Image optimization complete`);
+      pendingImageJobs.length = 0;
+    }
+  });
+  eleventyConfig.addWatchTarget(FAVICON_SOURCE);
   eleventyConfig.addPlugin(faviconsPlugin, { outputDir: "dist" });
   eleventyConfig.addPlugin(tocPlugin, {
     ul: true,
@@ -773,6 +827,10 @@ module.exports = async function(eleventyConfig) {
 
   eleventyConfig.addFilter("jsonify", function(variable) {
     return JSON.stringify(variable) || '""';
+  });
+
+  eleventyConfig.addFilter("notHidden", function (arr) {
+    return (arr || []).filter((item) => !item.data.hide);
   });
 
   eleventyConfig.addFilter("validJson", function(variable) {
