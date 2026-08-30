@@ -5,14 +5,16 @@
   "main": "index.js",
   "scripts": {
     "prebuild": "rimraf dist",
-    "start": "npm-run-all2 get-theme build:sass --parallel watch:*",
-    "watch:sass": "sass --watch src/site/styles:dist/styles",
-    "watch:eleventy": "cross-env DOTENV_CONFIG_QUIET=true ELEVENTY_ENV=dev eleventy --serve",
-    "build:eleventy": "cross-env DOTENV_CONFIG_QUIET=true ELEVENTY_ENV=prod NODE_OPTIONS=--max-old-space-size=4096 eleventy",
-    "build:sass": "sass src/site/styles:dist/styles --style compressed",
+    "start:eleventy": "npm-run-all2 get-theme build:sass --parallel watch:eleventy:*",
+    "watch:eleventy:sass": "sass --watch src/site/styles:dist/styles",
+    "watch:eleventy:dev": "cross-env DOTENV_CONFIG_QUIET=true ELEVENTY_ENV=dev eleventy --serve",
+    "build:eleventy": "npm-run-all2 get-theme build:eleventy:*",
+    "build:eleventy:prod": "cross-env DOTENV_CONFIG_QUIET=true ELEVENTY_ENV=prod NODE_OPTIONS=--max-old-space-size=4096 eleventy",
+    "build:eleventy:sass": "sass src/site/styles:dist/styles --style compressed",
     "get-theme": "cross-env DOTENV_CONFIG_QUIET=true node src/site/get-theme.js",
-    "build": "npm-run-all2 get-theme build:*",
-    "test": "node --test"
+    "test": "node --test",
+    "dev:astro": "astro dev",
+    "build:astro": "astro build"
   },
   "keywords": [],
   "author": "",
@@ -26,6 +28,8 @@
     "cross-env": "^10.1.0",
     "html-minifier-terser": "^7.2.0",
     "node-html-parser": "^7.1.0",
+    "prettier": "^3.9.6",
+    "prettier-plugin-astro": "^0.14.1",
     "sass": "^1.99.0"
   },
   "dependencies": {
@@ -33,6 +37,7 @@
     "@shikijs/markdown-it": "^4.1.0",
     "@shikijs/transformers": "^4.1.0",
     "@sindresorhus/slugify": "^1.1.0",
+    "astro": "^7.2.9",
     "axios": "^1.16.1",
     "dotenv": "^17.4.2",
     "eleventy-plugin-gen-favicons": "^1.1.2",

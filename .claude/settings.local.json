@@ -1,5 +1,8 @@
 {
   "permissions": {
-    "allow": ["Bash(ls ./src/site/styles/_theme*)"]
-  }
+    "allow": [
+      "Bash(ls ./src/site/styles/_theme*)"
+    ]
+  },
+  "outputStyle": "Concise"
 }

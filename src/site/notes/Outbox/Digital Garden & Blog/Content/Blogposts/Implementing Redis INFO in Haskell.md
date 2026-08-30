@@ -1,5 +1,5 @@
 ---
-{"dg-publish":true,"dg-path":" Posts/Implementing Redis INFO in Haskell.md","dg-permalink":"/posts/implementing-redis-info-in-haskell","permalink":"/posts/implementing-redis-info-in-haskell/","metatags":{"description":"You're INFO a treat"},"tags":["haskell","software-engineering"],"created":"2026-05-28T12:19:00","updated":"2026-08-12T13:49","dg-note-properties":{"tags":["haskell","software-engineering"],"created":"2026-05-28T12:19:00","updated":"2026-08-12T13:49"}}
+{"dg-publish":true,"dg-path":" Posts/Implementing Redis INFO in Haskell.md","dg-permalink":"/posts/implementing-redis-info-in-haskell","permalink":"/posts/implementing-redis-info-in-haskell/","metatags":{"description":"You're INFO a treat"},"tags":["haskell","software-engineering"],"created":"2026-05-28T12:19:00","updated":"2026-08-12T13:49","dg-note-properties":{"tags":["haskell","software-engineering"],"created":"2026-05-28T12:19:00","updated":"2026-08-12T13:49","title":"Implementing Redis INFO in Haskell","description":"You're INFO a treat","published":"2026-05-28T12:19:00","last_updated":"2026-08-12T13:49"}}
 ---
 
 

@@ -1,5 +1,5 @@
 ---
-{"dg-publish":true,"dg-path":" Posts/Numbers? Numerals? Oh Boy.md","dg-permalink":"/posts/numbers-numerals-oh-boy","permalink":"/posts/numbers-numerals-oh-boy/","metatags":{"description":"Ever wondered about the difference between numbers and numerals? Me neither, but here we are"},"tags":["software-engineering","computer-science"],"created":"2026-03-20T15:09","updated":"2026-08-12T13:49","dg-note-properties":{"tags":["software-engineering","computer-science"],"created":"2026-03-20T15:09","updated":"2026-08-12T13:49"}}
+{"dg-publish":true,"dg-path":" Posts/Numbers? Numerals? Oh Boy.md","dg-permalink":"/posts/numbers-numerals-oh-boy","permalink":"/posts/numbers-numerals-oh-boy/","metatags":{"description":"Ever wondered about the difference between numbers and numerals? Me neither, but here we are"},"tags":["software-engineering","computer-science"],"created":"2026-03-20T15:09","updated":"2026-08-12T13:49","dg-note-properties":{"tags":["software-engineering","computer-science"],"created":"2026-03-20T15:09","updated":"2026-08-12T13:49","title":"Numbers? Numerals? Oh Boy","description":"Ever wondered about the difference between numbers and numerals? Me neither, but here we are","published":"2026-03-20T15:09","last_updated":"2026-08-12T13:49"}}
 ---
 
 

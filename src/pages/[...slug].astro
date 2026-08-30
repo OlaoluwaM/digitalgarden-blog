@@ -1,0 +1,26 @@
+---
+import { getCollection, render } from "astro:content";
+
+// This is required for dynamic routes: https://docs.astro.build/en/guides/routing/#static-ssg-mode
+export async function getStaticPaths() {
+  const posts = await getCollection("posts");
+  return posts
+    .filter(p => {
+      const isToBePublished = p.data.pluginProps["dg-publish"];
+      const isHomePageContent = p.data.pluginProps.tags.includes("gardenEntry");
+
+      return isToBePublished && !isHomePageContent;
+    })
+    .map(p => ({
+      // We derive the slug from the permalink. We remove any leading or trailing slashes to ensure that the slug is valid.
+      // We use "permalink" instead of "dg-permalink" because even though the latter informs the former, there is still some processing the digital-garden plugin does to the permalink before it is ready for use. "dg-permalink" is the raw value from the frontmatter, while "permalink" is the processed value that is ready for use in the URL.
+      params: { slug: p.data.pluginProps.permalink.replace(/^\/|\/$/g, "") },
+      props: { post: p },
+    }));
+};
+
+const  { post } = Astro.props;
+const { Content: PostContent } = await render(post);
+---
+
+<PostContent />

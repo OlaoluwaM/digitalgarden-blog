@@ -1,5 +1,5 @@
 ---
-{"dg-publish":true,"dg-path":"Home.md","permalink":"/home/","tags":["gardenEntry"],"created":"2026-03-20T10:00","updated":"2026-08-12T13:49","dg-note-properties":{"created":"2026-03-20T10:00","updated":"2026-08-12T13:49"}}
+{"dg-publish":true,"dg-path":"Home.md","permalink":"/home/","tags":["gardenEntry"],"created":"2026-03-20T10:00","updated":"2026-08-12T13:49","dg-note-properties":{"created":"2026-03-20T10:00","updated":"2026-08-12T13:49","title":"Home","description":"PLACEHOLDER: reword me","tags":[],"published":"2026-03-20T10:00","last_updated":"2026-08-12T13:49"},"dg-permalink":"/home"}
 ---
 
 

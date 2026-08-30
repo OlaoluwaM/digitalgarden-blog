@@ -1,0 +1,10 @@
+---
+import { getCollection, render } from "astro:content";
+
+const posts = await getCollection("posts");
+// There should always be a garden entry, so we can safely use the non-null assertion operator here. If one doesn't exist, we want to throw an error and fail the build.
+const home = posts.find(p => p.data.pluginProps.tags.includes("gardenEntry"))!;
+const { Content: HomePageContent } = await render(home);
+---
+
+<HomePageContent />
