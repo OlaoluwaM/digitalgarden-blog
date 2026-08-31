@@ -13,7 +13,10 @@
     "build:eleventy:sass": "sass src/site/styles:dist/styles --style compressed",
     "get-theme": "cross-env DOTENV_CONFIG_QUIET=true node src/site/get-theme.js",
     "test": "node --test",
+    "generate:wikilink-index": "bash scripts/generate-wikilink-index.sh",
+    "predev:astro": "npm run generate:wikilink-index",
     "dev:astro": "astro dev",
+    "prebuild:astro": "npm run generate:wikilink-index",
     "build:astro": "astro build"
   },
   "keywords": [],
@@ -25,6 +28,8 @@
   "devDependencies": {
     "@11ty/eleventy": "^3.1.2",
     "@11ty/eleventy-plugin-rss": "^2.0.4",
+    "@types/mdast": "^4.0.4",
+    "@types/node": "^26.4.0",
     "cross-env": "^10.1.0",
     "html-minifier-terser": "^7.2.0",
     "node-html-parser": "^7.1.0",
@@ -34,6 +39,7 @@
   },
   "dependencies": {
     "@11ty/eleventy-img": "^4.0.2",
+    "@astrojs/markdown-satteri": "^0.3.8",
     "@shikijs/markdown-it": "^4.1.0",
     "@shikijs/transformers": "^4.1.0",
     "@sindresorhus/slugify": "^1.1.0",
