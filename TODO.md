@@ -16,3 +16,7 @@
   - Preserve wikilink provenance so plugins can distinguish `[[Example]]` from `[Example](Example)` without enabling position tracking and slicing `ctx.source`.
   - Fix escaped aliases such as `[[Folder/Note\|Alias]]`, which currently leave a trailing backslash in `node.url`.
   - If the maintainers prefer a general solution, propose `ctx.sourceText(node)` as the exact-source counterpart to `ctx.textContent(node)`.
+
+## Codebase
+
+- [ ] Custom wikilinks plugin doesn't yet work for wikilinks within callouts or code fences (admonitions)
