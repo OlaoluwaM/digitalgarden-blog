@@ -18,10 +18,6 @@ const posts = defineCollection({
 
     For now though, regarding property access, we can always use zod's transform method to make it more "ergonomic"
   */
-  // TODO: Update the note properties in the vault to align with this schema before this is merged into main
-  // TODO: Mirror the local note renames in the vault (see TODO.md) — filenames must not contain "?" or "#":
-  // Astro's content layer addresses files as file:// URLs, so those characters truncate the path and the
-  // note is silently dropped from the collection. Punctuation belongs in the "title" property instead.
   schema: () =>
     z
       .object({
