@@ -21,6 +21,8 @@
         devShells.default = pkgs.mkShell {
           packages = with pkgs; [
             nodejs_24
+            shfmt
+            shellcheck
           ];
 
           # SHELLHOOK: Commands that run automatically when entering the shell
