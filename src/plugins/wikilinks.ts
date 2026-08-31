@@ -11,21 +11,27 @@ export const mkmdastWikilinksPlugin = (wikilinkIndex: WikilinkIndex) =>
     },
 
     link(node, ctx) {
-      if (!node.position) return;
       // This node also matches regular markdown links like "[Example](example.com)" so we need to guard against that to ensure we're only working with wikilinks that look like "[[Example]]". It is also for this reason that nodeSourceText below isn't just equal to `ctx.textContent(node)` because it won't return back the actual different text in all cases
-      const { start, end } = node.position;
-      // Satteri for some reason doesn't seem to provide the actual node source text so we need to extract it using its absolute position in the overall document text
-      const nodeSourceText = ctx.source.slice(start.offset, end.offset);
-      const isWikilink =
-        nodeSourceText.startsWith("[[") && nodeSourceText.endsWith("]]");
-
-      if (!isWikilink) return;
+      if (!isWikilinkNode(ctx.source, node)) return;
       const newNode = transformWikilinkNode(wikilinkIndex, node);
       return newNode;
     },
   });
 
-function transformWikilinkNode(
+export function isWikilinkNode(
+  source: string,
+  currentNode: Readonly<Link>
+): boolean {
+  if (!currentNode.position) return false;
+
+  const { start, end } = currentNode.position;
+  // Satteri for some reason doesn't seem to provide the actual node source text so we need to extract it using its absolute position in the overall document text
+  const nodeSourceText = source.slice(start.offset, end.offset);
+
+  return nodeSourceText.startsWith("[[") && nodeSourceText.endsWith("]]");
+}
+
+export function transformWikilinkNode(
   wikilinkIndex: WikilinkIndex,
   currentNode: Readonly<Link>
 ) {
