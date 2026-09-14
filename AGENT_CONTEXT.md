@@ -56,11 +56,39 @@ with Eleventy; there is no single filtering or ordering rule for every route.
 - `src/site/feed.njk` reverses the note collection and excludes `/`.
   `src/site/_includes/layouts/random.njk` includes the published home note.
   `src/site/search-index.njk` has no `dg-hide` filter.
-- Permalinks are currently strings with no duplicate/shape validation.
+- The collection schema validates permalink format; `getPublishedPosts()`
+  rejects duplicate effective routes after filtering published posts.
 - `getRandomInt()` is unused; there is no exported random-post helper.
 - Minor cleanup: the home route's comment still refers to a removed non-null
   assertion. Neither cleanup item blocks the initial helper integration.
-- Duplicate/malformed permalink and wikilink-index validation remain open.
+- Duplicate/malformed wikilink-index validation remains open.
+
+## Permalink TDD exercise (2026-09-13)
+
+Olaolu implemented `permalinkSchema` and `assertUniquePermalinks` in
+`src/content/permalinks.ts`. The requested refinement uses `Map.groupBy()`
+and reports every conflicting route with all involved post IDs.
+
+- Approved format: `/` or nonempty segments of Unicode letters, digits,
+  hyphens and dots, separated by `/`, with an optional trailing slash.
+  Reject uppercase, underscores, standalone `.`/`..`, and percent encoding.
+  Do not normalize invalid inputs.
+- Uniqueness applies to published posts' effective routes. `gardenEntry`
+  claims `/`; collision errors must identify the route and both post IDs.
+  Paths differing only by a trailing slash count as duplicates. Preserve
+  original values when validating; route comparison must not mutate posts.
+- Run `npm run test:permalinks`. The focused command disables test isolation
+  to show individual assertions in this environment.
+- All 53 focused tests pass, including reporting multiple collision groups.
+  `npm test` passes all six test files.
+- Wired `permalinkSchema` into `src/content.config.ts` and
+  `assertUniquePermalinks()` into `getPublishedPosts()` after filtering.
+- Production build: 14 pages. Rebuilding content emitted Shiki warnings for
+  unregistered `ad-*` languages; the callout integration remains separate work.
+- Builds in a temporary project copy rejected malformed paths, trailing-slash
+  duplicates, and home-route collisions, with useful diagnostics. An
+  unpublished duplicate did not block the build. These were manual integration
+  checks, not persisted tests. Source notes were left untouched.
 
 ## Accepted decisions
 

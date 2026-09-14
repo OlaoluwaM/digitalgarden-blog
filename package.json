@@ -13,6 +13,7 @@
     "build:eleventy:sass": "sass src/site/styles:dist/styles --style compressed",
     "get-theme": "cross-env DOTENV_CONFIG_QUIET=true node src/site/get-theme.js",
     "test": "node --test",
+    "test:permalinks": "node --test --test-isolation=none test/permalinks.test.ts",
     "generate:wikilink-index": "bash scripts/generate-wikilink-index.sh",
     "predev:astro": "npm run generate:wikilink-index",
     "dev:astro": "astro dev",

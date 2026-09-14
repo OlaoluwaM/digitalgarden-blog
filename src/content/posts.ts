@@ -1,4 +1,5 @@
 import { getCollection, type CollectionEntry } from "astro:content";
+import { assertUniquePermalinks } from "./permalinks.ts";
 
 type Post = CollectionEntry<"posts">;
 
@@ -6,10 +7,13 @@ const DEFAULT_LIMIT = 3;
 
 export async function getPublishedPosts(): Promise<Post[]> {
   const posts = await getCollection("posts");
-  return posts.filter(p => {
+  const publishedPosts = posts.filter(p => {
     const shouldBePublished = p.data.pluginProps["dg-publish"];
     return shouldBePublished;
   });
+
+  assertUniquePermalinks(publishedPosts);
+  return publishedPosts;
 }
 
 export function getHomePost(posts: Post[]): Post {

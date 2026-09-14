@@ -19,7 +19,7 @@
 - [x] Implement `src/content/posts.ts` and use it in the page routes.
 - [x] Centralize home-note selection and recent-article date handling.
 - [x] Sort recent articles by `published`, newest first; default to three entries.
-- [ ] Fail on duplicate or malformed permalinks.
+- [x] Fail on duplicate or malformed permalinks.
 - [x] Fail unless exactly one published `gardenEntry` exists.
 - [ ] Fail on duplicate or malformed wikilink-index entries.
 
