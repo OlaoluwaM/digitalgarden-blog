@@ -28,7 +28,7 @@ Vault publishing remains paused pending the tasks in [TODO.md](TODO.md).
   selection, and recent sorting. Home and article routes use its helpers;
   the Recent Posts interface remains to be built.
 - `astro.config.ts` registers the wikilink plugin only. The generated index
-  is rebuilt before Astro dev/build by `scripts/generate-wikilink-index.sh`.
+  is rebuilt before Astro dev/build by `scripts/generate-wikilink-index.ts`.
   Do not edit `src/generated/wikilink-index.ts` manually.
 - `src/plugins/admonitions.ts` converts legacy `ad-*` fences to blockquote
   Markdown and resolves nested wikilinks. Its isolated tests pass, but the
@@ -61,7 +61,7 @@ with Eleventy; there is no single filtering or ordering rule for every route.
 - `getRandomInt()` is unused; there is no exported random-post helper.
 - Minor cleanup: the home route's comment still refers to a removed non-null
   assertion. Neither cleanup item blocks the initial helper integration.
-- Duplicate/malformed wikilink-index validation remains open.
+- Duplicate/malformed wikilink-index validation is integrated and tested.
 
 ## Permalink TDD exercise (2026-09-13)
 
@@ -89,6 +89,32 @@ and reports every conflicting route with all involved post IDs.
   duplicates, and home-route collisions, with useful diagnostics. An
   unpublished duplicate did not block the build. These were manual integration
   checks, not persisted tests. Source notes were left untouched.
+
+## Wikilink index generator (2026-09-13)
+
+- Replaced the Bash generator with TypeScript. The
+  `npm run generate:wikilink-index` command and Astro pre-dev/pre-build hooks
+  remain in place; no dependencies were added.
+- Uses native filesystem globbing, installed `gray-matter` for frontmatter,
+  `permalinkSchema` for paths, and the installed Prettier API for formatting.
+  Missing tags default to an empty array; supplied tags must be strings in an
+  array. Metadata-like text in the Markdown body is ignored.
+- Duplicate extensionless targets fail with both source filenames. Different
+  target names may share a destination. All ingress notes remain indexed,
+  regardless of `dg-publish`, matching the previous generator's scope.
+- Validate stored permalinks before mapping a `gardenEntry` to `/`. Fail with
+  source diagnostics for missing or malformed metadata.
+- Preserve the previous byte ordering of targets. JSON serialization and
+  `Object.fromEntries()` protect escaped filenames and keys such as `__proto__`.
+- Finish validation and formatting before writing a temporary file beside the
+  output, then rename it into place. Failures preserve the previous index.
+- TDD: the new CLI tests exposed 15 failures in the Bash version; all 19 now
+  pass. Run `npm run test:wikilink-index`. Tests use isolated temporary note
+  directories and capture subprocess output to files for sandbox compatibility.
+- Verified all 14 mappings and their order match the old generated index.
+  `npm test` passes seven test files; `npm run build:astro` builds 14 pages.
+- Node emits `MODULE_TYPELESS_PACKAGE_JSON` for the TypeScript entry point in
+  this mixed CommonJS/ESM project. No package-wide module-mode change was made.
 
 ## Accepted decisions
 

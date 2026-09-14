@@ -21,7 +21,7 @@
 - [x] Sort recent articles by `published`, newest first; default to three entries.
 - [x] Fail on duplicate or malformed permalinks.
 - [x] Fail unless exactly one published `gardenEntry` exists.
-- [ ] Fail on duplicate or malformed wikilink-index entries.
+- [x] Fail on duplicate or malformed wikilink-index entries.
 
 ## Markdown and Assets
 
