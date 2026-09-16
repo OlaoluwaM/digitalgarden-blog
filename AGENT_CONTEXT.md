@@ -120,16 +120,25 @@ and reports every conflicting route with all involved post IDs.
 
 - The visitor in `src/plugins/hast/callout.ts` returns the transformed node;
   the plugin is registered in Astro's `hastPlugins`.
-- All 78 tests pass with `npm run test:callouts`. Coverage includes header
+- All 79 tests pass with `npm run test:callouts`; the admonition suite adds
+  nine tests, for 88 across both files. Coverage includes header
   boundaries, malformed markers, nested formatting, whitespace preservation,
   title defaults, metadata, attributes, nested/sibling callouts, and MDAST composition.
 - Every callout is collapsible; only `-` starts closed. Default titles are
   supplied by the HAST plugin for both native callouts and converted admonitions.
+- `transformAdmonitionCodeBlock()` recursively converts direct nested `ad-*`
+  code children and preserves ordinary code. Each conversion resolves wikilinks
+  against its own generated Markdown. Traversal through lists is outside the
+  agreed scope. Tests cover three levels and nested link/title/collapse behavior.
 - `npm test` passes all eight test files; TypeScript passes. Astro builds
-  14 pages. Verified 12 callouts in generated HTML, including native callouts
-  and converted TLDR/Horner's Method fences, with titles and collapse classes.
-- Browser styles, icons/toggling, and nested `ad-*` fence conversion remain
-  separate. Rendered HTML and plugin tests do not prove browser behavior.
+  14 pages. Verified 13 callouts in generated HTML, including the Maths nested
+  aside, its default title, the outer wikilink, and preserved algorithm code.
+- After Markdown plugin implementation changes, use
+  `npm run build:astro -- --force` for verification. A normal build reused
+  stale rendered content; the forced build cleared the content store and
+  rendered the nested aside correctly.
+- Browser styles and icons/toggling remain separate. Rendered HTML and plugin
+  tests do not prove browser behavior.
 
 ## Accepted decisions
 
@@ -150,12 +159,10 @@ ordinary fenced code. The learning note at
 [docs/satteri-markdown-pipeline.md](docs/satteri-markdown-pipeline.md) provides
 background; check the current implementation when using it.
 
-The admonition converter is registered. Verification on 2026-09-13: all seven
-test files pass and Astro builds 14 pages. Built Endianness and Maths pages
-contain the converted TLDR and Horner's Method blockquotes. The nested
-`ad-aside` in the Maths note still renders as code and triggers a Shiki warning.
-Callout HTML is now integrated and verified as described above. Nested fence
-conversion and browser styling/collapse behavior remain unfinished.
+The admonition converter and callout renderer are registered. A forced build
+on 2026-09-16 verified the converted TLDR/Horner's Method callouts and the
+Maths note's nested `ad-aside`. Browser styling/collapse behavior remains
+unfinished.
 
 The Redis post references
 `/img/user/Extras/Assets/redis-info-server-got-hands-meme.jpg`, but the build

@@ -27,7 +27,7 @@
 
 - [x] Register the admonition plugin in Astro.
 - [x] Render callout markup for Obsidian blockquotes and converted `ad-*` fences.
-- [ ] Verify nested callouts, titles, collapse states, and wikilinks in built pages.
+- [x] Verify nested callouts, titles, collapse states, and wikilinks in built pages.
 - [ ] Resolve publisher image paths through Astro's image pipeline.
 - [ ] Keep original `/img/user/*` URLs available.
 - [ ] Generate image dimensions and responsive sources.

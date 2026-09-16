@@ -11,7 +11,8 @@ import { mkmdastWikilinksPlugin } from "../src/plugins/mdast/wikilinks.ts";
 // Exercise the public plugin through Sätteri. Assertions describe the HTML
 // expected by the existing callout styles and browser script. Whitespace,
 // attribute order, and the implementation's helper functions can vary.
-// Browser interaction and nested ad-* fence conversion are separate work.
+// Browser interaction is separate; nested ad-* conversion is exercised below
+// with both the MDAST converter and HAST renderer enabled.
 const render = (markdown: string) =>
   markdownToHtml(markdown, {
     hastPlugins: [hastAdmonitionCalloutPlugin],
@@ -608,6 +609,59 @@ describe("callout plugin composition", () => {
     mkmdastWikilinksPlugin(index),
     mkmdastAdmonitionCalloutPlugin(index),
   ];
+
+  it("renders nested ad-* fences with independent titles, collapse states, and wikilinks", () => {
+    const markdown = [
+      "````ad-note",
+      "title: Outer",
+      "collapse: false",
+      "Before.",
+      "",
+      "```ad-aside",
+      "title: Inner **title**",
+      "collapse: true",
+      "See [[Some Note|this note]] and [[Missing]].",
+      "```",
+      "",
+      "After.",
+      "````",
+    ].join("\n");
+    const { html } = markdownToHtml(markdown, {
+      features: { wikilinks: true },
+      mdastPlugins,
+      hastPlugins: [hastAdmonitionCalloutPlugin],
+    });
+    const document = parse(html);
+    const outer = required(document, '.callout[data-callout="note"]');
+    const inner = required(body(outer), '.callout[data-callout="aside"]');
+    assert.equal(document.querySelectorAll(".callout").length, 2);
+    assert.equal(title(outer).textContent, "Outer");
+    assert.equal(title(inner).textContent, "Inner title");
+    assert.equal(required(title(inner), "strong").textContent, "title");
+    assert.ok(outer.classList.contains("is-collapsible"));
+    assert.ok(inner.classList.contains("is-collapsible"));
+    assert.ok(!outer.classList.contains("is-collapsed"));
+    assert.ok(inner.classList.contains("is-collapsed"));
+    assert.equal(body(inner).textContent.trim(), "See this note and Missing.");
+    const resolved = required(body(inner), 'a[href="/posts/some-note/"]');
+    assert.equal(resolved.textContent, "this note");
+    assert.ok(resolved.classList.contains("internal-link"));
+    assert.ok(!resolved.classList.contains("is-unresolved"));
+    assert.ok(
+      required(body(inner), 'a[href="/404"]').classList.contains(
+        "is-unresolved"
+      )
+    );
+    const siblings = body(outer).children.filter(
+      child => child.tagName === "P"
+    );
+    assert.deepEqual(
+      siblings.map(child => child.textContent),
+      ["Before.", "After."]
+    );
+    assert.equal(outer.querySelector("pre"), null);
+    assert.equal(outer.querySelector("blockquote"), null);
+  });
 
   for (const [name, metadata, expectedTitle, collapsed] of [
     ["omitted title and collapse", "", "Note", false],

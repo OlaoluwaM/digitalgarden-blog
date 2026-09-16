@@ -2,47 +2,72 @@ import { defineMdastPlugin, markdownToMdast } from "satteri";
 import type { MdastNode } from "satteri";
 import type { WikilinkIndex } from "../../generated/wikilink-index.ts";
 import { isWikilinkNode, transformWikilinkNode } from "./wikilinks.ts";
+import type { Blockquote, Code } from "mdast";
 
 export const mkmdastAdmonitionCalloutPlugin = (wikilinkIndex: WikilinkIndex) =>
   defineMdastPlugin({
     name: "mdast-admonition-callout",
 
     code(node) {
-      const language = node.lang;
-
-      if (!language?.startsWith("ad-")) return;
-
-      const type = language.slice(3);
-      if (!type) {
-        throw new Error("An admonition must specify a type after `ad-`");
-      }
-
-      const { title, collapse, body } = parseAdmonitionBodyToParts(node.value);
-
-      const calloutMarkdown = [
-        `> [!${type}]${collapseStateToSign(collapse)} ${title}`,
-        ">",
-        ...body.split("\n").map(line => `> ${line}`),
-      ].join("\n");
-
-      // Parse the generated callout now, while its wikilinks still have
-      // positions relative to the generated Markdown.
-      const calloutTree = resolveWikilinksInTree(
-        markdownToMdast(calloutMarkdown, {
-          features: { wikilinks: true },
-          position: true,
-        }),
-        calloutMarkdown,
-        wikilinkIndex
-      );
-
-      if (calloutTree.type !== "root" || calloutTree.children.length !== 1) {
-        throw new Error("An admonition must produce exactly one callout node");
-      }
-
-      return calloutTree.children[0];
+      return transformAdmonitionCodeBlock(node, wikilinkIndex);
     },
   });
+
+function transformAdmonitionCodeBlock(
+  node: Code,
+  wikilinkIndex: WikilinkIndex
+): Code | Blockquote {
+  const language = node.lang;
+
+  if (!language?.startsWith("ad-")) return node;
+
+  const type = language.slice(3);
+
+  if (!type) {
+    throw new Error("An admonition must specify a type after `ad-`");
+  }
+
+  const { title, collapse, body } = parseAdmonitionBodyToParts(node.value);
+
+  const calloutMarkdown = [
+    `> [!${type}]${collapseStateToSign(collapse)} ${title}`,
+    ">",
+    ...body.split("\n").map(line => `> ${line}`),
+  ].join("\n");
+
+  // Parse the generated callout now, while its wikilinks still have
+  // positions relative to the generated Markdown.
+  const calloutTree = resolveWikilinksInTree(
+    markdownToMdast(calloutMarkdown, {
+      features: { wikilinks: true },
+      position: true,
+    }),
+    calloutMarkdown,
+    wikilinkIndex
+  );
+
+  if (calloutTree.type !== "root" || calloutTree.children.length !== 1) {
+    throw new Error("An admonition must produce exactly one callout node");
+  }
+
+  const generatedBlockquote = calloutTree.children[0];
+  if (generatedBlockquote.type !== "blockquote") {
+    throw new Error(
+      `Expected ad-${type} to produce a blockquote, but got "${generatedBlockquote.type}"`
+    );
+  }
+
+  return {
+    ...generatedBlockquote,
+    children: generatedBlockquote.children.map(child => {
+      if (child.type === "code") {
+        return transformAdmonitionCodeBlock(child, wikilinkIndex);
+      }
+
+      return child;
+    }),
+  };
+}
 
 function resolveWikilinksInTree(
   node: MdastNode,
@@ -54,7 +79,7 @@ function resolveWikilinksInTree(
   }
 
   if (!("children" in node)) return node;
-  [node];
+
   return {
     ...node,
     children: node.children.map(child =>
