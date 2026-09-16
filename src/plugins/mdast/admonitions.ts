@@ -1,6 +1,6 @@
 import { defineMdastPlugin, markdownToMdast } from "satteri";
 import type { MdastNode } from "satteri";
-import type { WikilinkIndex } from "../generated/wikilink-index.ts";
+import type { WikilinkIndex } from "../../generated/wikilink-index.ts";
 import { isWikilinkNode, transformWikilinkNode } from "./wikilinks.ts";
 
 export const mkmdastAdmonitionCalloutPlugin = (wikilinkIndex: WikilinkIndex) =>
@@ -17,10 +17,7 @@ export const mkmdastAdmonitionCalloutPlugin = (wikilinkIndex: WikilinkIndex) =>
         throw new Error("An admonition must specify a type after `ad-`");
       }
 
-      const { title, collapse, body } = parseAdmonitionBodyToParts(
-        node.value,
-        type
-      );
+      const { title, collapse, body } = parseAdmonitionBodyToParts(node.value);
 
       const calloutMarkdown = [
         `> [!${type}]${collapseStateToSign(collapse)} ${title}`,
@@ -57,7 +54,7 @@ function resolveWikilinksInTree(
   }
 
   if (!("children" in node)) return node;
-
+  [node];
   return {
     ...node,
     children: node.children.map(child =>
@@ -74,17 +71,15 @@ interface AdmonitionParts {
 
 type Collapse = "open" | "closed";
 
-function parseAdmonitionBodyToParts(
-  body: string,
-  admonitionType: string
-): AdmonitionParts {
+function parseAdmonitionBodyToParts(body: string): AdmonitionParts {
   const metadataLine = /^(title|collapse):[ \t]*(.*)$/;
   const carriageReturn = /\r$/;
 
   let cursor = 0;
 
   const admonitionParts: AdmonitionParts = {
-    title: toTitleCase(admonitionType),
+    // The HAST callout plugin supplies the default title.
+    title: "",
     collapse: "open",
     body,
   };
@@ -127,21 +122,6 @@ function parseAdmonitionBodyToParts(
   admonitionParts["body"] = body.slice(cursor);
 
   return admonitionParts;
-}
-
-const CALLOUT_TITLE_OVERRIDES: Record<string, string> = {
-  "ai-text": "AI Text",
-};
-
-function toTitleCase(str: string) {
-  const override = CALLOUT_TITLE_OVERRIDES[str.toLowerCase()];
-  if (override) return override;
-  return str
-    .replace(/-/g, " ")
-    .replace(
-      /\w\S*/g,
-      word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase()
-    );
 }
 
 function resolveCollapseKeyValToState(val: string): Collapse {

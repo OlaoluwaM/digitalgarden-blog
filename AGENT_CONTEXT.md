@@ -27,13 +27,13 @@ Vault publishing remains paused pending the tasks in [TODO.md](TODO.md).
 - `src/content/posts.ts` implements published-post filtering, home/article
   selection, and recent sorting. Home and article routes use its helpers;
   the Recent Posts interface remains to be built.
-- `astro.config.ts` registers the wikilink plugin only. The generated index
+- `astro.config.ts` registers the wikilink, admonition, and HAST callout plugins. The generated index
   is rebuilt before Astro dev/build by `scripts/generate-wikilink-index.ts`.
   Do not edit `src/generated/wikilink-index.ts` manually.
-- `src/plugins/admonitions.ts` converts legacy `ad-*` fences to blockquote
-  Markdown and resolves nested wikilinks. Its isolated tests pass, but the
-  plugin is not registered in Astro. Tests assert plain blockquotes containing
-  `[!note]`, not finished callout markup or collapse behavior.
+- `src/plugins/mdast/admonitions.ts` converts legacy `ad-*` fences to blockquote
+  Markdown and resolves nested wikilinks. It is registered in Astro; tests
+  assert plain blockquotes containing `[!note]`, not finished callout markup
+  or collapse behavior.
 - Astro does not yet load the shared layout, styles, or client behavior.
   `.claude/skills/sync-callouts/SKILL.md` still targets the Eleventy Sass and
   `calloutScript.njk`; those remain the reference during the visual port.
@@ -116,6 +116,21 @@ and reports every conflicting route with all involved post IDs.
 - Node emits `MODULE_TYPELESS_PACKAGE_JSON` for the TypeScript entry point in
   this mixed CommonJS/ESM project. No package-wide module-mode change was made.
 
+## HAST callout integration (2026-09-16)
+
+- The visitor in `src/plugins/hast/callout.ts` returns the transformed node;
+  the plugin is registered in Astro's `hastPlugins`.
+- All 78 tests pass with `npm run test:callouts`. Coverage includes header
+  boundaries, malformed markers, nested formatting, whitespace preservation,
+  title defaults, metadata, attributes, nested/sibling callouts, and MDAST composition.
+- Every callout is collapsible; only `-` starts closed. Default titles are
+  supplied by the HAST plugin for both native callouts and converted admonitions.
+- `npm test` passes all eight test files; TypeScript passes. Astro builds
+  14 pages. Verified 12 callouts in generated HTML, including native callouts
+  and converted TLDR/Horner's Method fences, with titles and collapse classes.
+- Browser styles, icons/toggling, and nested `ad-*` fence conversion remain
+  separate. Rendered HTML and plugin tests do not prove browser behavior.
+
 ## Accepted decisions
 
 - Route from processed `permalink`, not filenames or raw `dg-permalink`.
@@ -127,7 +142,7 @@ and reports every conflicting route with all involved post IDs.
 
 ## Markdown and image gaps
 
-`src/plugins/wikilinks.ts` uses source positions to distinguish wikilinks
+`src/plugins/mdast/wikilinks.ts` uses source positions to distinguish wikilinks
 from ordinary links, resolves the generated index, and marks missing targets
 with `/404` and `is-unresolved`. Admonitions resolve links while reparsed
 fragment positions still match their source. Preserve literal inline and
@@ -135,9 +150,12 @@ ordinary fenced code. The learning note at
 [docs/satteri-markdown-pipeline.md](docs/satteri-markdown-pipeline.md) provides
 background; check the current implementation when using it.
 
-Register the admonition converter and implement callout HTML before claiming
-site support. Nested callouts, titles, and collapse behavior still need built
-page and browser verification.
+The admonition converter is registered. Verification on 2026-09-13: all seven
+test files pass and Astro builds 14 pages. Built Endianness and Maths pages
+contain the converted TLDR and Horner's Method blockquotes. The nested
+`ad-aside` in the Maths note still renders as code and triggers a Shiki warning.
+Callout HTML is now integrated and verified as described above. Nested fence
+conversion and browser styling/collapse behavior remain unfinished.
 
 The Redis post references
 `/img/user/Extras/Assets/redis-info-server-got-hands-meme.jpg`, but the build

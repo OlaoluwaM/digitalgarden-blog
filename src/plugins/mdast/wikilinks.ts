@@ -1,5 +1,5 @@
 import { defineMdastPlugin } from "satteri";
-import type { WikilinkIndex } from "../generated/wikilink-index.ts";
+import type { WikilinkIndex } from "../../generated/wikilink-index.ts";
 import type { Link } from "mdast";
 
 export const mkmdastWikilinksPlugin = (wikilinkIndex: WikilinkIndex) =>

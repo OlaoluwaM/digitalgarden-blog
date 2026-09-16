@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { markdownToHtml } from "satteri";
 
-import { mkmdastWikilinksPlugin } from "../src/plugins/wikilinks.ts";
+import { mkmdastWikilinksPlugin } from "../src/plugins/mdast/wikilinks.ts";
 
 const wikilinkIndex = {
   "Some Note": "/posts/some-note/",

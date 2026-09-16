@@ -25,8 +25,8 @@
 
 ## Markdown and Assets
 
-- [ ] Register the admonition plugin in Astro.
-- [ ] Render callout markup for Obsidian blockquotes and converted `ad-*` fences.
+- [x] Register the admonition plugin in Astro.
+- [x] Render callout markup for Obsidian blockquotes and converted `ad-*` fences.
 - [ ] Verify nested callouts, titles, collapse states, and wikilinks in built pages.
 - [ ] Resolve publisher image paths through Astro's image pipeline.
 - [ ] Keep original `/img/user/*` URLs available.
