@@ -185,7 +185,7 @@ produces an optimized asset under `/_astro/`.
 Responsive sources use Astro's defaults. Olaolu dropped preservation of original
 `/img/user/*` URLs on 2026-09-17; do not add copying or redirects for those URLs.
 Remote optimization policy and build-level fixtures for SVGs and encoded filenames
-remain open. The missing-image build test below exposes a failure-propagation gap.
+remain open. A local Astro patch fixes the missing-image failure-propagation gap.
 
 ### Digital Garden image resolver TDD (2026-09-16)
 
@@ -247,12 +247,20 @@ remain open. The missing-image build test below exposes a failure-propagation ga
   an image, then references a nonexistent /img/user/ asset on a forced rebuild.
   Notes, assets, build output, and caches are isolated from the real project.
 - The test checks the image URL, absolute note path, and nonzero exit status.
-  It currently fails: Astro logs the resolver's diagnostic but exits with 0.
-- In installed Astro 7.2.9, `dist/content/loaders/glob.js` catches rendering
-  errors and logs them without rethrowing. Resolver/plugin tests therefore
-  do not prove that a missing image stops a full site build.
-- Leave this test red until failure propagation is fixed. Application code is
-  unchanged; the other 11 test files pass.
+  It failed against unpatched Astro 7.2.9, which logged the error but exited 0.
+- `patches/astro+7.2.9.patch` removes the rendering catch in the glob loader.
+  Sync now rejects before storing a failed render. Default rendering caches
+  remain enabled; the site does not use `deferRender`.
+- Astro is pinned to 7.2.9. npm's `postinstall` reapplies the patch and fails
+  if it cannot apply. Reversing the patch and running an offline `npm install`
+  verified reapplication. See `patches/README.md` for upkeep and upstream steps.
+- With the patch, all 12 test files and source TypeScript pass. A forced site
+  build produces all 14 pages. A separate loader probe with a stub watcher/store
+  verified error identity, no failed entry caching, preservation of the valid
+  entry on a watched failure, and recovery on a corrected edit. This probe was
+  not a live dev-server test or an addition to the committed test suite.
+- The upstream issue form was prepared for Olaolu to submit. No issue or PR
+  has been created by the agent; the upstream source change and tests remain.
 
 ## Verification and deployment
 

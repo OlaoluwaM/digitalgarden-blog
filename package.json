@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "postinstall": "patch-package --error-on-fail",
     "prebuild": "rimraf dist",
     "start:eleventy": "npm-run-all2 get-theme build:sass --parallel watch:eleventy:*",
     "watch:eleventy:sass": "sass --watch src/site/styles:dist/styles",
@@ -40,6 +41,7 @@
     "cross-env": "^10.1.0",
     "html-minifier-terser": "^7.2.0",
     "node-html-parser": "^7.1.0",
+    "patch-package": "^8.0.1",
     "prettier": "^3.9.6",
     "prettier-plugin-astro": "^0.14.1",
     "sass": "^1.99.0"
@@ -50,7 +52,7 @@
     "@shikijs/markdown-it": "^4.1.0",
     "@shikijs/transformers": "^4.1.0",
     "@sindresorhus/slugify": "^1.1.0",
-    "astro": "^7.2.9",
+    "astro": "7.2.9",
     "axios": "^1.16.1",
     "dotenv": "^17.4.2",
     "eleventy-plugin-gen-favicons": "^1.1.2",
