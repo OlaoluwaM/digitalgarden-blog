@@ -181,8 +181,8 @@ Publisher notes and source images remain unchanged. The Redis post's
 `/img/user/Extras/Assets/redis-info-server-got-hands-meme.jpg` reference now
 produces an optimized asset under `/_astro/`.
 
-Responsive sources and serving the original `/img/user/...` URLs remain open.
-The original URL is not copied by this integration. Remote optimization policy
+Responsive sources use Astro's defaults. Serving the original `/img/user/...`
+URLs remains open; the original URL is not copied by this integration. Remote optimization policy
 and build-level fixtures for SVGs, encoded filenames, and missing images are
 still separate work.
 
@@ -198,8 +198,8 @@ still separate work.
 - The return value is an encoded relative URL. Inputs include the absolute
   note path and publisher image directory. The synchronous resolver requires
   a /img/user/ URL; the visitor owns URL filtering and passthrough tests.
-- Source TypeScript and focused image tests pass. Responsive images and original
-  URL serving remain open, as does remote optimization policy.
+- Source TypeScript and focused image tests pass. Original URL serving and
+  remote optimization policy remain open.
 
 ### Image plugin TDD
 
@@ -220,12 +220,24 @@ still separate work.
 - `npm run build:astro -- --force` builds all 14 pages and generates the Redis
   image as a 515 x 500 WebP: 16,588 bytes versus the 46,903-byte source JPEG.
 - The generated HTML preserves the exact alt text and includes width/height.
-  Decoding the generated image confirms those dimensions. Its `srcset` is
-  empty; responsive variants have not been configured.
+  Decoding the generated image confirms those dimensions.
 - A local Astro preview served the Redis page and its optimized image with
   HTTP 200. The image response was `image/webp` with the expected byte count.
   The temporary preview was stopped. Browser layout was not inspected.
 - All 11 test files, TypeScript, and config formatting checks pass.
+
+### Responsive image defaults (2026-09-17)
+
+- `astro.config.ts` sets `image.layout: "constrained"` and enables
+  `image.responsiveStyles`. Breakpoints and generated sizes use Astro's defaults.
+- A forced build produces `sizes="(min-width: 515px) 515px, 100vw"` and one
+  515w source for the Redis image. Its source width is below the default
+  breakpoints, so Astro does not generate additional widths for this image.
+- Verified the source candidate decodes to 515 x 500 and retains the alt text.
+  The build, TypeScript, and config formatting checks pass.
+- The built Redis page currently emits no stylesheet or inline styles despite
+  enabling responsiveStyles. Verify CSS delivery and small-screen sizing when
+  adding the shared layout; responsive markup alone does not prove layout behavior.
 
 ## Verification and deployment
 

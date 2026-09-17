@@ -17,6 +17,10 @@ const mdastDigitalGardenImagesPlugin = mkmdastDigitalGardenImagesPlugin(
 export default defineConfig({
   site: "https://thunk.blog",
   outDir: "dist-astro",
+  image: {
+    layout: "constrained",
+    responsiveStyles: true,
+  },
   markdown: {
     processor: satteri({
       features: {
