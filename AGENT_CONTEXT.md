@@ -175,19 +175,16 @@ on 2026-09-16 verified the converted TLDR/Horner's Method callouts and the
 Maths note's nested `ad-aside`. Browser styling/collapse behavior remains
 unfinished.
 
-The Redis post references
-`/img/user/Extras/Assets/redis-info-server-got-hands-meme.jpg`, but the build
-does not copy that asset. The source exists under `src/site/img/user/`.
-Image handling is still open. The prior proposal, not an approved design:
+The image plugin is now registered after admonition conversion in `astro.config.ts`.
+Its absolute image directory is resolved from the config's `import.meta.url`.
+Publisher notes and source images remain unchanged. The Redis post's
+`/img/user/Extras/Assets/redis-info-server-got-hands-meme.jpg` reference now
+produces an optimized asset under `/_astro/`.
 
-1. Keep `src/site/img` as publisher ingress; rewrite `/img/user/...` references
-   to local assets at the Markdown boundary for Astro optimization.
-2. Generate intrinsic dimensions and responsive sources; preserve alt text.
-3. Also serve original `/img/user/...` URLs for URL parity.
-
-Copying images to `public/img` is simpler but does not meet the checklist's
-optimization requirement by itself. Check Astro's current APIs before choosing
-the approach. Verify missing assets, spaces/encoding, remote images, and SVGs.
+Responsive sources and serving the original `/img/user/...` URLs remain open.
+The original URL is not copied by this integration. Remote optimization policy
+and build-level fixtures for SVGs, encoded filenames, and missing images are
+still separate work.
 
 ### Digital Garden image resolver TDD (2026-09-16)
 
@@ -201,8 +198,8 @@ the approach. Verify missing assets, spaces/encoding, remote images, and SVGs.
 - The return value is an encoded relative URL. Inputs include the absolute
   note path and publisher image directory. The synchronous resolver requires
   a /img/user/ URL; the visitor owns URL filtering and passthrough tests.
-- Source TypeScript and focused image tests pass. Site registration, responsive
-  images, and original URL serving remain open, as does remote optimization policy.
+- Source TypeScript and focused image tests pass. Responsive images and original
+  URL serving remain open, as does remote optimization policy.
 
 ### Image plugin TDD
 
@@ -214,10 +211,21 @@ the approach. Verify missing assets, spaces/encoding, remote images, and SVGs.
   They cover URL passthrough without a note URL, asset
   collection, alt/title preservation, encoding, SVGs, per-note paths, native
   and nested converted callouts, missing files, and missing note URLs.
-- Tests place the image plugin after admonition conversion. The site config
-  has not yet been updated to register it.
+- Tests and the site config place the image plugin after admonition conversion.
 - These tests check image import metadata and Astro's HTML image markers.
   They do not verify optimized files, responsive output, or original URL serving.
+
+### Image site integration verification
+
+- `npm run build:astro -- --force` builds all 14 pages and generates the Redis
+  image as a 515 x 500 WebP: 16,588 bytes versus the 46,903-byte source JPEG.
+- The generated HTML preserves the exact alt text and includes width/height.
+  Decoding the generated image confirms those dimensions. Its `srcset` is
+  empty; responsive variants have not been configured.
+- A local Astro preview served the Redis page and its optimized image with
+  HTTP 200. The image response was `image/webp` with the expected byte count.
+  The temporary preview was stopped. Browser layout was not inspected.
+- All 11 test files, TypeScript, and config formatting checks pass.
 
 ## Verification and deployment
 
