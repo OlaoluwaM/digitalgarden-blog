@@ -9,6 +9,11 @@ Astro implementation: [REWRITE.md](REWRITE.md).
 - [ ] Keep the original titles in each note's `title` property. Avoid `?` and `#` in publishable filenames.
 - [ ] Align vault properties with [the content schema](src/content.config.ts): explicit `dg-permalink`; `title`, `description`, `tags`, `published`, and `last_updated` under `dg-note-properties` in publisher output.
 
+## Deferred upstream PRs
+
+- [ ] Astro: upstream the Markdown rendering error fix and regression tests from the [local patch](patches/astro+7.2.9.patch).
+- [ ] Digital Garden plugin: add an option to sync content through a pull request instead of committing directly to `main`.
+
 ## Upstream Sätteri
 
 Open focused issues; offer PRs after maintainers confirm the direction.
