@@ -8,6 +8,7 @@ Recheck source before relying on this snapshot.
 Olaolu is implementing in Learn / Guide mode. Preserve published content,
 public URLs, and the existing desktop/mobile design. Eleventy remains the
 reference until parity and cutover; Astro builds separately into `dist-astro`.
+Exception agreed on 2026-09-17: original `/img/user/*` URLs need not remain available.
 Vault publishing remains paused pending the tasks in [TODO.md](TODO.md).
 
 - [AGENTS.md](AGENTS.md): session requirements and working conventions.
@@ -181,10 +182,10 @@ Publisher notes and source images remain unchanged. The Redis post's
 `/img/user/Extras/Assets/redis-info-server-got-hands-meme.jpg` reference now
 produces an optimized asset under `/_astro/`.
 
-Responsive sources use Astro's defaults. Serving the original `/img/user/...`
-URLs remains open; the original URL is not copied by this integration. Remote optimization policy
-and build-level fixtures for SVGs, encoded filenames, and missing images are
-still separate work.
+Responsive sources use Astro's defaults. Olaolu dropped preservation of original
+`/img/user/*` URLs on 2026-09-17; do not add copying or redirects for those URLs.
+Remote optimization policy and build-level fixtures for SVGs, encoded filenames,
+and missing images remain open.
 
 ### Digital Garden image resolver TDD (2026-09-16)
 
@@ -198,8 +199,8 @@ still separate work.
 - The return value is an encoded relative URL. Inputs include the absolute
   note path and publisher image directory. The synchronous resolver requires
   a /img/user/ URL; the visitor owns URL filtering and passthrough tests.
-- Source TypeScript and focused image tests pass. Original URL serving and
-  remote optimization policy remain open.
+- Source TypeScript and focused image tests pass. Remote optimization policy
+  remains open.
 
 ### Image plugin TDD
 
@@ -213,7 +214,7 @@ still separate work.
   and nested converted callouts, missing files, and missing note URLs.
 - Tests and the site config place the image plugin after admonition conversion.
 - These tests check image import metadata and Astro's HTML image markers.
-  They do not verify optimized files, responsive output, or original URL serving.
+  They do not verify optimized files or responsive output.
 
 ### Image site integration verification
 

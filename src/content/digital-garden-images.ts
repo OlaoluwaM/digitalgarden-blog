@@ -18,8 +18,8 @@ export interface DigitalGardenImageContext {
  * Reject missing files, directories, and malformed encoding. Errors must name
  * both the original image URL and the note that contains it.
  *
- * This helper only resolves paths. Image optimization, alt text, and serving
- * the original public URLs belong to the later integration step.
+ * This helper only resolves paths. The Markdown pipeline handles image
+ * optimization and alt text.
  */
 export function resolveDigitalGardenImagePath(
   imageUrl: string,

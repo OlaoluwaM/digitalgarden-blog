@@ -29,7 +29,6 @@
 - [x] Render callout markup for Obsidian blockquotes and converted `ad-*` fences.
 - [x] Verify nested callouts, titles, collapse states, and wikilinks in built pages.
 - [x] Resolve publisher image paths through Astro's image pipeline.
-- [ ] Keep original `/img/user/*` URLs available.
 - [x] Generate image dimensions and responsive sources.
 - [ ] Fail clearly on missing publisher images.
 - [ ] Test local, remote, SVG, encoded, and missing images.
