@@ -178,6 +178,22 @@ Copying images to `public/img` is simpler but does not meet the checklist's
 optimization requirement by itself. Check Astro's current APIs before choosing
 the approach. Verify missing assets, spaces/encoding, remote images, and SVGs.
 
+### Digital Garden image resolver TDD (2026-09-16)
+
+- `src/content/digital-garden-images.ts` implements `resolveDigitalGardenImagePath()`.
+  It strips the URL prefix, decodes the path once, checks for a regular file,
+  and returns an encoded relative URL. Errors include the image URL and note
+  path, with the original error retained as the cause.
+- `npm run test:images` passes all 18 tests: note-relative
+  paths, SVGs, spaces, encoding, URL passthrough, and useful errors for missing
+  files, directories, and malformed encoding. Fixtures use temporary files.
+- The return value is an encoded relative URL. Inputs include the absolute
+  note path and publisher image directory; remote URLs pass through unchanged.
+- This is an isolated resolver exercise. Plugin registration, alt text,
+  responsive images, original URL serving, and images inside callouts still
+  need integration tests. Remote optimization policy remains open.
+- TypeScript and formatting checks pass. `npm test` passes all nine test files.
+
 ## Verification and deployment
 
 ```sh

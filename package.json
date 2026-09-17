@@ -15,6 +15,7 @@
     "test": "node --test",
     "test:permalinks": "node --test --test-isolation=none test/permalinks.test.ts",
     "test:callouts": "node --test --test-isolation=none test/callout.test.ts",
+    "test:images": "node --test --test-isolation=none test/digital-garden-images.test.ts",
     "test:wikilink-index": "node --test --test-isolation=none test/wikilink-index.test.ts",
     "generate:wikilink-index": "node scripts/generate-wikilink-index.ts",
     "predev:astro": "npm run generate:wikilink-index",
