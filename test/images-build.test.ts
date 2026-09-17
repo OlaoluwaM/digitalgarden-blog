@@ -14,8 +14,9 @@ import {
 } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
-import { it } from "node:test";
+import { it, type TestContext } from "node:test";
 import { fileURLToPath } from "node:url";
+import { parse } from "node-html-parser";
 
 const repository = fileURLToPath(new URL("../", import.meta.url));
 
@@ -49,7 +50,7 @@ async function build(project: string) {
   }
 }
 
-it("fails an Astro build when a note references a missing image", async t => {
+async function fixture(t: TestContext) {
   const project = await mkdtemp(join(tmpdir(), "images-build-test-"));
   t.after(() => rm(project, { recursive: true, force: true }));
 
@@ -104,7 +105,7 @@ export default {
     permalink: "/",
     "dg-note-properties": {
       title: "Test note",
-      description: "Missing image build fixture.",
+      description: "Image build fixture.",
       tags: [],
       published: "2026-01-01",
       last_updated: "2026-01-01",
@@ -113,7 +114,123 @@ export default {
   const note = (body: string) =>
     `---\n${JSON.stringify(frontmatter)}\n---\n${body}\n`;
 
-  await writeFile(notePath, note("A note without an image."));
+  return {
+    project,
+    notePath,
+    imageDirectory: join(project, "src/site/img/user"),
+    writeNote: (body: string) => writeFile(notePath, note(body)),
+  };
+}
+
+async function emittedImage(project: string, alt: string) {
+  const html = await readFile(join(project, "dist-astro/index.html"), "utf8");
+  const images = parse(html).querySelectorAll("img");
+  assert.equal(images.length, 1, html);
+  const image = images[0]!;
+  assert.equal(image.getAttribute("alt"), alt, html);
+  assert.equal(image.getAttribute("ASTRO_IMAGE_"), undefined);
+  const source = image.getAttribute("src");
+  assert.ok(source, html);
+
+  const readAsset = async (url: string) => {
+    assert.ok(url.startsWith("/_astro/"), `Expected emitted asset: ${url}`);
+    const pathname = new URL(url, "https://fixture.test").pathname;
+    // Decode the browser URL once to locate the emitted file on disk.
+    const bytes = await readFile(
+      join(project, "dist-astro", decodeURIComponent(pathname).slice(1))
+    );
+    assert.ok(bytes.length > 0, `Empty image asset: ${url}`);
+    return bytes;
+  };
+
+  const bytes = await readAsset(source);
+  for (const candidate of (image.getAttribute("srcset") ?? "").split(",")) {
+    if (candidate.trim()) await readAsset(candidate.trim().split(/\s+/)[0]!);
+  }
+  return { image, source, bytes };
+}
+
+it("builds a local SVG with an emitted asset and dimensions", async t => {
+  const { project, imageDirectory, writeNote } = await fixture(t);
+  const svg =
+    '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="16" viewBox="0 0 32 16"><rect width="32" height="16" fill="red"/></svg>';
+  await writeFile(join(imageDirectory, "diagram.svg"), svg);
+  await writeNote('![Diagram](/img/user/diagram.svg "Diagram title")');
+
+  const result = await build(project);
+  assert.equal(result.status, 0, result.output);
+  const { image, source, bytes } = await emittedImage(project, "Diagram");
+  assert.match(source, /\.svg$/);
+  assert.equal(image.getAttribute("width"), "32");
+  assert.equal(image.getAttribute("height"), "16");
+  assert.equal(image.getAttribute("title"), "Diagram title");
+  const emittedSvg = parse(bytes.toString()).querySelector("svg");
+  assert.ok(emittedSvg, "Expected an SVG file, not an HTML fallback");
+  assert.equal(emittedSvg.getAttribute("viewBox"), "0 0 32 16");
+  assert.equal(emittedSvg.querySelector("rect")?.getAttribute("fill"), "red");
+});
+
+it(
+  "preserves ampersands in built image alt text",
+  { todo: "Built HTML currently double-escapes & as &amp;amp;." },
+  async t => {
+    const { project, imageDirectory, writeNote } = await fixture(t);
+    await writeFile(
+      join(imageDirectory, "diagram.svg"),
+      '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="16"><rect width="32" height="16"/></svg>'
+    );
+    await writeNote("![A & B diagram](/img/user/diagram.svg)");
+    const result = await build(project);
+    assert.equal(result.status, 0, result.output);
+    await emittedImage(project, "A & B diagram");
+  }
+);
+
+for (const [name, filename, imageUrl] of [
+  [
+    "spaces in directories and filenames",
+    "My Assets/My Photo.png",
+    "/img/user/My%20Assets/My%20Photo.png",
+  ],
+  ["Unicode filenames", "café.png", "/img/user/caf%C3%A9.png"],
+  [
+    "literal percent-encoded text in filenames",
+    "literal%20name.png",
+    "/img/user/literal%2520name.png",
+  ],
+] as const) {
+  it(`builds an encoded image URL with ${name}`, async t => {
+    const { project, imageDirectory, writeNote } = await fixture(t);
+    const imagePath = join(imageDirectory, filename);
+    await mkdir(dirname(imagePath), { recursive: true });
+    // A real 1 x 1 PNG exercises Astro's image service, not only path resolution.
+    await writeFile(
+      imagePath,
+      Buffer.from(
+        "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aS1cAAAAASUVORK5CYII=",
+        "base64"
+      )
+    );
+    await writeNote(`![Encoded image](${imageUrl} "Image title")`);
+
+    const result = await build(project);
+    assert.equal(result.status, 0, result.output);
+    const { image, source, bytes } = await emittedImage(
+      project,
+      "Encoded image"
+    );
+    assert.equal(image.getAttribute("width"), "1");
+    assert.equal(image.getAttribute("height"), "1");
+    assert.equal(image.getAttribute("title"), "Image title");
+    assert.match(source, /\.webp$/);
+    assert.equal(bytes.toString("ascii", 0, 4), "RIFF");
+    assert.equal(bytes.toString("ascii", 8, 12), "WEBP");
+  });
+}
+
+it("fails an Astro build when a note references a missing image", async t => {
+  const { project, notePath, writeNote } = await fixture(t);
+  await writeNote("A note without an image.");
   const baseline = await build(project);
   assert.equal(baseline.status, 0, baseline.output);
   assert.match(
@@ -122,7 +239,7 @@ export default {
   );
 
   const missingImageUrl = "/img/user/Extras/Assets/does-not-exist.png";
-  await writeFile(notePath, note(`![Missing image](${missingImageUrl})`));
+  await writeNote(`![Missing image](${missingImageUrl})`);
   const result = await build(project);
   for (const detail of ["Cannot resolve image", missingImageUrl, notePath]) {
     assert.ok(

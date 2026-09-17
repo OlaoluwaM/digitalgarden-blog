@@ -184,8 +184,8 @@ produces an optimized asset under `/_astro/`.
 
 Responsive sources use Astro's defaults. Olaolu dropped preservation of original
 `/img/user/*` URLs on 2026-09-17; do not add copying or redirects for those URLs.
-Remote optimization policy and build-level fixtures for SVGs and encoded filenames
-remain open. A local Astro patch fixes the missing-image failure-propagation gap.
+Remote optimization policy remains open. Build tests cover SVGs and encoded
+filenames. A local Astro patch fixes the missing-image failure-propagation gap.
 
 ### Digital Garden image resolver TDD (2026-09-16)
 
@@ -261,6 +261,22 @@ remain open. A local Astro patch fixes the missing-image failure-propagation gap
   not a live dev-server test or an addition to the committed test suite.
 - The upstream issue form was prepared for Olaolu to submit. No issue or PR
   has been created by the agent; the upstream source change and tests remain.
+
+### SVG and encoded-filename build tests (2026-09-17)
+
+- `test/images-build.test.ts` now shares the isolated project setup across cases.
+  The SVG test checks dimensions, alt/title, the emitted SVG's geometry, and
+  that `src` and any `srcset` candidates point to nonempty files in `dist-astro`.
+- Real PNG fixtures cover encoded spaces in directories and filenames, Unicode,
+  and literal `%20` in a filename referenced as `%2520`. Builds emit WebP files;
+  tests check their file signatures, dimensions, alt/title, and output references.
+- The build suite has five passing tests and one known-failing TODO test.
+  The extra test found `![A & B diagram](...)` becomes
+  `alt="A &amp;amp; B diagram"` in built HTML. The test still executes and asserts
+  the intended alt text; Node's TODO flag keeps this separate bug non-blocking.
+  Its cause has not been traced beyond the full Markdown-to-build pipeline.
+- The resolver's 10 tests, plugin's 19 tests, and build test TypeScript check pass.
+  Remote-image builds remain untested. Application code is unchanged.
 
 ## Verification and deployment
 

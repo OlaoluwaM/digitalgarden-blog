@@ -31,8 +31,9 @@
 - [x] Resolve publisher image paths through Astro's image pipeline.
 - [x] Generate image dimensions and responsive sources.
 - [x] Fail clearly on missing publisher images (local Astro patch).
-- [ ] Test local, remote, SVG, encoded, and missing images.
-- [x] Preserve image alt text.
+- [x] Test local, SVG, encoded, and missing images in full builds.
+- [ ] Decide remote-image behavior and test it.
+- [ ] Preserve image alt text (fix double-escaped ampersands).
 - [ ] Match code highlighting.
 - [ ] Restore copy-code behavior.
 - [ ] Preserve heading IDs and wikilink heading fragments.
