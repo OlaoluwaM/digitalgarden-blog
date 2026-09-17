@@ -32,12 +32,12 @@ async function fixture(t: TestContext, files: string[] = []) {
   return context;
 }
 
-async function expectResolutionError(
+function expectResolutionError(
   source: string,
   context: DigitalGardenImageContext
 ) {
-  await assert.rejects(
-    resolveDigitalGardenImagePath(source, context),
+  assert.throws(
+    () => resolveDigitalGardenImagePath(source, context),
     error => {
       assert.ok(error instanceof Error);
       for (const detail of [source, context.notePath]) {
@@ -92,10 +92,7 @@ describe("resolveDigitalGardenImagePath", () => {
   ]) {
     it(name, async t => {
       const context = await fixture(t, [file]);
-      assert.equal(
-        await resolveDigitalGardenImagePath(source, context),
-        expected
-      );
+      assert.equal(resolveDigitalGardenImagePath(source, context), expected);
     });
   }
 
@@ -106,43 +103,24 @@ describe("resolveDigitalGardenImagePath", () => {
     await writeFile(context.notePath, "A nested note.\n");
 
     assert.equal(
-      await resolveDigitalGardenImagePath("/img/user/photo.jpg", context),
+      resolveDigitalGardenImagePath("/img/user/photo.jpg", context),
       "../../../../img/user/photo.jpg"
     );
   });
 
-  for (const source of [
-    "https://example.com/img/user/photo.jpg",
-    "http://example.com/photo.jpg",
-    "//example.com/photo.jpg",
-    "../assets/photo.jpg",
-    "/img/tree-1.svg",
-    "/img/users/photo.jpg",
-    "data:image/png;base64,aGVsbG8=",
-    "",
-  ]) {
-    it(`leaves ${JSON.stringify(source)} unchanged`, async t => {
-      const context = await fixture(t);
-      assert.equal(
-        await resolveDigitalGardenImagePath(source, context),
-        source
-      );
-    });
-  }
-
   it("reports the image URL and note path when a file is missing", async t => {
     const context = await fixture(t);
-    await expectResolutionError("/img/user/missing.png", context);
+    expectResolutionError("/img/user/missing.png", context);
   });
 
   it("rejects a directory even though it exists", async t => {
     const context = await fixture(t);
     await mkdir(join(context.imageDirectory, "folder.png"));
-    await expectResolutionError("/img/user/folder.png", context);
+    expectResolutionError("/img/user/folder.png", context);
   });
 
   it("reports the note and URL when percent encoding is malformed", async t => {
     const context = await fixture(t);
-    await expectResolutionError("/img/user/broken%2.png", context);
+    expectResolutionError("/img/user/broken%2.png", context);
   });
 });

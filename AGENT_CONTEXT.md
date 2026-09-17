@@ -195,15 +195,29 @@ the approach. Verify missing assets, spaces/encoding, remote images, and SVGs.
   It strips the URL prefix, decodes the path once, checks for a regular file,
   and returns an encoded relative URL. Errors include the image URL and note
   path, with the original error retained as the cause.
-- `npm run test:images` passes all 18 tests: note-relative
-  paths, SVGs, spaces, encoding, URL passthrough, and useful errors for missing
+- `npm run test:images` passes all 10 tests: note-relative
+  paths, SVGs, spaces, encoding, and useful errors for missing
   files, directories, and malformed encoding. Fixtures use temporary files.
 - The return value is an encoded relative URL. Inputs include the absolute
-  note path and publisher image directory; remote URLs pass through unchanged.
-- This is an isolated resolver exercise. Plugin registration, alt text,
-  responsive images, original URL serving, and images inside callouts still
-  need integration tests. Remote optimization policy remains open.
-- TypeScript and formatting checks pass. `npm test` passes all nine test files.
+  note path and publisher image directory. The synchronous resolver requires
+  a /img/user/ URL; the visitor owns URL filtering and passthrough tests.
+- Source TypeScript and focused image tests pass. Site registration, responsive
+  images, and original URL serving remain open, as does remote optimization policy.
+
+### Image plugin TDD
+
+- `src/plugins/mdast/images.ts` implements
+  `mkmdastDigitalGardenImagesPlugin(imageDirectory)` using the resolver and
+  the containing note's `ctx.fileURL`. It filters the prefix before requiring
+  a note URL, then updates only the image URL.
+- `npm run test:images-plugin` passes all 19 tests through Astro's Satteri processor.
+  They cover URL passthrough without a note URL, asset
+  collection, alt/title preservation, encoding, SVGs, per-note paths, native
+  and nested converted callouts, missing files, and missing note URLs.
+- Tests place the image plugin after admonition conversion. The site config
+  has not yet been updated to register it.
+- These tests check image import metadata and Astro's HTML image markers.
+  They do not verify optimized files, responsive output, or original URL serving.
 
 ## Verification and deployment
 

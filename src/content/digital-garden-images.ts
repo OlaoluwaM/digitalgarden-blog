@@ -13,19 +13,19 @@ export interface DigitalGardenImageContext {
  * Return a URL relative to the note's directory, with forward slashes and URL
  * encoding. Decode the input path once when locating the file.
  *
- * Leave URLs outside /img/user/ unchanged, including remote and relative URLs.
+ * The caller must supply a URL starting with /img/user/. The Markdown visitor
+ * leaves other image URLs unchanged before calling this function.
  * Reject missing files, directories, and malformed encoding. Errors must name
  * both the original image URL and the note that contains it.
  *
  * This helper only resolves paths. Image optimization, alt text, and serving
  * the original public URLs belong to the later integration step.
  */
-export async function resolveDigitalGardenImagePath(
+export function resolveDigitalGardenImagePath(
   imageUrl: string,
   context: DigitalGardenImageContext
-): Promise<string> {
+): string {
   const digitalGardenImagePrefix = "/img/user/";
-  if (!imageUrl.startsWith(digitalGardenImagePrefix)) return imageUrl;
 
   try {
     const imagePathWithinDirectory = decodeURI(
