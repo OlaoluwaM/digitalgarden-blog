@@ -47,8 +47,15 @@ export function getRecentArticles(
   limit: number = DEFAULT_LIMIT
 ): Post[] {
   const articles = getPublishedArticles(posts);
-  const articlesSortedByRecency = articles.toSorted(sortByRecency);
-  return take(articlesSortedByRecency, limit);
+  // Validate every article, even when there are too few entries to sort.
+  const datedArticles = articles.map(article => ({
+    article,
+    publishedAt: toEpochTimestamp(article.data.rawNoteProps.published),
+  }));
+  const articlesSortedByRecency = datedArticles.toSorted(
+    (a, b) => b.publishedAt - a.publishedAt
+  );
+  return take(articlesSortedByRecency, limit).map(({ article }) => article);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -57,16 +64,6 @@ export function getRecentArticles(
 
 function isHomePost(post: Post): boolean {
   return post.data.pluginProps.tags.includes("gardenEntry");
-}
-
-function sortByRecency(postA: Post, postB: Post) {
-  const postAPublishDate = postA.data.rawNoteProps.published;
-  const postBPublishDate = postB.data.rawNoteProps.published;
-
-  // Descending order because we want newer posts first
-  return (
-    toEpochTimestamp(postBPublishDate) - toEpochTimestamp(postAPublishDate)
-  );
 }
 
 /* -------------------------------------------------------------------------- */

@@ -63,6 +63,17 @@ with Eleventy; there is no single filtering or ordering rule for every route.
   assertion. Neither cleanup item blocks the initial helper integration.
 - Duplicate/malformed wikilink-index validation is integrated and tested.
 
+## Posts helper tests
+
+- `npm run test:posts` runs 34 tests against the real `src/content/posts.ts`.
+  The test setup substitutes only Astro's virtual `getCollection()` import.
+- Coverage includes publication filtering, hidden posts, route validation after
+  filtering, home selection, recent ordering, limits, dates, and input preservation.
+- All 34 tests pass. Dates are parsed and validated before sorting, including
+  when there is only one article. Sorting reuses those timestamps and preserves
+  the original post objects. Source and test TypeScript checks pass.
+- These are helper tests, not route builds.
+
 ## Permalink TDD exercise (2026-09-13)
 
 Olaolu implemented `permalinkSchema` and `assertUniquePermalinks` in
