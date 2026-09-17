@@ -18,6 +18,7 @@
     "test:callouts": "node --test --test-isolation=none test/callout.test.ts",
     "test:images": "node --test --test-isolation=none test/digital-garden-images.test.ts",
     "test:images-plugin": "node --test --test-isolation=none test/images-plugin.test.ts",
+    "test:images-build": "node --test --test-isolation=none test/images-build.test.ts",
     "test:wikilink-index": "node --test --test-isolation=none test/wikilink-index.test.ts",
     "generate:wikilink-index": "node scripts/generate-wikilink-index.ts",
     "predev:astro": "npm run generate:wikilink-index",

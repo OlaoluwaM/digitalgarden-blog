@@ -184,8 +184,8 @@ produces an optimized asset under `/_astro/`.
 
 Responsive sources use Astro's defaults. Olaolu dropped preservation of original
 `/img/user/*` URLs on 2026-09-17; do not add copying or redirects for those URLs.
-Remote optimization policy and build-level fixtures for SVGs, encoded filenames,
-and missing images remain open.
+Remote optimization policy and build-level fixtures for SVGs and encoded filenames
+remain open. The missing-image build test below exposes a failure-propagation gap.
 
 ### Digital Garden image resolver TDD (2026-09-16)
 
@@ -239,6 +239,20 @@ and missing images remain open.
 - The built Redis page currently emits no stylesheet or inline styles despite
   enabling responsiveStyles. Verify CSS delivery and small-screen sizing when
   adding the shared layout; responsive markup alone does not prove layout behavior.
+
+### Missing image build test (2026-09-17)
+
+- `npm run test:images-build` copies the real site config, schema, pages, and
+  plugins into a temporary project. Its only note builds successfully without
+  an image, then references a nonexistent /img/user/ asset on a forced rebuild.
+  Notes, assets, build output, and caches are isolated from the real project.
+- The test checks the image URL, absolute note path, and nonzero exit status.
+  It currently fails: Astro logs the resolver's diagnostic but exits with 0.
+- In installed Astro 7.2.9, `dist/content/loaders/glob.js` catches rendering
+  errors and logs them without rethrowing. Resolver/plugin tests therefore
+  do not prove that a missing image stops a full site build.
+- Leave this test red until failure propagation is fixed. Application code is
+  unchanged; the other 11 test files pass.
 
 ## Verification and deployment
 
