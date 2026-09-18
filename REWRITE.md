@@ -33,7 +33,7 @@
 - [x] Fail clearly on missing publisher images (local Astro patch).
 - [x] Test local, SVG, encoded, and missing images in full builds.
 - [ ] Decide remote-image behavior and test it.
-- [ ] Preserve image alt text (fix double-escaped ampersands).
+- [x] Preserve image alt text (local Astro patch for escaped characters).
 - [ ] Match code highlighting.
 - [ ] Restore copy-code behavior.
 - [ ] Preserve heading IDs and wikilink heading fragments.

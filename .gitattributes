@@ -1,0 +1,2 @@
+# Unified diffs need their context prefixes and original dependency whitespace.
+patches/*.patch -whitespace

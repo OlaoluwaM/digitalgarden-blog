@@ -122,8 +122,8 @@ export default {
   };
 }
 
-async function emittedImage(project: string, alt: string) {
-  const html = await readFile(join(project, "dist-astro/index.html"), "utf8");
+async function emittedImage(project: string, alt: string, page = "index.html") {
+  const html = await readFile(join(project, "dist-astro", page), "utf8");
   const images = parse(html).querySelectorAll("img");
   assert.equal(images.length, 1, html);
   const image = images[0]!;
@@ -170,21 +170,32 @@ it("builds a local SVG with an emitted asset and dimensions", async t => {
   assert.equal(emittedSvg.querySelector("rect")?.getAttribute("fill"), "red");
 });
 
-it(
-  "preserves ampersands in built image alt text",
-  { todo: "Built HTML currently double-escapes & as &amp;amp;." },
-  async t => {
-    const { project, imageDirectory, writeNote } = await fixture(t);
-    await writeFile(
-      join(imageDirectory, "diagram.svg"),
-      '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="16"><rect width="32" height="16"/></svg>'
+it("preserves image attribute characters in collection and Markdown pages", async t => {
+  const { project, imageDirectory, writeNote } = await fixture(t);
+  await writeFile(
+    join(imageDirectory, "diagram.svg"),
+    '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="16"><rect width="32" height="16"/></svg>'
+  );
+  const markdown =
+    '![A & B <tag> &quot;quoted&quot; Tom&apos;s &amp;quot; &amp;#x22;](/img/user/diagram.svg "A & B &quot;quoted&quot; &lt;tag&gt; &amp;quot; &amp;#x22;")';
+  await writeNote(markdown);
+  // Markdown pages use Vite's image transform; collections use the content
+  // runtime. Exercise both decoders with the same attribute values.
+  await writeFile(join(project, "src/pages/direct.md"), markdown);
+  const result = await build(project);
+  assert.equal(result.status, 0, result.output);
+  for (const page of ["index.html", "direct/index.html"]) {
+    const { image } = await emittedImage(
+      project,
+      'A & B <tag> "quoted" Tom\'s &quot; &#x22;',
+      page
     );
-    await writeNote("![A & B diagram](/img/user/diagram.svg)");
-    const result = await build(project);
-    assert.equal(result.status, 0, result.output);
-    await emittedImage(project, "A & B diagram");
+    assert.equal(
+      image.getAttribute("title"),
+      'A & B "quoted" <tag> &quot; &#x22;'
+    );
   }
-);
+});
 
 for (const [name, filename, imageUrl] of [
   [

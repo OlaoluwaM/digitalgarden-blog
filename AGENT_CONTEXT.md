@@ -270,11 +270,17 @@ filenames. A local Astro patch fixes the missing-image failure-propagation gap.
 - Real PNG fixtures cover encoded spaces in directories and filenames, Unicode,
   and literal `%20` in a filename referenced as `%2520`. Builds emit WebP files;
   tests check their file signatures, dimensions, alt/title, and output references.
-- The build suite has five passing tests and one known-failing TODO test.
-  The extra test found `![A & B diagram](...)` becomes
-  `alt="A &amp;amp; B diagram"` in built HTML. The test still executes and asserts
-  the intended alt text; Node's TODO flag keeps this separate bug non-blocking.
-  Its cause has not been traced beyond the full Markdown-to-build pipeline.
+- The extra test found `![A & B diagram](...)` became
+  `alt="A &amp;amp; B diagram"` in built HTML. The Astro patch now fixes both
+  image-marker decoders (content runtime and Vite's Markdown transform).
+  They previously decoded only quotes before JSON parsing; `html-escaper` now
+  decodes attribute values once, with hexadecimal quote normalization first.
+- The TODO flag is removed. The regression checks both collection and ordinary
+  Markdown pages, including alt/title ampersands, quotes, apostrophes, angle
+  brackets, and literal character references that must not be decoded twice.
+- All six build tests pass with no TODO cases. All 12 test files, source and
+  test TypeScript checks, and the forced 14-page site build pass. The combined
+  Astro patch was reversed and successfully reapplied through `postinstall`.
 - The resolver's 10 tests, plugin's 19 tests, and build test TypeScript check pass.
   Remote-image builds remain untested. Application code is unchanged.
 
