@@ -17,6 +17,7 @@
     "test:posts": "node --test --test-isolation=none test/posts.test.ts",
     "test:permalinks": "node --test --test-isolation=none test/permalinks.test.ts",
     "test:callouts": "node --test --test-isolation=none test/callout.test.ts",
+    "test:highlighting": "node --test --test-isolation=none test/highlighting.test.ts",
     "test:images": "node --test --test-isolation=none test/digital-garden-images.test.ts",
     "test:images-plugin": "node --test --test-isolation=none test/images-plugin.test.ts",
     "test:images-build": "node --test --test-isolation=none test/images-build.test.ts",

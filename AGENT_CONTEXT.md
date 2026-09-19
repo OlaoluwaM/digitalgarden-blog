@@ -295,6 +295,23 @@ fixes the missing-image failure-propagation gap.
 - All seven image build tests and all 257 tests in the full suite pass.
   The build test's TypeScript and formatting checks also pass.
 
+### Code highlighting TDD (2026-09-18)
+
+- `npm run test:highlighting` renders Markdown using the validated site config.
+  These are processor tests, not full builds or browser styling checks.
+- Seven cases cover dark-plus colors, language labels, blank-line numbering,
+  numbering reset, the `hs` alias, unlabelled code escaping, and inline code.
+- All seven pass. The config uses dark-plus, the `hs` alias, and a line-number
+  transformer. Astro supplies the language label; the duplicate `pre()`
+  transformer and unused language list were removed.
+- All 264 tests, source and test TypeScript checks, and formatting checks pass.
+  A forced Astro build produces 14 pages. An output check verified the theme and
+  sequential line numbers on all 12 highlighted blocks, with no duplicate
+  language attributes.
+- Browser styling remains unverified. CSS and the legacy copy-code script
+  target `pre.shiki`; Astro emits `pre.astro-code`. Port copy-code behavior next,
+  and adapt the CSS when integrating the shared layout and styles.
+
 ## Verification and deployment
 
 ```sh

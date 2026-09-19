@@ -33,5 +33,19 @@ export default defineConfig({
       ],
       hastPlugins: [hastAdmonitionCalloutPlugin],
     }),
+    shikiConfig: {
+      theme: "dark-plus",
+      langAlias: {
+        hs: "haskell",
+      },
+      transformers: [
+        {
+          // Add line number data attributes for CSS counter styling
+          line(node, line) {
+            node.properties["data-line"] = line;
+          },
+        },
+      ],
+    },
   },
 });
