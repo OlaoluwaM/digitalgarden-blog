@@ -309,8 +309,19 @@ fixes the missing-image failure-propagation gap.
   sequential line numbers on all 12 highlighted blocks, with no duplicate
   language attributes.
 - Browser styling remains unverified. CSS and the legacy copy-code script
-  target `pre.shiki`; Astro emits `pre.astro-code`. Port copy-code behavior next,
+  target `pre.shiki`; Astro emits `pre.astro-code`. Integrate copy-code behavior next,
   and adapt the CSS when integrating the shared layout and styles.
+
+### Copy-code tests (2026-09-18)
+
+- `src/scripts/copyCode.ts` ports the Eleventy behavior to `pre.astro-code`,
+  with a fallback for clipboard errors, duplicate-button prevention, pending
+  copy protection, and replacement of earlier feedback timers.
+- `npm run test:copy-code` runs 14 tests using parsed HTML, mocked clipboard
+  and DOM APIs, and fake timers. Coverage includes exact text, empty or missing
+  code, fallback cleanup, repeated clicks, and independent block timers.
+- All 278 tests in the full suite pass. This is isolated script coverage;
+  page imports, browser clipboard behavior, and styling remain unverified.
 
 ## Verification and deployment
 
