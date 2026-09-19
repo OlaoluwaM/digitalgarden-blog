@@ -58,7 +58,13 @@ async function fixture(t: TestContext) {
   // Copy application code, never the real notes or image assets. Share installed
   // dependencies while keeping generated output and caches inside the fixture.
   await mkdir(join(project, "src"));
-  for (const directory of ["content", "pages", "plugins", "generated"]) {
+  for (const directory of [
+    "content",
+    "pages",
+    "plugins",
+    "generated",
+    "scripts",
+  ]) {
     await cp(
       join(repository, "src", directory),
       join(project, "src", directory),

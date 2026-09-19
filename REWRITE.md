@@ -35,7 +35,7 @@
 - [x] Keep remote image URLs unchanged; verify builds do not fetch them.
 - [x] Preserve image alt text (local Astro patch for escaped characters).
 - [x] Match code highlighting, language labels, and line numbers.
-- [ ] Restore copy-code behavior.
+- [x] Restore copy-code behavior.
 - [ ] Preserve heading IDs and wikilink heading fragments.
 - [ ] Inventory the Markdown features used by published notes.
 - [ ] Implement the missing Markdown features in use.
