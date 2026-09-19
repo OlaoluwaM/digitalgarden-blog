@@ -12,6 +12,7 @@ import {
   symlink,
   writeFile,
 } from "node:fs/promises";
+import { createServer } from "node:http";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { it, type TestContext } from "node:test";
@@ -149,6 +150,43 @@ async function emittedImage(project: string, alt: string, page = "index.html") {
   }
   return { image, source, bytes };
 }
+
+it("preserves remote images without fetching them during the build", async t => {
+  const { project, writeNote } = await fixture(t);
+  let imageRequests = 0;
+  // A local HTTP server stands in for the remote host so unexpected downloads
+  // are counted without depending on an external service or network failure.
+  const server = createServer((_request, response) => {
+    imageRequests += 1;
+    response.writeHead(200, { "Content-Type": "image/svg+xml" });
+    response.end(
+      '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="16"/>'
+    );
+  });
+  server.listen(0, "127.0.0.1");
+  await once(server, "listening");
+  t.after(() => new Promise<void>(resolve => server.close(() => resolve())));
+  const address = server.address();
+  assert.ok(address && typeof address === "object");
+  const imageUrl = `http://127.0.0.1:${address.port}/diagram.svg?theme=light&version=1`;
+  const markdown = `![Remote diagram](${imageUrl} "Remote title")`;
+  await writeNote(markdown);
+  await writeFile(join(project, "src/pages/direct.md"), markdown);
+
+  const result = await build(project);
+  assert.equal(result.status, 0, result.output);
+  assert.equal(imageRequests, 0, "The build must not download remote images");
+  for (const page of ["index.html", "direct/index.html"]) {
+    const html = await readFile(join(project, "dist-astro", page), "utf8");
+    const images = parse(html).querySelectorAll("img");
+    assert.equal(images.length, 1, html);
+    const image = images[0]!;
+    assert.equal(image.getAttribute("src"), imageUrl, html);
+    assert.equal(image.getAttribute("alt"), "Remote diagram");
+    assert.equal(image.getAttribute("title"), "Remote title");
+    assert.equal(image.getAttribute("srcset"), undefined);
+  }
+});
 
 it("builds a local SVG with an emitted asset and dimensions", async t => {
   const { project, imageDirectory, writeNote } = await fixture(t);

@@ -184,8 +184,9 @@ produces an optimized asset under `/_astro/`.
 
 Responsive sources use Astro's defaults. Olaolu dropped preservation of original
 `/img/user/*` URLs on 2026-09-17; do not add copying or redirects for those URLs.
-Remote optimization policy remains open. Build tests cover SVGs and encoded
-filenames. A local Astro patch fixes the missing-image failure-propagation gap.
+Remote image URLs stay unchanged, without build-time downloads or optimization.
+Build tests cover remote images, SVGs, and encoded filenames. A local Astro patch
+fixes the missing-image failure-propagation gap.
 
 ### Digital Garden image resolver TDD (2026-09-16)
 
@@ -199,8 +200,7 @@ filenames. A local Astro patch fixes the missing-image failure-propagation gap.
 - The return value is an encoded relative URL. Inputs include the absolute
   note path and publisher image directory. The synchronous resolver requires
   a /img/user/ URL; the visitor owns URL filtering and passthrough tests.
-- Source TypeScript and focused image tests pass. Remote optimization policy
-  remains open.
+- Source TypeScript and focused image tests pass.
 
 ### Image plugin TDD
 
@@ -282,7 +282,18 @@ filenames. A local Astro patch fixes the missing-image failure-propagation gap.
   test TypeScript checks, and the forced 14-page site build pass. The combined
   Astro patch was reversed and successfully reapplied through `postinstall`.
 - The resolver's 10 tests, plugin's 19 tests, and build test TypeScript check pass.
-  Remote-image builds remain untested. Application code is unchanged.
+  Application code is unchanged.
+
+### Remote image build coverage (2026-09-18)
+
+- Remote images keep their original URLs. No application or configuration
+  changes were needed.
+- A build test checks collection and ordinary Markdown pages. It verifies the
+  remote URL (including query parameters), alt, and title survive, with no
+  generated `srcset`. A temporary localhost HTTP server records zero requests.
+- This test needs permission to bind a local port in restricted sandboxes.
+- All seven image build tests and all 257 tests in the full suite pass.
+  The build test's TypeScript and formatting checks also pass.
 
 ## Verification and deployment
 
