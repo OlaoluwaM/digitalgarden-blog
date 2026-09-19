@@ -13,3 +13,6 @@ dist-astro
 .cache
 _site/
 **/.DS_Store
+.env.browser.local
+.browser-artifacts/
+.vitest/

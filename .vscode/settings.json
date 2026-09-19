@@ -1,0 +1,4 @@
+{
+  "vitest.rootConfig": "vitest.browser.config.mts",
+  "vitest.nodeExecArgs": ["--env-file-if-exists=.env.browser.local"]
+}

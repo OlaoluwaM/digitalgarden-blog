@@ -308,20 +308,64 @@ fixes the missing-image failure-propagation gap.
   A forced Astro build produces 14 pages. An output check verified the theme and
   sequential line numbers on all 12 highlighted blocks, with no duplicate
   language attributes.
-- Browser styling remains unverified. CSS and the legacy copy-code script
-  target `pre.shiki`; Astro emits `pre.astro-code`. Integrate copy-code behavior next,
-  and adapt the CSS when integrating the shared layout and styles.
+- Browser checks confirm the shared styles are not loaded. CSS and the legacy copy-code script
+  target `pre.shiki`; Astro emits `pre.astro-code`. Adapt the CSS when integrating
+  the shared layout and styles.
 
 ### Copy-code tests (2026-09-18)
 
 - `src/scripts/copyCode.ts` ports the Eleventy behavior to `pre.astro-code`,
   with a fallback for clipboard errors, duplicate-button prevention, pending
   copy protection, and replacement of earlier feedback timers.
-- `npm run test:copy-code` runs 14 tests using parsed HTML, mocked clipboard
-  and DOM APIs, and fake timers. Coverage includes exact text, empty or missing
-  code, fallback cleanup, repeated clicks, and independent block timers.
-- All 278 tests in the full suite pass. This is isolated script coverage;
-  page imports, browser clipboard behavior, and styling remain unverified.
+- `npm run test:copy-code` now runs 15 Vitest Browser Mode tests in Chrome.
+  `test/browser/copyCode.test.ts` replaces the former Node mock-DOM suite.
+  It uses real elements, focus, selection, and browser clicks, with mocked
+  clipboard failures and fake feedback timers. One case uses the real clipboard.
+- All 264 Node tests and 15 browser tests pass. Page integration was checked
+  separately below.
+
+### Copy-code page integration (2026-09-18)
+
+- Both `index.astro` and `[...slug].astro` call the initializer from a processed
+  `<script>`. Move that inclusion into the shared layout when it exists.
+  Image build fixtures now also copy `src/scripts` to resolve those imports.
+- A forced build produces 14 pages. Headless Chrome, using an isolated profile
+  and a localhost server with clipboard permission granted, verified that the
+  home page loads its module without errors or stray buttons. The Stack
+  executables article gets eight buttons; copying preserves the exact code text,
+  shows `Copied!`, re-enables the button, and resets to `Copy` after two seconds.
+  Neither page raised a runtime exception.
+- Clipboard failure paths remain covered by mocked tests. Styling remains
+  deferred until shared layout and CSS integration.
+
+### Project-local browser tooling (2026-09-18)
+
+- `agent-browser` 0.38.1, Vitest 5.0.1, and its Playwright provider are local dev
+  dependencies. The upstream agent-browser skill is in `.agents/skills`.
+- `npm run browser -- ...` loads `.env.browser.local`, which points to the
+  installed Nix Chrome. The ignored local file is shared with `test:browser`;
+  `.env.browser.example` documents the override for other machines.
+- Use a task-specific `--session` for agent-browser and close it when finished.
+  `agent-browser.json` keeps screenshots under ignored `.browser-artifacts`.
+  No personal Chrome profile or global package installation is used.
+- `npm test` runs the Node suite followed by the browser suite. Browser tests
+  use their own config and directory; `test:unit` limits Node discovery to the
+  existing top-level tests. Vitest artifacts under `.vitest` are ignored.
+- VS Code recommends `vitest.explorer`. Workspace settings select the browser
+  config and load `.env.browser.local` through Node arguments. All 15 browser
+  tests pass with those arguments; the extension UI has not been verified.
+- Agent-browser was verified against the local Astro preview, including
+  interactive snapshots and inspected desktop/mobile screenshots. The pages
+  still lack the shared layout and CSS. Chrome reports `windows-1252` and shows
+  garbled punctuation; add UTF-8 metadata with the shared layout.
+  The homepage and three articles were checked, including internal navigation
+  and copy feedback/reset. No browser errors were observed. At a 390px viewport,
+  the Redis image loads but remains 515px wide and overflows; the page has no
+  stylesheets. Callout titles do not collapse their content. Page titles and
+  viewport metadata are also absent. Resolve these during layout, stylesheet,
+  and client behavior integration; passing browser tests do not cover them.
+  The local Vitest/Vite combination emits
+  a `vitest:mocks:interceptor` configureServer warning, but all tests pass.
 
 ## Verification and deployment
 
