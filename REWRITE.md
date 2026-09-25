@@ -37,8 +37,10 @@
 - [x] Match code highlighting, language labels, and line numbers.
 - [x] Restore copy-code behavior.
 - [x] Keep Astro heading IDs and resolve wikilink heading fragments.
-- [ ] Inventory the Markdown features used by published notes.
-- [ ] Implement the missing Markdown features in use.
+- [x] Inventory the Markdown features used by published notes.
+- [x] Turn off smart punctuation to match Eleventy.
+- [x] Add `external-link`/`internal-link` classes and `target="_blank"` to links.
+- [ ] Render inline math at build time.
 - [ ] Remove unexplained Markdown and Shiki warnings.
 
 ## Routes and Data
@@ -63,6 +65,7 @@
 - [ ] Vendor the Obsidian theme CSS.
 - [ ] Load the Sass layers in the existing order.
 - [ ] Match titles, tags, dates, footer, and links.
+- [ ] Match callout title markup and styles.
 - [ ] Rebuild the Recent Posts list.
 - [ ] Port the navbar and home link.
 - [ ] Port the file tree.

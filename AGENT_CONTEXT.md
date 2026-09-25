@@ -387,6 +387,60 @@ fixes the missing-image failure-propagation gap.
   warning remains. Fragment cases are processor tests; no dedicated full-build
   fixture or browser navigation check was added for synthetic heading links.
 
+### Markdown feature inventory (2026-09-25)
+
+Compared a dev Eleventy build (`dist/`) with a forced Astro build, page by page,
+after tokenizing published note bodies (including `ad-*` bodies) with
+Eleventy's markdown-it options. Olaolu put all resulting items in scope.
+
+- Match: headings, emphasis, inline code, fences, blockquotes/callouts, lists,
+  images, the email autolink, and inline `<br/>` HTML.
+- Unused, so do not port: footnotes, tables, task lists, `==mark==`, `{attrs}`,
+  strikethrough, body hashtags (`taggify`), Dataview fields, embeds,
+  mermaid/plantuml/gist/transclusion fences, Bases, and image `|width`.
+- Smart punctuation: Sätteri's `smartPunctuation` follows Astro's
+  `markdown.smartypants` (default on); Eleventy has typographer off. Astro
+  converts about 270 quotes/ellipses. Scope: disable it.
+- Link classes: Eleventy's `link_open` rule gives any href with a scheme
+  (including `mailto:`) `class="external-link" target="_blank"`, and other
+  hrefs `internal-link`. Astro adds neither to ordinary links (63 external
+  links across 13 pages). Wikilinks already carry `internal-link`; do not
+  duplicate it. The CSS icon targets `.external-link`. Scope: a HAST plugin.
+- Math: the Maths note has 51 inline `$…$` expressions. Eleventy renders
+  MathJax SVG at build time (`mjx-container jax="SVG"`). Astro emits raw `$`,
+  and four spans between expressions become `<em>`. Sätteri's `math: true`
+  emits `<code class="language-math math-inline">`, which stops the
+  corruption but still needs a renderer. `mathjax-full` 3.2.1 is present only
+  through `markdown-it-mathjax3`. No other note contains `$`.
+- Soft breaks: Eleventy uses `breaks: true`; Sätteri has no equivalent. The
+  only content difference is a tab-indented sub-list in NixOS part 1, which
+  neither renderer parses as a list. Fix it in the vault ([TODO.md](TODO.md)).
+- Callout titles: Astro emits `<p class="callout-title-content">`; Eleventy
+  emits text plus a stray `<br>`. Defer to the layout/CSS stage.
+- Eleventy leaves `[[Polynomials]]` as raw text; Astro's `/404` link follows
+  the agreed unresolved-link behavior.
+- The forced Astro build emitted no Shiki warnings, only the known
+  `MODULE_TYPELESS_PACKAGE_JSON` warning and the forced data-store notice.
+
+### Smart punctuation and link classes (2026-09-25)
+
+- `astro.config.ts` sets Sätteri's `features.smartPunctuation: false`; user
+  features override the adapter's `smartypants` default.
+  `npm run test:smart-punctuation` covers prose and callouts (2 tests, which
+  fail when the flag is `true`).
+- `src/plugins/hast/linkClasses.ts` (Olaolu's implementation) filters `a`
+  elements with an `href`, applies Eleventy's scheme rule, and appends
+  `external-link` plus `target="_blank"` or `internal-link` to existing
+  classes. It is registered after the callout plugin. Raw HTML anchors are
+  untouched, as in Eleventy's `link_open`; no note uses them.
+- `npm run test:link-classes`: 23 processor tests covering schemes, autolinks,
+  `mailto:`/`tel:`, relative forms, wikilink class preservation, callouts,
+  converted `ad-*` fences, mixed paragraphs, and code.
+- Verified: 304 Node tests and 15 Chrome tests, source/test TypeScript,
+  Prettier, and a forced 14-page build. A page-by-page comparison with the
+  Eleventy build shows no remaining link-class, target, or prose-punctuation
+  differences. The only curly characters left are MathJax's `\ldots` output.
+
 ## Verification and deployment
 
 ```sh
@@ -429,6 +483,7 @@ Keep these outside the migration checklist:
 - Table of contents, backlinks, local graph, and link previews.
 - Wikilink-index hot reload if pre-dev generation becomes insufficient.
 - Distill the vendored theme into owned styles after cutover (ADR 0001).
-- Vercel Speed Insights; revisit math support and the publishing boundary.
+- Vercel Speed Insights; revisit the publishing boundary. (Math moved into
+  Markdown scope on 2026-09-25.)
 - Upstream Sätteri issues in [TODO.md](TODO.md), then removal of superseded
   local workarounds.

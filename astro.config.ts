@@ -5,6 +5,7 @@ import { wikilinkIndex } from "./src/generated/wikilink-index.ts";
 import { mkmdastWikilinksPlugin } from "./src/plugins/mdast/wikilinks.ts";
 import { mkmdastAdmonitionCalloutPlugin } from "./src/plugins/mdast/admonitions.ts";
 import { hastAdmonitionCalloutPlugin } from "./src/plugins/hast/callout.ts";
+import { hastLinkClassesPlugin } from "./src/plugins/hast/linkClasses.ts";
 import { mkmdastDigitalGardenImagesPlugin } from "./src/plugins/mdast/images.ts";
 
 const mdastWikilinksPlugin = mkmdastWikilinksPlugin(wikilinkIndex);
@@ -25,13 +26,14 @@ export default defineConfig({
     processor: satteri({
       features: {
         wikilinks: true,
+        smartPunctuation: false,
       },
       mdastPlugins: [
         mdastWikilinksPlugin,
         mdastAdmonitionCalloutPlugin,
         mdastDigitalGardenImagesPlugin,
       ],
-      hastPlugins: [hastAdmonitionCalloutPlugin],
+      hastPlugins: [hastAdmonitionCalloutPlugin, hastLinkClassesPlugin],
     }),
     shikiConfig: {
       theme: "dark-plus",

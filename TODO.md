@@ -6,6 +6,7 @@ Astro implementation: [REWRITE.md](REWRITE.md).
 
 - [ ] Rename `Endianness, WOOT!?` to `Endianness, WOOT!` in the vault.
 - [ ] Rename `Numbers? Numerals? Oh Boy` to `Numbers Numerals Oh Boy` in the vault.
+- [ ] Fix the tab-indented sub-list in `NixOS, the start of something new (part 1)` (the "package may refer to" items) so it parses as a nested list.
 - [ ] Keep the original titles in each note's `title` property. Avoid `?` and `#` in publishable filenames.
 - [ ] Align vault properties with [the content schema](src/content.config.ts): explicit `dg-permalink`; `title`, `description`, `tags`, `published`, and `last_updated` under `dg-note-properties` in publisher output.
 
