@@ -367,6 +367,26 @@ fixes the missing-image failure-propagation gap.
   The local Vitest/Vite combination emits
   a `vitest:mocks:interceptor` configureServer warning, but all tests pass.
 
+### Heading fragments (verified 2026-09-25)
+
+- Comparison found one Markdown heading across the 14 published notes:
+  `Welcome`, with `id="welcome"` in both renderers. None of the seven body
+  wikilinks has a heading fragment. Keep Astro's default heading IDs rather
+  than reproducing Eleventy's HTML-based slug generation.
+- `npm run test:heading-links` exercises the site's configured Astro processor.
+  The 15 tests cover cross-note and same-page fragments, normal/escaped aliases,
+  punctuation, Unicode, formatted headings, duplicate heading suffixes, repeated
+  links, document isolation, admonitions, and unchanged non-wikilink behavior.
+- `resolveWikilinkTarget` separates the note target from the fragment, resolves
+  same-page links without an index lookup, and uses the stateless `slug` export
+  from the direct `github-slugger` dependency. Missing notes retain `/404` and
+  `is-unresolved`; heading existence is not validated.
+- TDD complete: all 15 heading-link tests pass. Full verification passes with
+  279 Node tests, 15 Chrome tests, source/test TypeScript checks, formatting,
+  and a forced Astro build producing 14 pages. The existing Vitest interceptor
+  warning remains. Fragment cases are processor tests; no dedicated full-build
+  fixture or browser navigation check was added for synthetic heading links.
+
 ## Verification and deployment
 
 ```sh

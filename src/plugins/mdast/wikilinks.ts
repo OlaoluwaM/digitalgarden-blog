@@ -1,6 +1,7 @@
 import { defineMdastPlugin } from "satteri";
 import type { WikilinkIndex } from "../../generated/wikilink-index.ts";
 import type { Link } from "mdast";
+import { slug } from "github-slugger";
 
 export const mkmdastWikilinksPlugin = (wikilinkIndex: WikilinkIndex) =>
   defineMdastPlugin({
@@ -11,47 +12,83 @@ export const mkmdastWikilinksPlugin = (wikilinkIndex: WikilinkIndex) =>
     },
 
     link(node, ctx) {
-      // This node also matches regular markdown links like "[Example](example.com)" so we need to guard against that to ensure we're only working with wikilinks that look like "[[Example]]". It is also for this reason that nodeSourceText below isn't just equal to `ctx.textContent(node)` because it won't return back the actual different text in all cases
+      // Sätteri uses link nodes for both Markdown links and wikilinks.
       if (!isWikilinkNode(ctx.source, node)) return;
-      const newNode = transformWikilinkNode(wikilinkIndex, node);
-      return newNode;
+      return transformWikilinkNode(wikilinkIndex, node);
     },
   });
 
 export function isWikilinkNode(
   source: string,
-  currentNode: Readonly<Link>
+  linkNode: Readonly<Link>
 ): boolean {
-  if (!currentNode.position) return false;
+  if (!linkNode.position) return false;
 
-  const { start, end } = currentNode.position;
-  // Satteri for some reason doesn't seem to provide the actual node source text so we need to extract it using its absolute position in the overall document text
-  const nodeSourceText = source.slice(start.offset, end.offset);
+  const { start, end } = linkNode.position;
+  // Read the original syntax; the node's text contains only the visible label.
+  const linkSource = source.slice(start.offset, end.offset);
 
-  return nodeSourceText.startsWith("[[") && nodeSourceText.endsWith("]]");
+  return linkSource.startsWith("[[") && linkSource.endsWith("]]");
 }
 
 export function transformWikilinkNode(
   wikilinkIndex: WikilinkIndex,
-  currentNode: Readonly<Link>
+  linkNode: Readonly<Link>
 ) {
   // Satteri currently preserves the escape character from `[[target\|alias]]`
   // in the parsed URL, so remove it before looking up the target.
-  const wikilinkTarget = currentNode.url.replace(/\\$/, "");
-  const newUrl = wikilinkIndex[wikilinkTarget];
-  const isUnresolvedLink = newUrl === undefined;
+  const wikilinkTarget = linkNode.url.replace(/\\$/, "");
+  const { url: resolvedUrl, isUnresolved } = resolveWikilinkTarget(
+    wikilinkTarget,
+    wikilinkIndex
+  );
 
   return {
-    ...currentNode,
-    url: newUrl ?? "/404",
+    ...linkNode,
+    url: resolvedUrl,
     data: {
-      ...currentNode.data,
+      ...linkNode.data,
       hProperties: {
         className: [
           "internal-link",
-          ...(isUnresolvedLink ? ["is-unresolved"] : []),
+          ...(isUnresolved ? ["is-unresolved"] : []),
         ],
       },
     },
+  };
+}
+
+function resolveWikilinkTarget(
+  wikilinkTarget: string,
+  wikilinkIndex: WikilinkIndex
+): {
+  url: string;
+  isUnresolved: boolean;
+} {
+  const unresolvedNoteUrl = "/404";
+
+  const [noteTarget, ...fragmentParts] = wikilinkTarget.split("#");
+  // Only the first # separates the note from the heading; preserve later ones.
+  const headingText = fragmentParts.join("#");
+  const headingId = slug(headingText);
+
+  const isSamePageTarget = noteTarget === "";
+
+  if (isSamePageTarget) {
+    return {
+      url: headingId ? `#${headingId}` : "",
+      isUnresolved: false,
+    };
+  }
+
+  const noteUrl = wikilinkIndex[noteTarget];
+  if (!noteUrl)
+    return {
+      url: unresolvedNoteUrl,
+      isUnresolved: true,
+    };
+  return {
+    url: headingId ? `${noteUrl}#${headingId}` : noteUrl,
+    isUnresolved: false,
   };
 }
