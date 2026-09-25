@@ -40,7 +40,7 @@
 - [x] Inventory the Markdown features used by published notes.
 - [x] Turn off smart punctuation to match Eleventy.
 - [x] Add `external-link`/`internal-link` classes and `target="_blank"` to links.
-- [ ] Render inline math at build time.
+- [x] Render inline math at build time.
 - [ ] Remove unexplained Markdown and Shiki warnings.
 
 ## Routes and Data

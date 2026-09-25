@@ -39,7 +39,7 @@ function transformAdmonitionCodeBlock(
   // positions relative to the generated Markdown.
   const calloutTree = resolveWikilinksInTree(
     markdownToMdast(calloutMarkdown, {
-      features: { wikilinks: true },
+      features: { wikilinks: true, math: true },
       position: true,
     }),
     calloutMarkdown,

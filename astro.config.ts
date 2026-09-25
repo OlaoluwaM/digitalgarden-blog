@@ -7,6 +7,7 @@ import { mkmdastAdmonitionCalloutPlugin } from "./src/plugins/mdast/admonitions.
 import { hastAdmonitionCalloutPlugin } from "./src/plugins/hast/callout.ts";
 import { hastLinkClassesPlugin } from "./src/plugins/hast/linkClasses.ts";
 import { mkmdastDigitalGardenImagesPlugin } from "./src/plugins/mdast/images.ts";
+import { mdastMathRenderPlugin } from "./src/plugins/mdast/math.ts";
 
 const mdastWikilinksPlugin = mkmdastWikilinksPlugin(wikilinkIndex);
 const mdastAdmonitionCalloutPlugin =
@@ -26,11 +27,13 @@ export default defineConfig({
     processor: satteri({
       features: {
         wikilinks: true,
+        math: true,
         smartPunctuation: false,
       },
       mdastPlugins: [
         mdastWikilinksPlugin,
         mdastAdmonitionCalloutPlugin,
+        mdastMathRenderPlugin,
         mdastDigitalGardenImagesPlugin,
       ],
       hastPlugins: [hastAdmonitionCalloutPlugin, hastLinkClassesPlugin],

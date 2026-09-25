@@ -16,6 +16,12 @@ Astro implementation: [REWRITE.md](REWRITE.md).
 - [ ] Astro: upstream the image-attribute decoding fix and regression tests from the same patch.
 - [ ] Digital Garden plugin: add an option to sync content through a pull request instead of committing directly to `main`.
 
+## After pull-request publishing
+
+Requires the Digital Garden plugin's pull-request option above.
+
+- [ ] Add a CI/CD workflow that runs all tests and the Astro build on each publish pull request, and deploys only after they pass.
+
 ## Upstream Sätteri
 
 Open focused issues; offer PRs after maintainers confirm the direction.

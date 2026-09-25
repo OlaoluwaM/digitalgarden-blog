@@ -441,6 +441,35 @@ Eleventy's markdown-it options. Olaolu put all resulting items in scope.
   Eleventy build shows no remaining link-class, target, or prose-punctuation
   differences. The only curly characters left are MathJax's `\ldots` output.
 
+### Build-time math (2026-09-25)
+
+- Sätteri's `math` feature is on in the site config and in the `ad-*` reparse
+  (`src/plugins/mdast/admonitions.ts`); the Maths note has math inside an
+  `ad-note`. The reparse still omits GFM, so bare-URL autolinks inside `ad-*`
+  fences would not link; no note does this.
+- `src/plugins/mdast/math.ts` replaces `inlineMath`/`math` nodes with HTML
+  from `renderMath(tex, "inline" | "full")`, which mirrors
+  markdown-it-mathjax3: TeX with `AllPackages`, SVG with `fontCache: "none"`,
+  assistive MathML, and styles inlined by `juice`. The adaptor and handler are
+  registered once per module. It is registered after the admonition plugin.
+- Why MDAST: Astro's Satteri highlight plugin reads `code.data.lang`, which
+  Sätteri does not set for `$$` blocks, so the default `math` exclusion never
+  matches and display math becomes a `plaintext` Shiki block before user HAST
+  plugins run. Candidate upstream issue.
+- `mathjax-full` 3.2.1 (Eleventy's version) and `juice` 12.2.0 are pinned
+  direct dependencies; both ship types. Eleventy uses juice 8.1.0 internally.
+- `npm run test:math`: 12 processor tests, with assertions checked against
+  markdown-it-mathjax3 output (container attributes, SVG, assistive MathML,
+  inline styles, no `<use>`/`<defs>`, error markers, display math, callouts,
+  literal code dollars).
+- Verified: 316 Node tests and 15 Chrome tests, TypeScript, Prettier, and a
+  forced 14-page build. All 51 Maths-page `mjx-container` elements are
+  byte-identical to Eleventy's.
+- Known deviations: Sätteri treats `$5 and $6` as math, unlike
+  markdown-it-mathjax3's delimiter rules (no note has prose dollars). TeX
+  errors render as MathJax error output, as in Eleventy, without failing the
+  build.
+
 ## Verification and deployment
 
 ```sh
