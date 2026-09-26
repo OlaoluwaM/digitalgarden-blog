@@ -15,6 +15,13 @@
     height: 100%;
   }
 
+  /* Obsidian's root and body settings, which live pages inherit. The page
+     scrollbar follows the reader's color scheme (html); everything inside
+     the body is dark. */
+  html {
+    color-scheme: light dark;
+  }
+
   body {
     position: relative;
     margin: 0;
@@ -29,6 +36,12 @@
     line-height: var(--text-ui--line-height);
     font-kerning: normal;
     text-rendering: optimizeLegibility;
+    color-scheme: dark;
+    -webkit-tap-highlight-color: transparent;
+    /* Long words and URLs wrap instead of widening the column. */
+    overflow-wrap: break-word;
+    user-select: text;
+    tab-size: 4;
   }
 
   ::selection {

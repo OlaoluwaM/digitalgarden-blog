@@ -96,3 +96,29 @@ comparisons, and the tests named per entry.
   Analytics section.
 - **Why:** unused or replaced at build time.
 - **Evidence:** `test/site-build.test.ts` (no third-party scripts).
+
+## 2026-09-26: Phase 2 design system
+
+Evidence for every entry: computed-style diffs and screenshots against the
+phase 1 build (identical to thunk.blog apart from the phase 1 entries above),
+with the legacy CSS switched off (`LEGACY_CSS=off`), and the tests named per
+entry.
+
+### Muted text passes WCAG AA
+
+- **Change:** muted text (Recent Posts descriptions and dates, the post
+  footer, search key hints) is #8c8c8c instead of #666. List markers and the
+  blockquote rule stay #666; contrast rules for text do not apply to them.
+- **Why:** #666 on the page background is 2.9:1; #8c8c8c is 4.96:1 on the
+  page and 4.5:1 on the sidebar.
+- **Evidence:** `test/tokens.test.ts`; the axe `color-contrast` entries for
+  these elements disappear.
+
+### No overlap at exactly 1000px
+
+- **Change:** at a viewport of exactly 1000px the note column sits beside the
+  file tree. Live showed the file tree (its script switches at 1000px) but
+  centered the column (its CSS switches below 1001px), so the two overlapped.
+- **Why:** one breakpoint for both.
+- **Evidence:** computed-style diff of `main.content` at 999, 1000, and
+  1200px.
