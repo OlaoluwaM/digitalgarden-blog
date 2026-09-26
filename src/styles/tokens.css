@@ -229,6 +229,9 @@
   --external-link-icon-size: 0.8125em;
   --external-link-icon-offset: 4px;
   --spacing-external-link: 1rem;
+  /* The faint underline on links in running text (design-changes.md). */
+  --link-underline-strength: 40%;
+  --link-underline-offset: 0.2em;
 
   /* Task-list checkboxes. Obsidian --checkbox-size, --checkbox-radius, the
      and 6px margin-inline-end. */

@@ -51,9 +51,11 @@ const canonical = canonicalUrl(Astro.url.pathname);
     <script>
       import { initializeCopyButtons } from "../scripts/copyCode";
       import { initializeCalloutToggles } from "../scripts/callouts";
+      import { initializeScrollRegions } from "../scripts/scrollRegions";
 
       initializeCopyButtons();
       initializeCalloutToggles();
+      initializeScrollRegions();
     </script>
   </body>
 </html>

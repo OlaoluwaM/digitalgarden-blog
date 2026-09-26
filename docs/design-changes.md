@@ -214,3 +214,25 @@ entry.
   published note has one yet.
 - **Why:** even line spacing, the usual web default.
 - **Evidence:** the style guide's Markdown sample with and without Preflight.
+
+### Links in text are underlined
+
+- **Change:** links in note text (paragraphs, lists, tables, callouts,
+  footnotes) carry a faint 1px underline in their own gray at 40%, which
+  turns solid on hover. Navigation, tags, and Recent Posts titles are
+  unchanged.
+- **Why:** links were told apart from body text by color alone, and the link
+  gray is only 2:1 against the text (WCAG 1.4.1; axe `link-in-text-block`).
+- **Evidence:** the axe check in `test/layout/site-layout.test.ts` no longer
+  allows `link-in-text-block`.
+
+### Scrollable callouts are keyboard reachable
+
+- **Change:** a callout body that scrolls sideways (wide math on phones)
+  gets a tab stop and a name ("Horner's Method, scrollable"), so the arrow
+  keys scroll it. Boxes that fit get no tab stop; the check follows resizing
+  and collapsing.
+- **Why:** keyboard users could not scroll it (WCAG 2.1.1; axe
+  `scrollable-region-focusable`).
+- **Evidence:** `test/browser/scrollRegions.test.ts`; the axe check no longer
+  allows `scrollable-region-focusable`.

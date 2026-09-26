@@ -332,23 +332,11 @@ describe("accessibility checks (axe-core)", () => {
   // - color-contrast: the vault's `aside` callout title color (#7f849c,
   //   3.98:1 on its tinted background). It comes from the Obsidian vault
   //   through /sync-callouts, so the fix belongs there.
-  // - scrollable-region-focusable: a callout whose math overflows at phone
-  //   width scrolls sideways with nothing keyboard-focusable inside.
-  // - link-in-text-block: internal links distinguished from body text by
-  //   color alone.
   const KNOWN = [
     {
       rule: "color-contrast",
       target:
         /^div\[data-callout="aside"\] > \.callout-title > \.callout-title-inner$|^\.callout-title-inner$/,
-    },
-    {
-      rule: "scrollable-region-focusable",
-      target: /^div\[data-callout="\w+"\] > \.callout-content$/,
-    },
-    {
-      rule: "link-in-text-block",
-      target: /^(p:nth-child\(\d+\) > )?\.internal-link$/,
     },
   ];
 

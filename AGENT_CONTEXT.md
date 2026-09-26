@@ -678,10 +678,10 @@ Eleventy's markdown-it options. Olaolu put all resulting items in scope.
   typography; code and callouts), then an adversarial review (10 findings,
   all fixed: print, tests, axe allowlist, reduced motion, copy button hover,
   synthesized bold, rem sizing, overlay, hygiene).
-- Open: the vault's `aside` callout color (#7f849c, 3.98:1) comes from
-  `/sync-callouts`; `link-in-text-block` (links distinguished by color only)
-  and the keyboard scroll region for wide math in callouts remain on the axe
-  allowlist, pending Olaolu's decision.
+- Links in note text have a faint underline, and overflowing callout bodies
+  get a tab stop (`src/scripts/scrollRegions.ts`). The only axe allowlist
+  entry left is the vault's `aside` callout color (#7f849c, 3.98:1), which
+  comes from `/sync-callouts`.
 - `.fullpage-overlay` has no styles yet; the mobile-navigation task adds them.
 
 ## Verification and deployment
