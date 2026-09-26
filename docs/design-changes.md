@@ -336,3 +336,16 @@ computed-style comparison of each dialog state against thunk.blog at
   own highlight markup).
 - **Why:** the three defects REWRITE.md lists for the port.
 - **Evidence:** `test/browser/search.test.ts` and `test/search-engine.test.ts`.
+
+### Search results and tags
+
+- **Change:** results are links, so they open in a new tab like any link
+  (live used click handlers). A note's header tags search in place with
+  JavaScript and open `/?q=#tag` without it. The preview drops the note's
+  element ids and loads only where the panel shows (not on phones).
+  Opening, closing, the arrow keys, Enter, hover, and Ctrl/⌘+K work as on
+  live.
+- **Why:** links are what results are; ids in the preview duplicated the
+  page's own and captured its `#` links; phones never see the preview.
+- **Evidence:** `test/browser/searchDialog.test.ts` and the "search dialog
+  wiring" tests in `test/layout/site-layout.test.ts`.

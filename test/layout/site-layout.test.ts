@@ -738,6 +738,113 @@ describe("search", () => {
   });
 });
 
+describe("search dialog wiring", () => {
+  const isOpen = (page: Page) =>
+    page.evaluate(
+      () => document.querySelector<HTMLDialogElement>("#globalsearch")!.open
+    );
+
+  // Why: the search button is how most readers find search: the sidebar's
+  // on desktop, the navbar's on phones. Escape closes the dialog and puts
+  // focus back on the button.
+  for (const [width, button] of [
+    [1440, ".filetree-sidebar .search-button"],
+    [390, ".navbar .search-button"],
+  ] as const) {
+    it(`opens from the search button and closes on Escape at ${width}px`, async () => {
+      await withPage(width, async page => {
+        await page.goto(origin + "/", { waitUntil: "load" });
+        await page.click(button);
+        assert.equal(await isOpen(page), true);
+        assert.equal(
+          await page.evaluate(() => document.activeElement?.id),
+          "term"
+        );
+        await page.keyboard.press("Escape");
+        assert.equal(await isOpen(page), false);
+        assert.ok(
+          await page.evaluate(
+            selector =>
+              document.activeElement === document.querySelector(selector),
+            button
+          )
+        );
+      });
+    });
+  }
+
+  // Why: `/?q=` links open search with results; the note header's tag
+  // links point there.
+  it("opens with the results for ?q=", async () => {
+    await withPage(1440, async page => {
+      await page.goto(`${origin}/?q=%23linux`, { waitUntil: "load" });
+      assert.equal(await isOpen(page), true);
+      await page.waitForSelector(".searchresult");
+      assert.equal(await page.locator(".searchresult").count(), 4);
+    });
+  });
+
+  // Why: a note's tags search in place, without leaving the note.
+  it("searches a note's tag in place", async () => {
+    await withPage(1440, async page => {
+      const url = `${origin}/posts/io-in-haskell-an-epiphany/`;
+      await page.goto(url, { waitUntil: "load" });
+      await page.click("header a.tag >> nth=1");
+      assert.equal(await isOpen(page), true);
+      assert.equal(await page.inputValue("#term"), "#haskell");
+      await page.waitForSelector(".searchresult");
+      assert.equal(page.url(), url);
+    });
+  });
+
+  // Why: the keyboard path end to end: type, arrow to a result, Enter
+  // opens its note.
+  it("opens the selected result with Enter", async () => {
+    await withPage(1440, async page => {
+      await page.goto(origin + "/", { waitUntil: "load" });
+      await page.keyboard.press("Control+k");
+      await page.keyboard.type("haskell");
+      await page.waitForSelector(".searchresult");
+      const second = await page.getAttribute(".searchresult >> nth=1", "href");
+      await page.keyboard.press("ArrowDown");
+      await Promise.all([
+        page.waitForURL(origin + second),
+        page.keyboard.press("Enter"),
+      ]);
+    });
+  });
+
+  // Why: on desktop the preview shows the selected note, styled as a note;
+  // phones hide the panel and fetch no notes for it.
+  it("previews the selected note on desktop only", async () => {
+    for (const width of [1440, 390]) {
+      await withPage(width, async page => {
+        const notes: string[] = [];
+        page.on("request", request => {
+          if (new URL(request.url()).pathname.startsWith("/posts/"))
+            notes.push(request.url());
+        });
+        await page.goto(origin + "/", { waitUntil: "load" });
+        await page.keyboard.press("Control+k");
+        await page.keyboard.type("redis");
+        await page.waitForSelector(".searchresult");
+        if (width === 390) {
+          await page.waitForTimeout(300);
+          assert.deepEqual(notes, []);
+          return;
+        }
+        await page.waitForSelector(".preview-body p");
+        assert.equal(
+          await page.textContent(".preview-title"),
+          "Implementing Redis INFO in Haskell"
+        );
+        assert.equal(await page.isVisible(".preview-body > header"), false);
+        assert.equal(await page.locator(".preview-body [id]").count(), 0);
+      });
+    }
+  });
+});
+
 describe("mobile file tree", () => {
   // Why: on phones and tablets the file tree opens over the page when the
   // hamburger's `aria-expanded` is "true" (the navigation script flips

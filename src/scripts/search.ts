@@ -148,19 +148,26 @@ function highlighted(
   terms: readonly string[]
 ) {
   const span = element("span", className);
+  span.append(markMatches(text, terms));
+  return span;
+}
+
+/** Text as text nodes, with each match wrapped in a <mark>. */
+export function markMatches(text: string, terms: readonly string[]) {
+  const fragment = document.createDocumentFragment();
   for (const segment of highlightSegments(text, terms)) {
     if (segment.match) {
       const mark = element("mark", "search-highlight");
       mark.textContent = segment.text;
-      span.append(mark);
+      fragment.append(mark);
     } else {
-      span.append(segment.text);
+      fragment.append(segment.text);
     }
   }
-  return span;
+  return fragment;
 }
 
-function element<K extends keyof HTMLElementTagNameMap>(
+export function element<K extends keyof HTMLElementTagNameMap>(
   tag: K,
   className: string
 ) {

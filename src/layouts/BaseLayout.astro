@@ -57,11 +57,16 @@ const canonical = canonicalUrl(Astro.url.pathname);
       import { initializeCalloutToggles } from "../scripts/callouts";
       import { initializeScrollRegions } from "../scripts/scrollRegions";
       import { initializeSearch } from "../scripts/search";
+      import { initializeSearchDialog } from "../scripts/searchDialog";
+      import { initializeSearchPreview } from "../scripts/searchPreview";
 
       initializeCopyButtons();
       initializeCalloutToggles();
       initializeScrollRegions();
       initializeSearch();
+      initializeSearchPreview();
+      // Last: a `?q=` link opens the dialog and searches at once.
+      initializeSearchDialog();
     </script>
     <!-- Custom elements, so they belong in the body, not the head. -->
     <Analytics />

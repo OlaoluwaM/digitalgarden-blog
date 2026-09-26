@@ -763,13 +763,24 @@ Eleventy's markdown-it options. Olaolu put all resulting items in scope.
   engine module load together on first focus or input (dynamic import, so
   FlexSearch is its own chunk), retry after a failure, and a query number
   drops stale searches.
-- Left for "Wire the search dialog": open/close (buttons, Ctrl/⌘+K, `?q=`),
-  arrow-key selection and Enter, the preview (call
-  `initializeScrollRegions()` after filling it), tag buttons searching
-  `#tag`, the Mac ⌘ label.
+- Dialog wiring (also handed over, 2026-09-26):
+  `src/scripts/searchDialog.ts` opens the dialog from the search buttons
+  (`aria-controls="globalsearch"`), Ctrl/⌘+K (toggles), `?q=`, and tags
+  (header `a.tag` links search their `?q=` in place unless modified-clicked;
+  preview `button.tag`s search their text); a click whose target is the
+  dialog closes it; arrows move `aria-selected`/`aria-activedescendant`
+  (wrapping), hover selects, Enter clicks the selected link; Apple
+  platforms show ⌘. `src/scripts/searchPreview.ts` watches the field's
+  `aria-activedescendant` (MutationObserver) and fills `#preview-content`
+  with the result's title and tags plus the fetched note's `main.content`
+  (ids dropped, matches marked on text nodes, `initializeScrollRegions()`
+  after), caches pages per visit, drops stale previews, and fetches
+  nothing while the panel is hidden (phones). `BaseLayout` initializes the
+  dialog last so `?q=` searches at once.
 - Tests: `test/search-engine.test.ts` (16, Node), `test/browser/search.test.ts`
-  (12, Chrome), two built-site tests in `test/layout/site-layout.test.ts`,
-  and a `page scripts` build test. 11 mutations (the three live defects
+  (13, Chrome), `test/browser/searchDialog.test.ts` (14, Chrome), seven
+  built-site tests in `test/layout/site-layout.test.ts`, and a
+  `page scripts` build test. The wiring's 11 mutations each fail a test. 11 mutations (the three live defects
   reintroduced, the race guard, retry, idempotence, excerpt stripping,
   overlap merge, tag search) each fail a test.
 
