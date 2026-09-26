@@ -35,7 +35,7 @@ const { posts } = Astro.props;
               {post.data.rawNoteProps.title}
             </a>
             {metaDescription(post.data.rawNoteProps.description) && (
-              <p class="m-0 text-[0.9rem] text-faint">
+              <p class="m-0 text-teaser text-faint">
                 {metaDescription(post.data.rawNoteProps.description)}
               </p>
             )}

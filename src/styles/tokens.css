@@ -110,6 +110,12 @@
   /* Dates, footer, Recent Posts metadata. */
   --text-xs: 0.8rem;
   --text-xs--line-height: 1.5;
+  /* Relative to the surrounding text: tag pills (Obsidian --font-smaller),
+     note timestamps (--dg-timestamps-size), Recent Posts descriptions. */
+  --text-tag: 0.875em;
+  --text-tag--line-height: 1;
+  --text-meta: 0.8em;
+  --text-teaser: 0.9rem;
 
   /* Named by role; Obsidian's legacy CSS owns the --radius-xs..xl names. */
   --radius-key: 4px;

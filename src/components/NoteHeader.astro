@@ -25,7 +25,7 @@ function tagHref(tag: string): string {
       {
         tags.map((tag: string) => (
           <a
-            class="tag inline-flex h-8 items-center justify-center whitespace-nowrap rounded-tag border-0 border-solid border-link/20 bg-link/10 px-2 py-1 text-[0.875em] leading-none font-medium text-link no-underline shadow-input transition-colors motion-reduce:transition-none"
+            class="tag inline-flex h-8 items-center justify-center whitespace-nowrap rounded-tag border-0 border-solid border-link/20 bg-link/10 px-2 py-1 text-tag font-medium text-link no-underline shadow-input transition-colors hover:border-link/30 hover:bg-link/15 hover:text-link-hover motion-reduce:transition-none"
             href={tagHref(tag)}
           >
             #{tag}
@@ -33,9 +33,7 @@ function tagHref(tag: string): string {
         ))
       }
     </div>
-    <div
-      class="timestamps mt-5 flex gap-2.5 text-[0.8em] text-muted tabular-nums"
-    >
+    <div class="timestamps mt-5 flex gap-2.5 text-meta text-muted tabular-nums">
       <div
         title="Created at"
         aria-label="Created at"

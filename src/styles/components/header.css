@@ -3,33 +3,3 @@
  */
 @layer components {
 }
-
-/*
- * Tag hover only changes color on pointers that can actually hover: the live
- * site guards it with `@media (hover: hover)`
- * (src/styles/legacy/adaptations/_header.scss, mirroring obsidian-base.scss's
- * `a.tag:hover`). Tailwind's `hover:` variant compiles to a plain `:hover`
- * with no such guard, so the hover-only color change needs a manual rule;
- * the idle colors, the transition, and the `prefers-reduced-motion` override
- * are utilities in NoteHeader.astro (`transition-colors
- * motion-reduce:transition-none`).
- *
- * This lives in `@layer utilities`, not `@layer components`: the cascade
- * layer order (global.css) puts `components` below `utilities`, so a rule in
- * `components` can never beat the idle `bg-link/10`/`border-link/20`
- * utilities regardless of specificity or `:hover` — layers are resolved
- * before specificity. `.header-tags a.tag:hover` has higher specificity than
- * the single-class idle utilities it needs to beat, so once it's in the same
- * layer it wins normally.
- * `color-mix(..., transparent)` reproduces Tailwind's own opacity-modifier
- * math (e.g. `bg-link/15`) for a value that can't be a utility here.
- */
-@layer utilities {
-  @media (hover: hover) {
-    .header-tags a.tag:hover {
-      background-color: color-mix(in srgb, var(--color-link) 15%, transparent);
-      border-color: color-mix(in srgb, var(--color-link) 30%, transparent);
-      color: var(--color-link-hover);
-    }
-  }
-}
