@@ -637,8 +637,9 @@ Eleventy's markdown-it options. Olaolu put all resulting items in scope.
   pages).
 - npm 11 skipped the root `postinstall` (`patch-package`) after dependency
   installs in this session, silently dropping `patches/astro+7.2.9.patch`;
-  `test:images-build` caught it. Reapplied with `npx patch-package`. Fresh
-  installs (including Vercel) may drop it too; decision pending.
+  `test:images-build` caught it. `dev:astro` and `build:astro` now reapply
+  patches first (`patch-dependencies`); test builds call `astro build`
+  directly and rely on the installed state.
 - Worktree-isolated subagents cannot run agent-browser `eval`; verify
   computed styles from the lead session.
 - Type checking: `npm run typecheck` (`astro check`, first step of

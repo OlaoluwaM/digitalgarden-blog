@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "postinstall": "patch-package --error-on-fail",
+    "postinstall": "npm run patch-dependencies",
+    "patch-dependencies": "patch-package --error-on-fail",
     "prebuild": "rimraf dist",
     "start:eleventy": "npm-run-all2 get-theme build:sass --parallel watch:eleventy:*",
     "watch:eleventy:sass": "sass --watch src/site/styles:dist/styles",
@@ -39,9 +40,9 @@
     "test:images-build": "node --test --test-isolation=none test/images-build.test.ts",
     "test:wikilink-index": "node --test --test-isolation=none test/wikilink-index.test.ts",
     "generate:wikilink-index": "node scripts/generate-wikilink-index.ts",
-    "predev:astro": "npm run generate:wikilink-index",
+    "predev:astro": "npm run patch-dependencies && npm run generate:wikilink-index",
     "dev:astro": "astro dev",
-    "prebuild:astro": "npm run generate:wikilink-index",
+    "prebuild:astro": "npm run patch-dependencies && npm run generate:wikilink-index",
     "build:astro": "astro build"
   },
   "keywords": [],

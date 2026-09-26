@@ -4,6 +4,10 @@
 `postinstall`. Install development dependencies for this build project; they
 include `patch-package`. An unapplicable patch must fail the install.
 
+`dev:astro` and `build:astro` reapply the patches first (`patch-dependencies`),
+because npm 11 can skip `postinstall` scripts and silently drop a patch.
+Reapplying an applied patch is a no-op.
+
 ## Astro 7.2.9
 
 ### Propagate Markdown rendering errors
