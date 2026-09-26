@@ -12,8 +12,9 @@ Exception agreed on 2026-09-17: original `/img/user/*` URLs need not remain avai
 Vault publishing remains paused pending the tasks in [TODO.md](TODO.md).
 
 - [AGENTS.md](AGENTS.md): session requirements and working conventions.
-- [REWRITE.md](REWRITE.md): human implementation checklist. Keep markup/CSS
-  penultimate, cutover last, and agent discussion here.
+- [REWRITE.md](REWRITE.md): human implementation checklist. Markup/CSS comes
+  before search and the remaining client behavior; cutover is last. Keep
+  agent discussion here.
 - [TODO.md](TODO.md): vault tasks and upstream follow-ups.
 - `docs/adrs/`: accepted decisions; proposals below do not supersede them.
 
@@ -550,6 +551,59 @@ Eleventy's markdown-it options. Olaolu put all resulting items in scope.
   forced build. The built index has 14 entries whose URLs match Eleventy's,
   tags match after removing `note`/`gardenEntry`, and no content contains
   callout markers or HTML.
+
+### Search port requirements and layout-first order (2026-09-26)
+
+- Olaolu moved Markup and CSS ahead of the remaining search work: the search
+  box, button, and preview (`.content`/`main` extraction) depend on the layout.
+- Search port (`searchScript.njk`): FlexSearch `0.7.43` pinned and bundled (0.7
+  API; 0.8 changed encoders). Split into pure search logic (Node tests against
+  real index entries), UI behavior (Chrome tests on `searchContainer.njk`
+  markup), then preview and wiring after the layout exists.
+- Fix, with regression tests, three Eleventy defects instead of porting them:
+  1. Unescaped `innerHTML`: titles, excerpts, tags, and the no-results query.
+     The new index stores decoded text (for example
+     `<options-to-pass-to-executable>` in the Stack post), and `?q=` is
+     attacker-controlled. Test that such text renders as text, not elements.
+  2. `highlightTerms` re-scans its own `<span class="search-highlight">`
+     markup, so queries like `span` or `class` corrupt it. Test those queries.
+  3. Search runs on `keydown`, so mouse paste and the search field's clear
+     button never search. Listen for `input` and test both.
+- Visual reference: the live site loads `obsidian-base.css`, then
+  `_theme.b9d91f25.css`, `digital-garden-base.css`, `custom-style.css`, and
+  `user/{callout-overrides,callouts,code-blocks,custom}.css`. A local
+  `npx eleventy` run without `get-theme` falls back to `style.css`, so use the
+  live site or a full `npm run build:eleventy` for visual comparison.
+
+### Vendored theme (2026-09-26)
+
+- `src/styles/vendor/obsidian-theme.css` is the live
+  `/styles/_theme.b9d91f25.css`, committed verbatim (SHA-256
+  `b9d91f255feb4505…`, matching the Eleventy name; upstream HEAD hashes the
+  same). Provenance is in `src/styles/vendor/README.md`; `.prettierignore`
+  excludes the directory. Not loaded by Astro yet.
+- Eleventy still runs `get-theme` as the parity reference; deleting it and
+  the `THEME` settings is a cutover item.
+
+### Markup and CSS stage (2026-09-26)
+
+- Claude implements this stage (Olaolu's handover); every other stage stays
+  in Learn / Guide mode. Every test Claude writes explains in a comment why
+  it exists and why that level of test fits.
+- [ADR 0003](docs/adrs/0003-build-a-tailwind-token-design-system-before-cutover.md):
+  Tailwind v4 design system before cutover, in two phases. Phase 1 is a
+  parity shell: Eleventy class names with the legacy cascade in one low
+  cascade layer. Phase 2 revises the Eleventy styles into tokens,
+  utility-based components, and a content stylesheet, then removes the
+  legacy CSS.
+- Log intentional changes in `docs/design-changes.md`. The working plan is
+  the uncommitted `MARKUP_CSS_PLAN.md` at the repository root.
+- Fonts stay: Instrument Sans (text), Instrument Serif (headings, weight 700),
+  and Commit Mono (code). Headings currently render from the vendored
+  theme's base64 Instrument Serif; the self-hosted face declares weight 400
+  only, so removing the theme risks synthesized bold.
+- Analytics are deferred until after markup (their own REWRITE.md section).
+  The live site has them, so they must land before cutover.
 
 ## Verification and deployment
 

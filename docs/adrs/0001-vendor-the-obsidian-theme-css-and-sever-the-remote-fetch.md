@@ -38,3 +38,4 @@ Post-cutover (phase 2), distill the vendored file into a first-class, owned toke
 ## Related
 
 - ADR 0002 — sibling Astro-migration decision; both trade official/upstream machinery for owned, frozen artifacts to protect design and URL parity.
+- ADR 0003 — keeps this vendored file as the phase 1 parity baseline and moves the distillation before cutover, as a Tailwind token design system.

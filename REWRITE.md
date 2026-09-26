@@ -51,19 +51,14 @@
 - [ ] Rebuild `/sitemap.xml`.
 - [x] Rebuild `/searchIndex.json` from published entries.
 
-## Client Behavior
-
-- [x] Port callout collapsing and keyboard toggling.
-- [ ] Port FlexSearch search and tag filtering.
-- [ ] Port mobile navigation and file-tree folder state to TypeScript (no Alpine).
-- [ ] Keep usable fallbacks where JavaScript is not essential.
-
 ## Markup and CSS
+
+Phase 1: parity shell ([ADR 0003](docs/adrs/0003-build-a-tailwind-token-design-system-before-cutover.md)).
 
 - [ ] Build the shared page layout.
 - [ ] Add metadata, canonical URLs, and social metadata.
 - [ ] Add fonts, icons, favicons, and static assets.
-- [ ] Vendor the Obsidian theme CSS.
+- [x] Vendor the Obsidian theme CSS.
 - [ ] Load the Sass layers in the existing order.
 - [ ] Match titles, tags, dates, footer, and links.
 - [ ] Match callout title markup and styles.
@@ -71,9 +66,30 @@
 - [ ] Rebuild the Recent Posts list.
 - [ ] Port the navbar and home link.
 - [ ] Port the file tree.
-- [ ] Build the search and tag-filtering interface.
 - [ ] Match the responsive layout.
 - [ ] Preserve accessibility and keyboard behavior.
+- [ ] Review phase 1 against the live site.
+
+Phase 2: design system.
+
+- [ ] Add Tailwind v4 with the cascade layer order.
+- [ ] Define tokens from the live site and add a style guide page.
+- [ ] Revise the chrome styles into token-based components.
+- [ ] Revise the Markdown content styles into a token-based stylesheet.
+- [ ] Remove the legacy stylesheets and vendored theme; add Preflight.
+
+## Analytics
+
+- [ ] Add Vercel Web Analytics.
+- [ ] Add Vercel Speed Insights.
+
+## Client Behavior
+
+- [x] Port callout collapsing and keyboard toggling.
+- [ ] Port FlexSearch search and tag filtering, escaping inserted text, highlighting safely, and searching on `input`.
+- [ ] Build the search and tag-filtering interface.
+- [ ] Port mobile navigation and file-tree folder state to TypeScript (no Alpine).
+- [ ] Keep usable fallbacks where JavaScript is not essential.
 
 ## Cutover
 
@@ -87,4 +103,5 @@
 - [ ] Update the README and publishing instructions.
 - [ ] Document each Markdown plugin and the Eleventy behavior it replaces.
 - [ ] Remove Eleventy and migration-only code.
+- [ ] Delete `get-theme` and the `THEME` settings (ADR 0001).
 - [ ] Add `"type": "module"` to `package.json` to remove `MODULE_TYPELESS_PACKAGE_JSON` warnings.

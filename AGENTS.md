@@ -25,7 +25,8 @@ Before working on the Astro rewrite, read [AGENT_CONTEXT.md](AGENT_CONTEXT.md).
 Then inspect the working tree and relevant implementation; context can drift.
 
 - [REWRITE.md](REWRITE.md): Olaolu's implementation checklist, ordered by
-  dependency, with markup/CSS penultimate and cutover last.
+  dependency: markup/CSS comes before search and the remaining client
+  behavior, and cutover is last.
 - [TODO.md](TODO.md): vault publishing tasks and upstream follow-ups.
 - [AGENT_CONTEXT.md](AGENT_CONTEXT.md): agent continuity, open decisions,
   known gaps, and verification evidence.
