@@ -1,6 +1,10 @@
 ---
 import { render } from "astro:content";
 import { getPublishedArticles, getPublishedPosts } from "../content/posts";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import SiteNavigation from "../components/SiteNavigation.astro";
+import NoteHeader from "../components/NoteHeader.astro";
+import PostFooter from "../components/PostFooter.astro";
 
 // This is required for dynamic routes: https://docs.astro.build/en/guides/routing/#static-ssg-mode
 export async function getStaticPaths() {
@@ -18,12 +22,12 @@ const { post } = Astro.props;
 const { Content: PostContent } = await render(post);
 ---
 
-<PostContent />
-
-<script>
-  import { initializeCopyButtons } from "../scripts/copyCode";
-  import { initializeCalloutToggles } from "../scripts/callouts";
-
-  initializeCopyButtons();
-  initializeCalloutToggles();
-</script>
+<BaseLayout
+  title={post.data.rawNoteProps.title}
+  description={post.data.rawNoteProps.title}
+>
+  <SiteNavigation slot="navigation" />
+  <NoteHeader post={post} isHome={false} />
+  <PostContent />
+  <PostFooter />
+</BaseLayout>

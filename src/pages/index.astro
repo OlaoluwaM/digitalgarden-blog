@@ -1,19 +1,25 @@
 ---
 import { render } from "astro:content";
-import { getHomePost, getPublishedPosts } from "../content/posts";
+import {
+  getHomePost,
+  getPublishedPosts,
+  getRecentArticles,
+} from "../content/posts";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import SiteNavigation from "../components/SiteNavigation.astro";
+import NoteHeader from "../components/NoteHeader.astro";
+import RecentPosts from "../components/RecentPosts.astro";
 
 const posts = await getPublishedPosts();
-// There should always be a garden entry, so we can safely use the non-null assertion operator here. If one doesn't exist, we want to throw an error and fail the build.
+// getHomePost throws unless exactly one published garden entry exists, which fails the build.
 const home = getHomePost(posts);
 const { Content: HomePageContent } = await render(home);
+const recentPosts = getRecentArticles(posts);
 ---
 
-<HomePageContent />
-
-<script>
-  import { initializeCopyButtons } from "../scripts/copyCode";
-  import { initializeCalloutToggles } from "../scripts/callouts";
-
-  initializeCopyButtons();
-  initializeCalloutToggles();
-</script>
+<BaseLayout title={home.data.rawNoteProps.title}>
+  <SiteNavigation slot="navigation" />
+  <NoteHeader post={home} isHome={true} />
+  <HomePageContent />
+  <RecentPosts posts={recentPosts} />
+</BaseLayout>
