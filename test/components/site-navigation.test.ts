@@ -18,11 +18,10 @@
  * and to `test/file-tree.test.ts` (the tree builder's own unit tests).
  *
  * Why this level: the markup (classes, nesting, which note is marked
- * active) is exactly what the legacy CSS in
- * `src/styles/legacy/adaptations/_navigation.scss` and the Eleventy cascade
- * select against. Visual parity with the live site (sidebar width, colors,
- * the 1000px breakpoint) is checked separately with a real browser, not
- * here.
+ * active) is what `src/styles/components/navigation.css`, the layout tests,
+ * and the upcoming mobile-navigation script select against. Visual parity
+ * (sidebar width, colors, the 1000px breakpoint) is checked separately with
+ * a real browser, not here.
  */
 import { experimental_AstroContainer as AstroContainer } from "astro/container";
 import { parse, type HTMLElement } from "node-html-parser";
@@ -69,9 +68,9 @@ async function renderNav(activePathname: string): Promise<HTMLElement> {
 }
 
 describe("structure", () => {
-  // Why: these are the load-bearing classes/nesting every legacy selector
-  // in digital-garden-base.scss, custom.scss, and our own adaptations file
-  // target. If the shape drifts here, styling silently breaks.
+  // Why: these are the load-bearing classes and nesting the navigation
+  // styles, layout tests, and scripts target. If the shape drifts here,
+  // styling or behavior silently breaks.
   it("renders the mobile navbar with a hamburger and site name", async () => {
     const root = await renderNav("/");
     const navbar = root.querySelector(".navbar");
@@ -94,7 +93,7 @@ describe("structure", () => {
     const sidebar = wrapper!.querySelector("nav.filetree-sidebar");
     expect(sidebar).not.toBeNull();
     // Eleventy renders the sidebar's <h1> without the navbar's
-    // `site-name-header` class, which the legacy navbar rules select on.
+    // `site-name-header` class; kept for parity with its markup.
     const heading = sidebar!.querySelector(":scope > a > h1");
     expect(heading?.classList.contains("site-name-header")).toBe(false);
     expect(heading?.text).toBe("Thunks & Thoughts");

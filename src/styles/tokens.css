@@ -53,7 +53,7 @@
   --color-code: #abb2bf;
 
   /* Links, focus rings, and tags (tags tint it: bg-link/10). Not named
-     "accent": the legacy Obsidian CSS already defines --color-accent. */
+     "accent": Obsidian's CSS used --color-accent for its purple. */
   --color-link: var(--color-gray-60);
   --color-link-hover: var(--color-gray-70);
 
@@ -117,7 +117,7 @@
   --text-meta: 0.8em;
   --text-teaser: 0.9rem;
 
-  /* Named by role; Obsidian's legacy CSS owns the --radius-xs..xl names. */
+  /* Named by role. */
   --radius-key: 4px;
   --radius-code: 6px;
   --radius-tag: 0.45rem;
@@ -171,10 +171,9 @@
   --spacing-key-y-narrow: 3.5px;
   /* The sidebar site name wraps at this width. */
   --container-site-name: 8ch;
-  /* The theme's softer corners on rendered code, blocks, and images
-     (vendor/obsidian-theme.css --corner-shape): search keys, blockquotes,
-     images, code blocks, callouts. Chrome draws it; other browsers keep
-     round corners. */
+  /* The live theme's softer corners (its --corner-shape) on search keys,
+     blockquotes, images, code blocks, and callouts. Chrome draws them;
+     other browsers keep round corners. */
   --corner-shape-soft: superellipse(1.1);
   /* Obsidian's button easing (--anim-motion-baseline), which the live
      hamburger kept (obsidian-base.scss). */

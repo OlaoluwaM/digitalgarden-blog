@@ -206,3 +206,11 @@ entry.
   at 20px, a post is about 18% longer than live at the same setting. Layout stays intact at 20px and 24px.
 - **Why:** readers who enlarge the default text get larger text everywhere.
 - **Evidence:** computed sizes with Chrome's default font size set to 20px.
+
+### Superscripts keep the line spacing
+
+- **Change:** footnote references and other superscripts no longer push
+  their line apart (Tailwind's Preflight sets their line height to 0). No
+  published note has one yet.
+- **Why:** even line spacing, the usual web default.
+- **Evidence:** the style guide's Markdown sample with and without Preflight.

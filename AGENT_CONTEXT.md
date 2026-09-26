@@ -650,52 +650,39 @@ Eleventy's markdown-it options. Olaolu put all resulting items in scope.
 
 ### Phase 2 design system (2026-09-26)
 
-- Token set approved by Olaolu. Decisions: muted text raised to AA (`--color-faint` #8c8c8c); 404 stays
-  site-consistent; quote/cite callouts get Lucide `quote`; builds reapply
-  patches.
-- `src/styles/global.css` (imported before the legacy Sass) declares
-  `legacy < theme < base < components < utilities`, loads Tailwind 4.3.3
-  theme and utilities only (no Preflight), and limits utility scanning to
-  components, layouts, pages, and scripts (`source(none)`): the default scan
-  turned note words into `.table`, `.hidden`, `.collapse` utilities.
-- Lightning CSS rewrites the order statement when minifying; tests check the
-  effective order (first appearance of each layer name).
-- `src/styles/tokens.css` (`@theme static`) clears Tailwind's default
-  namespaces. Token names must not reuse a legacy custom property name: a
-  `body` declaration beats the `:root` token regardless of layers
-  (`--color-accent` rendered Obsidian purple, hence `--color-link`; radii are
-  named by role). `test/site-build.test.ts` checks for clashes.
+- Done: the legacy Eleventy/Obsidian cascade (`src/styles/legacy/`, the
+  vendored theme) is deleted; Tailwind 4.3.3 tokens, utilities, and
+  hand-written content CSS style the site, with Preflight. Page CSS went from
+  about 1.1 MB to about 36 KB. Structure and conventions:
+  `src/styles/README.md`. Every visible change from live:
+  `docs/design-changes.md`.
+- Olaolu's decisions: muted text raised to AA (#8c8c8c); 404 site-consistent;
+  quote/cite get Lucide `quote`; built-in callout icons shown; fix inherited
+  Obsidian defects like a regular website (checkboxes, footnotes heading,
+  heading letter-spacing, Recent Posts indent) and log each.
+- `global.css` declares `theme < base < components < utilities`; Lightning
+  CSS rewrites the order statement, so tests check the effective order.
+  Utility scanning is limited to components, layouts, pages, and scripts
+  (`source(none)`): the default scan turned note words into `.table`,
+  `.hidden`, `.collapse` utilities.
+- `tokens.css` (`@theme static`) clears Tailwind's default namespaces.
+- Removed dead Obsidian hooks: body `theme-dark`, `markdown-preview-view`,
+  `markdown-preview-section`; main `cm-s-obsidian`, `print`. Kept
+  `markdown-rendered` (content stylesheet scope) and other class names
+  scripts and tests use.
+- Preflight side effects handled: inline MathJax SVGs (`display: inline`),
+  `ol` numbering, `pre` and 404 paragraph margins.
 - Style guide: `src/style-guide/StyleGuide.astro`, injected at
-  `/style-guide/` by `astro dev` only. Lists tokens from `tokens.css` and
-  renders the chrome components and `sample.md`.
-- Found on live and phase 1: Obsidian's CSS masks `.lucide-<name>` icons, so
-  every built-in callout icon (note, info, tip, warning, …) is invisible;
-  only the vault's custom types show one. Decided: show them once the
-  legacy CSS is gone (log it in docs/design-changes.md then).
-- Open: the vault's `aside` callout color (#7f849c) is 3.98:1 on its tinted
-  background; it comes from `/sync-callouts`, so change it in the vault.
-- Recent Posts items sit 2.25em right of their heading on live and phase 1:
-  Obsidian's `li { margin-inline-start: var(--list-indent) }` survives
-  `custom.scss` removing the bullets. Candidate fix when Recent Posts moves
-  to tokens.
-- Evidence harness (scratchpad, not committed): full-page screenshots of all
-  15 pages at 1440 and 390 against the phase 1 baseline; step 1 diff 0%.
-- Work happens on `astro-rewrite-phase2` until Olaolu approves the legacy
-  removal checkpoint. Four worktree agents restyled navigation; header,
-  footer, Recent Posts, 404; Markdown typography; code and callouts. An
-  adversarial review found 10 issues (print, tests only on the legacy build,
-  stale axe allowlist, reduced motion, copy button hover, synthesized bold,
-  rem sizing, key-hint contrast claim, overlay styles, hygiene); all fixed.
-- `LEGACY_CSS=off` is the target state. `npm run test:layout` runs the
-  layout suite on both builds, because legacy `!important` rules hide phase 2
-  changes (callout icons, heading letter-spacing, Recent Posts alignment) in
-  the legacy build.
-- Olaolu's rule: fix inherited Obsidian defects like a regular website
-  (checkboxes, footnotes heading, heading letter-spacing, list indent) and
-  log each in docs/design-changes.md.
-- Open for the checkpoint: `link-in-text-block` (links distinguished by color
-  only) and the focusable scroll region for wide math in callouts remain on
-  the axe allowlist.
+  `/style-guide/` by `astro dev` only.
+- Process: four worktree agents (navigation; header/footer/Recent Posts/404;
+  typography; code and callouts), then an adversarial review (10 findings,
+  all fixed: print, tests, axe allowlist, reduced motion, copy button hover,
+  synthesized bold, rem sizing, overlay, hygiene).
+- Open: the vault's `aside` callout color (#7f849c, 3.98:1) comes from
+  `/sync-callouts`; `link-in-text-block` (links distinguished by color only)
+  and the keyboard scroll region for wide math in callouts remain on the axe
+  allowlist, pending Olaolu's decision.
+- `.fullpage-overlay` has no styles yet; the mobile-navigation task adds them.
 
 ## Verification and deployment
 

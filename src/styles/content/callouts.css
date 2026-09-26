@@ -65,7 +65,8 @@
   /*
    * Custom types from the Obsidian vault. Copied from
    * src/site/styles/user/callouts.scss, which `/sync-callouts` writes. That
-   * file is deleted with the legacy CSS, so the skill must write these
+   * file is deleted at cutover with the Eleventy styles, so the skill must
+   * write these
    * rules (and the icon map in src/plugins/hast/callout-icons.ts) instead.
    */
   .callout[data-callout="ai-text"] {

@@ -7,7 +7,7 @@
  * whole file.
  */
 import assert from "node:assert/strict";
-import { access, readFile } from "node:fs/promises";
+import { access } from "node:fs/promises";
 import { join } from "node:path";
 import { after, before, describe, it } from "node:test";
 import { parse, type HTMLElement } from "node-html-parser";
@@ -118,16 +118,18 @@ describe("the stylesheet bundle (ADR 0003)", () => {
   }
 
   // Why: unlayered CSS beats every layered rule regardless of specificity,
-  // and a layer's position is fixed where its name first appears. The
-  // legacy cascade must come first (lowest) so utilities beat it, and no
-  // style rule may sit outside a layer. The minifier rewrites the declared
-  // order statement, so this checks the effective order, not the source.
-  it("orders the layers legacy < theme < base < components < utilities", async () => {
+  // and a layer's position is fixed where its name first appears. Utilities
+  // must beat component and base rules, and no style rule may sit outside a
+  // layer. The minifier rewrites the declared order statement, so this
+  // checks the effective order, not the source.
+  it("orders the layers theme < base < components < utilities", async () => {
     const css = (await stylesheets("index.html")).join("\n");
     const topLevel = postcss
       .parse(css)
       .nodes.filter(
-        node => !(node.type === "atrule" && node.name === "charset")
+        node =>
+          node.type !== "comment" &&
+          !(node.type === "atrule" && node.name === "charset")
       );
     const order: string[] = [];
     for (const node of topLevel) {
@@ -140,7 +142,7 @@ describe("the stylesheet bundle (ADR 0003)", () => {
     // for older browsers; it may come first (lowest) or be absent.
     assert.deepEqual(
       order.filter(name => name !== "properties"),
-      ["legacy", "theme", "base", "components", "utilities"]
+      ["theme", "base", "components", "utilities"]
     );
     // `@property` (custom properties for utilities) and `@font-face` are
     // not style rules; layers do not order them.
@@ -190,58 +192,30 @@ describe("the stylesheet bundle (ADR 0003)", () => {
     assert.deepEqual([...collisions], []);
   });
 
-  // Why: a custom property declared on `body` by the legacy CSS beats the
-  // same name inherited from the tokens on `:root`, whatever the layers.
-  // Obsidian defines hundreds of variables; a token that reuses one of
-  // their names (as `--color-accent` once did) silently takes the legacy
-  // value everywhere until the legacy layer is gone.
-  it("defines no token that the legacy CSS also defines", async () => {
-    const legacy = new Set<string>();
+  // Why: ADR 0003 ends with the legacy Eleventy/Obsidian cascade (about
+  // 1 MB, with base64 fonts) deleted. If an import of it came back, the
+  // page would silently carry both designs; the size budget also catches
+  // any other large stylesheet creeping in.
+  it("ships no legacy CSS and stays within its size budget", async () => {
+    const css = (await stylesheets("index.html")).join("\n");
+    assert.doesNotMatch(css, /@layer legacy|\.messageBar\{|--dg-content/);
+    assert.ok(css.length < 64_000, `${css.length} bytes`);
+  });
+
+  // Why: with the legacy CSS gone, Tailwind's Preflight reset is the element
+  // baseline the base, content, and component styles are written against
+  // (margins, lists, headings, media). It must load, in the base layer.
+  it("ships the Preflight reset in the base layer", async () => {
+    let found = false;
     postcss
       .parse((await stylesheets("index.html")).join("\n"))
       .walkAtRules("layer", layer => {
-        if (layer.params !== "legacy") return;
-        layer.walkDecls(decl => {
-          if (decl.prop.startsWith("--")) legacy.add(decl.prop);
+        if (layer.params !== "base") return;
+        layer.walkRules(rule => {
+          if (rule.selector.includes("::file-selector-button")) found = true;
         });
       });
-    const clashes: string[] = [];
-    postcss
-      .parse(await readFile("src/styles/tokens.css", "utf8"))
-      .walkDecls(decl => {
-        if (legacy.has(decl.prop)) clashes.push(decl.prop);
-      });
-    assert.deepEqual(clashes, []);
-  });
-
-  // Why: ADR 0003 adds Tailwind's Preflight reset only after the legacy CSS
-  // is gone. Before that, Preflight would restyle every element underneath
-  // the legacy cascade (margins, list styles, heading sizes) and break parity.
-  it("ships no Preflight reset while the legacy layer exists", async () => {
-    const css = (await stylesheets("index.html")).join("\n");
-    assert.doesNotMatch(css, /::file-selector-button\s*\{[^}]*box-sizing/);
-  });
-
-  // Why: parity depends on the live cascade order. Later files override
-  // earlier ones, so swapping any two changes the design without any error.
-  it("keeps the live cascade order", async () => {
-    const css = (await stylesheets("index.html")).join("\n");
-    const markers = [
-      [".messageBar{", "obsidian-base.scss"],
-      ["--font-interface-theme:Inter", "the vendored theme"],
-      ["--dg-external-link-icon-size:13px", "digital-garden-base.scss"],
-      ["--dg-content-font-size:1.03rem", "user/custom.scss"],
-    ] as const;
-    const positions = markers.map(([marker, file]) => {
-      const position = css.indexOf(marker);
-      assert.notEqual(position, -1, `missing marker from ${file}`);
-      return position;
-    });
-    assert.deepEqual(
-      positions,
-      positions.toSorted((a, b) => a - b),
-      "legacy files are out of order"
-    );
+    assert.ok(found, "no Preflight rules in @layer base");
   });
 
   // Why: the stylesheets reference fonts and icons by absolute URL. They
@@ -271,18 +245,13 @@ describe("page structure", () => {
     );
   });
 
-  // Why: note content must stay inside `main.content.cm-s-obsidian`. The
-  // legacy CSS positions and styles the note column through that selector,
-  // and later components are placed relative to it.
-  it("renders note content inside the legacy content container", () => {
+  // Why: note content must stay inside `main.content`: layout.css places the
+  // note column through that selector, and the code styles are scoped to it.
+  it("renders note content inside the content container", () => {
     for (const page of site.pages.filter(page => page !== "404.html")) {
       const main = documents.get(page)!.querySelector("body > main");
       assert.ok(main, page);
-      assert.deepEqual(
-        [...main.classList.values()],
-        ["content", "cm-s-obsidian", "print"],
-        page
-      );
+      assert.deepEqual([...main.classList.values()], ["content"], page);
       assert.ok(main.querySelector("p"), `${page} has no rendered content`);
     }
   });
@@ -304,19 +273,13 @@ describe("page structure", () => {
     }
   });
 
-  // Why: the legacy theme applies its dark palette and preview typography
-  // through these body classes; without them the page renders unstyled.
-  it("sets the legacy body classes on every note page", () => {
+  // Why: the rendered Markdown stylesheet is scoped to
+  // `.markdown-rendered main.content`; without the body class every note
+  // renders with browser defaults.
+  it("marks every note page's body as rendered Markdown", () => {
     for (const page of site.pages.filter(page => page !== "404.html")) {
       const classes = documents.get(page)!.querySelector("body")?.classList;
-      for (const name of [
-        "theme-dark",
-        "markdown-preview-view",
-        "markdown-rendered",
-        "markdown-preview-section",
-      ]) {
-        assert.ok(classes?.contains(name), `${page} lacks ${name}`);
-      }
+      assert.ok(classes?.contains("markdown-rendered"), page);
     }
   });
 });

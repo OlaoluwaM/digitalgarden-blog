@@ -1,7 +1,6 @@
 ---
 // T4 (phase 1): standalone 404 page, not using BaseLayout
 import "../styles/global.css";
-import "../styles/legacy/index.scss";
 import { site } from "../lib/site.ts";
 ---
 
@@ -22,7 +21,7 @@ import { site } from "../lib/site.ts";
       href={new URL("/feed.xml", site.url).href}
     />
   </head>
-  <body class="theme-dark markdown-preview-view">
+  <body>
     <main class="content centered">
       <h1 class="font-serif font-normal text-h1 mt-7 mb-7">
         There is nothing here

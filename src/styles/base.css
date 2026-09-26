@@ -1,7 +1,6 @@
 /*
- * Element defaults (ADR 0003 phase 2), in the `base` layer. Tailwind's
- * Preflight is not loaded while the legacy CSS exists, so the few resets the
- * design relies on are declared here.
+ * Element defaults (ADR 0003 phase 2), in the `base` layer after Tailwind's
+ * Preflight reset.
  */
 @layer base {
   *,

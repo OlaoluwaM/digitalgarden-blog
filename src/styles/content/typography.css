@@ -154,6 +154,9 @@
     ul {
       list-style-type: disc;
     }
+    ol {
+      list-style-type: decimal;
+    }
     :is(ul, ol) > li {
       position: relative;
       margin-inline-start: var(--spacing-list-marker);
@@ -302,6 +305,10 @@
     }
 
     /* Math: MathJax inlines its own layout (display blocks are centered with
-       a 1em margin); nothing to add. */
+       a 1em margin, and each SVG carries its vertical-align). Preflight makes
+       every svg a block; formulas must stay in the line of text. */
+    mjx-container > svg {
+      display: inline;
+    }
   }
 }

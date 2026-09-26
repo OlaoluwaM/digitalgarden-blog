@@ -68,8 +68,6 @@ async function fixture(t: TestContext) {
     "components",
     "lib",
     "styles",
-    // The shared layout imports the Eleventy Sass through src/styles/legacy.
-    "site/styles",
   ]) {
     await cp(
       join(repository, "src", directory),

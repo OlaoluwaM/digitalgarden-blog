@@ -75,9 +75,9 @@ Phase 2: design system.
 
 - [x] Add Tailwind v4 with the cascade layer order.
 - [x] Define tokens from the live site and add a style guide page.
-- [ ] Revise the chrome styles into token-based components.
-- [ ] Revise the Markdown content styles into a token-based stylesheet.
-- [ ] Remove the legacy stylesheets and vendored theme; add Preflight.
+- [x] Revise the chrome styles into token-based components.
+- [x] Revise the Markdown content styles into a token-based stylesheet.
+- [x] Remove the legacy stylesheets and vendored theme; add Preflight.
 
 ## Analytics
 

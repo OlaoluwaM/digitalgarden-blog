@@ -13,14 +13,13 @@ import {
 // no specific `[data-callout="..."]` override, e.g. "note").
 const DEFAULT_KEY = "__default__";
 
-// The same cascade order legacy stylesheets load in (src/styles/legacy/index.scss):
-// Obsidian's base callout types, then the vendored theme override (currently
-// none), then this project's custom types synced from the vault. A later
-// file overrides an earlier one for the same type, exactly like the CSS
-// cascade would for equal-specificity `.callout[data-callout="x"]` rules.
+// Obsidian's base callout types, then this project's custom types synced
+// from the vault (the Eleventy styles, kept until cutover; the vendored
+// theme declared no icon overrides). A later file overrides an earlier one
+// for the same type, as the CSS cascade would for equal-specificity
+// `.callout[data-callout="x"]` rules.
 const CALLOUT_ICON_SOURCES = [
   "src/site/styles/obsidian-base.scss",
-  "src/styles/vendor/obsidian-theme.css",
   "src/site/styles/user/callouts.scss",
 ];
 
@@ -82,7 +81,7 @@ function parseCalloutIconsFromAllSources(): Map<string, string> {
 describe("callout icon map", () => {
   // Why: the map is hand-authored in TypeScript but must mirror the CSS
   // that actually decides each callout's icon in the browser (Obsidian
-  // defaults + the vendored theme + `/sync-callouts`-generated custom
+  // defaults + `/sync-callouts`-generated custom
   // types). Parsing those sources independently and diffing against the
   // exported map is the only thing that catches drift after someone edits
   // one side and forgets the other -- in particular, re-running

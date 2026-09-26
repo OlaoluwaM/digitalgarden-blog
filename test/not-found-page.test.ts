@@ -108,20 +108,6 @@ describe("404 page", () => {
     );
   });
 
-  // Why: the body carries the legacy theme and presentation classes. Without
-  // them, the page renders unstyled.
-  it("sets the legacy body classes", async () => {
-    const html = await site.read("404.html");
-    const doc = parse(html);
-    const body = doc.querySelector("body");
-    assert.ok(body, "no <body> found");
-
-    const classes = body.classList;
-    for (const name of ["theme-dark", "markdown-preview-view"]) {
-      assert.ok(classes?.contains(name), `body missing class ${name}`);
-    }
-  });
-
   // Why: the content wrapper keeps the live `content centered` classes the
   // legacy CSS positions, but is a <main> landmark (live used a <div>), so
   // screen readers can jump to the page's content (axe landmark-one-main).
@@ -163,12 +149,13 @@ describe("404 page", () => {
     assert.match(link?.text || "", /[Gg]o back home/);
   });
 
-  // Why: the 404 page is standalone like Eleventy's, not the note layout: no
-  // note container (`cm-s-obsidian`) and no site navigation.
+  // Why: the 404 page is standalone like Eleventy's, not the note layout:
+  // no site navigation, and no `markdown-rendered` body, so the rendered
+  // Markdown stylesheet (scoped to it) does not restyle its heading and text.
   it("does not use the note layout", async () => {
     const html = await site.read("404.html");
     const doc = parse(html);
-    assert.equal(doc.querySelector(".cm-s-obsidian"), null);
+    assert.equal(doc.querySelector("body.markdown-rendered"), null);
     assert.equal(doc.querySelector(".filetree-wrapper, .navbar"), null);
   });
 });

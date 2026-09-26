@@ -29,6 +29,8 @@
      Courier on some systems; see docs/design-changes.md.) */
   .content pre.astro-code {
     position: relative;
+    /* The browser's default block margin, which Preflight removes. */
+    margin-block: 1em;
     font-family: var(--font-mono);
     min-height: 38px;
     /* The wide left padding holds the line numbers. */
@@ -107,6 +109,7 @@
     font-family: inherit;
     font-size: var(--text-2xs);
     font-weight: var(--font-weight-medium);
+    line-height: normal;
     white-space: nowrap;
     cursor: pointer;
     user-select: none;
