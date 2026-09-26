@@ -1,7 +1,8 @@
 import { getCollection, type CollectionEntry } from "astro:content";
 import { assertUniquePermalinks } from "./permalinks.ts";
+import { isHomePost } from "./home.ts";
 
-type Post = CollectionEntry<"posts">;
+export type Post = CollectionEntry<"posts">;
 
 const DEFAULT_LIMIT = 3;
 
@@ -56,14 +57,6 @@ export function getRecentArticles(
     (a, b) => b.publishedAt - a.publishedAt
   );
   return take(articlesSortedByRecency, limit).map(({ article }) => article);
-}
-
-/* -------------------------------------------------------------------------- */
-/*                                 // Helpers                                 */
-/* -------------------------------------------------------------------------- */
-
-function isHomePost(post: Post): boolean {
-  return post.data.pluginProps.tags.includes("gardenEntry");
 }
 
 /* -------------------------------------------------------------------------- */

@@ -49,7 +49,7 @@
 - [ ] Rebuild `/~random/`.
 - [ ] Rebuild `/feed.xml`.
 - [ ] Rebuild `/sitemap.xml`.
-- [ ] Rebuild `/searchIndex.json` from published entries.
+- [x] Rebuild `/searchIndex.json` from published entries.
 
 ## Client Behavior
 

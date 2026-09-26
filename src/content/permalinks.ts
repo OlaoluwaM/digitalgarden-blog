@@ -1,4 +1,5 @@
 import { z } from "astro/zod";
+import { HOME_POST_TAG } from "./home.ts";
 
 // The subset of a published post needed for route validation.
 export interface PostWithPermalink {
@@ -41,7 +42,7 @@ export function assertUniquePermalinks(
   const postsByRoute = Map.groupBy(posts, post => {
     const { permalink, tags } = post.data.pluginProps;
 
-    if (tags.includes("gardenEntry") || permalink === "/") {
+    if (tags.includes(HOME_POST_TAG) || permalink === "/") {
       return "/";
     }
 

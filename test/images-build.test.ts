@@ -135,7 +135,7 @@ async function emittedImage(project: string, alt: string, page = "index.html") {
   assert.equal(images.length, 1, html);
   const image = images[0]!;
   assert.equal(image.getAttribute("alt"), alt, html);
-  assert.equal(image.getAttribute("ASTRO_IMAGE_"), undefined);
+  assert.equal(image.getAttribute("__ASTRO_IMAGE_"), undefined);
   const source = image.getAttribute("src");
   assert.ok(source, html);
 

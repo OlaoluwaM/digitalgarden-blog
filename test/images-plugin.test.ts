@@ -47,8 +47,7 @@ async function fixture(t: TestContext) {
 function imageMarker(html: string, selector = "img") {
   const image = parse(html).querySelector(selector);
   assert.ok(image, `Expected ${selector} in ${html}`);
-  // node-html-parser drops the marker attribute's two leading underscores.
-  const marker = image.getAttribute("ASTRO_IMAGE_");
+  const marker = image.getAttribute("__ASTRO_IMAGE_");
   assert.ok(marker, "Expected Astro to mark the image for asset processing");
   return JSON.parse(marker) as { src: string; alt: string; title?: string };
 }

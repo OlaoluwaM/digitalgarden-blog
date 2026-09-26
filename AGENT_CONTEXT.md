@@ -524,6 +524,33 @@ Eleventy's markdown-it options. Olaolu put all resulting items in scope.
   and Space on the outer note, toggled only the targeted callout, with no page
   errors on the Maths page or home. Collapse is not visible until the CSS stage.
 
+### Search index (2026-09-26)
+
+- `src/pages/searchIndex.json.ts` is a static endpoint: Astro calls `GET` at
+  build time and writes `dist-astro/searchIndex.json`. It serializes
+  `buildSearchIndex(await getPublishedPosts())` from
+  `src/content/search-index.ts` (Olaolu's implementation).
+- Entries are `{ title, url, content, tags }` for all 14 published posts in
+  collection order. Agreed changes from Eleventy: `date` dropped (unused by
+  the search script and identical for every note); tags are
+  `rawNoteProps.tags` only (no `note`/`gardenEntry`); content is the text of
+  `rendered.html` (`node-html-parser` `structuredText` with `<pre>` parsed,
+  whitespace collapsed), so callout markers and raw wikilinks are gone.
+  Titles come from the `title` property, so `?` titles differ from Eleventy's
+  filename-based ones by design. Missing rendered HTML fails with the post id.
+- `HOME_POST_TAG` and `isHomePost()` moved to `src/content/home.ts`, which has
+  no Astro runtime imports. `permalinks.ts` is loaded by the Node wikilink
+  generator, so it must never import `posts.ts` (`astro:content`).
+- `node-html-parser` is now a dependency at `^9.0.4`. v9 keeps the
+  `__ASTRO_IMAGE_` attribute name that v7 truncated, so the image tests now
+  read the real name (the build test's absence check was vacuous under v9).
+- `npm run test:search-index`: 19 tests (some render through the site
+  processor); checked against a throwaway reference implementation first.
+- Verified: 335 Node tests and 28 Chrome tests, TypeScript, Prettier, and a
+  forced build. The built index has 14 entries whose URLs match Eleventy's,
+  tags match after removing `note`/`gardenEntry`, and no content contains
+  callout markers or HTML.
+
 ## Verification and deployment
 
 ```sh
