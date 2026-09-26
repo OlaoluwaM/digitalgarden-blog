@@ -262,6 +262,47 @@ describe("keyboard access", () => {
   });
 });
 
+describe("reduced motion", () => {
+  // Why: readers who ask the system for reduced motion should get no
+  // animated transitions. Transitions are declared in several stylesheets
+  // (tags, footer links, callout chevrons, the copy button), so only the
+  // built page with the media feature emulated shows whether each one
+  // honors it.
+  it("drops transitions when the reader prefers reduced motion", async () => {
+    await withPage(1440, async page => {
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await page.goto(`${origin}/posts/on-maths-and-engineering/`, {
+        waitUntil: "load",
+      });
+      // No transition means no animated property or no duration (Tailwind's
+      // `transition-none` clears the property and keeps the duration).
+      const animated = await page.evaluate(() =>
+        [
+          ".header-tags a.tag",
+          "footer.post-cta a",
+          ".callout-fold svg",
+          "pre.astro-code .copy-code-btn",
+        ].flatMap(selector => {
+          const element = document.querySelector(selector);
+          if (!element) return [`${selector}: missing`];
+          const style = getComputedStyle(element);
+          const still =
+            style.transitionProperty === "none" ||
+            style.transitionDuration
+              .split(",")
+              .every(duration => parseFloat(duration) === 0);
+          return still
+            ? []
+            : [
+                `${selector}: ${style.transitionProperty} ${style.transitionDuration}`,
+              ];
+        })
+      );
+      assert.deepEqual(animated, []);
+    });
+  });
+});
+
 describe("accessibility checks (axe-core)", () => {
   // Known issues that the live site has too, matched by rule and target.
   // They are listed, not ignored: each must still occur somewhere (so the

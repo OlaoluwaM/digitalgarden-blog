@@ -142,6 +142,10 @@
     & svg {
       scale: 0.9;
       transition: transform 100ms ease-in-out;
+
+      @media (prefers-reduced-motion: reduce) {
+        transition: none;
+      }
     }
   }
 

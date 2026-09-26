@@ -24,10 +24,12 @@
     box-decoration-break: clone;
   }
 
-  /* Code blocks. The `pre` keeps the browser's monospace font, which the
-     language label and copy button inherit (as on live). */
+  /* Code blocks. The language label and copy button inherit the block's
+     font. (Live left the `pre` on the browser's generic monospace, which is
+     Courier on some systems; see docs/design-changes.md.) */
   .markdown-rendered pre.astro-code {
     position: relative;
+    font-family: var(--font-mono);
     min-height: 38px;
     /* The wide left padding holds the line numbers. */
     padding: 1rem 1rem 1rem 2.25rem;
@@ -112,6 +114,10 @@
     pointer-events: none;
     transition: opacity var(--default-transition-duration)
       var(--default-transition-timing-function);
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+    }
 
     &:hover {
       background: color-mix(in srgb, currentColor 10%, transparent);

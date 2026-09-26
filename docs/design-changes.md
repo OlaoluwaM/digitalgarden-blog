@@ -168,3 +168,28 @@ entry.
   1000px anyway.
 - **Evidence:** navigation computed-style diffs at 799, 800, 801, 999, 1000,
   1399, 1400, and 1401px.
+
+### Callout icons on every type
+
+- **Change:** built-in callout types (note, info, tip, warning, and the rest)
+  show their icon, like the vault's custom types. Quote and cite callouts get
+  Lucide's `quote` icon, so their title text moves right to line up with the
+  body.
+- **Why:** Obsidian's CSS masked `.lucide-*` icons, which hid every built-in
+  icon on live; quote's `quote-glyph` has no Lucide equivalent.
+- **Evidence:** `test/callout-icons.test.ts`, `test/callout.test.ts`, element
+  screenshots of every callout type.
+
+### Code block labels and copy button in Commit Mono
+
+- **Change:** the language label and copy button use Commit Mono like the
+  code. Live used the browser's generic monospace (Courier on some systems).
+- **Why:** consistent type in code blocks.
+- **Evidence:** screenshots of code blocks with the legacy CSS off.
+
+### Reduced motion
+
+- **Change:** the callout chevron and the copy button no longer animate when
+  the reader asks for reduced motion (tags and footer links already didn't).
+- **Why:** accessibility.
+- **Evidence:** `test/browser/content-styles.test.ts`.
