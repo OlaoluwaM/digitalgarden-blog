@@ -87,14 +87,17 @@
     h1 {
       font-size: var(--text-h1);
       line-height: var(--text-h1--line-height);
+      letter-spacing: var(--text-h1--letter-spacing);
     }
     h2 {
       font-size: var(--text-h2);
       line-height: var(--text-h2--line-height);
+      letter-spacing: var(--text-h2--letter-spacing);
     }
     h3 {
       font-size: var(--text-h3);
       line-height: var(--text-h3--line-height);
+      letter-spacing: var(--text-h3--letter-spacing);
     }
     h4 {
       font-size: var(--text-h4);
@@ -169,9 +172,9 @@
       margin-inline-start: var(--spacing-list-indent);
     }
 
-    /* Task lists. The live theme masks the whole checkbox with a check
-       mark, so a done task shows a light check and an open task shows
-       nothing; kept for parity. */
+    /* Task lists: a plain box when open, a filled box with a check mark
+       when done. (The live theme masked the whole box into a check mark,
+       so open tasks showed nothing; see docs/design-changes.md.) */
     ul > li.task-list-item {
       list-style: none;
     }
@@ -183,32 +186,22 @@
       margin: 0;
       margin-inline-end: var(--spacing-checkbox);
       padding: 0;
-      border: 1px solid var(--color-decoration);
+      vertical-align: -0.125em;
+      /* Faint rather than decoration gray: a control's edge needs 3:1. */
+      border: 1px solid var(--color-faint);
       border-radius: var(--radius-checkbox);
       appearance: none;
-      mask-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='none' viewBox='0 0 20 20'%3e%3cpath fill='black' d='m12.998 6.084-4.17 6.7-1.982-2.56c-.244-.322-.46-.41-.742-.41a.788.788 0 0 0-.782.801c0 .225.088.44.235.635l2.45 3.008c.255.342.528.478.86.478.332 0 .615-.156.82-.478l4.59-7.227c.118-.205.245-.43.245-.644 0-.46-.4-.752-.83-.752-.255 0-.508.156-.694.449Z'/%3e%3c/svg%3e");
-      transition: box-shadow var(--default-transition-duration) ease-in-out;
 
-      &:hover {
-        border-color: var(--color-muted);
-      }
       &:checked {
-        border: none;
+        border-color: var(--color-text);
         background-color: var(--color-text);
 
-        &:hover {
-          background-color: var(--color-checkbox-hover);
-        }
         &::after {
           content: "";
-          display: block;
           position: absolute;
-          top: 0;
-          inset-inline-start: 0;
-          width: var(--size-checkbox);
-          height: var(--size-checkbox);
+          inset: 0;
           background-color: var(--color-surface);
-          mask-image: inherit;
+          mask-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='none' viewBox='0 0 20 20'%3e%3cpath fill='black' d='m12.998 6.084-4.17 6.7-1.982-2.56c-.244-.322-.46-.41-.742-.41a.788.788 0 0 0-.782.801c0 .225.088.44.235.635l2.45 3.008c.255.342.528.478.86.478.332 0 .615-.156.82-.478l4.59-7.227c.118-.205.245-.43.245-.644 0-.46-.4-.752-.83-.752-.255 0-.508.156-.694.449Z'/%3e%3c/svg%3e");
           mask-position: center;
           mask-size: 100% 100%;
           mask-repeat: no-repeat;
@@ -298,6 +291,19 @@
        list and link rules above. */
     .footnotes {
       font-size: var(--text-footnote);
+    }
+    /* The pipeline labels the footnotes list with an h2 meant for screen
+       readers only (live never defined the class, so it showed). */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+      border-width: 0;
     }
 
     /* Math: MathJax inlines its own layout (display blocks are centered with
