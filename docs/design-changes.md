@@ -122,3 +122,49 @@ entry.
 - **Why:** one breakpoint for both.
 - **Evidence:** computed-style diff of `main.content` at 999, 1000, and
   1200px.
+
+### Heading letter-spacing
+
+- **Change:** note headings h1–h3 use the tighter letter-spacing that
+  `custom.scss` specified (-0.02em, -0.015em, -0.01em). Live showed normal
+  spacing on note pages because an Obsidian `!important` rule overrode it;
+  only the 404 page had the tighter spacing.
+- **Why:** the intended design, applied consistently; the override was a
+  side effect of the Obsidian CSS.
+- **Evidence:** computed `letter-spacing` on content and header headings with
+  the legacy CSS off.
+
+### Recent Posts align with their heading
+
+- **Change:** Recent Posts items start at the heading's left edge instead of
+  about 33px in.
+- **Why:** the indent was Obsidian's list-bullet space, left behind when the
+  bullets were removed.
+- **Evidence:** screenshots of Home with the legacy CSS off.
+
+### Task-list checkboxes
+
+- **Change:** an open task shows an empty box and a done task a filled box
+  with a check mark. Live masked the whole box into a check mark, so open
+  tasks showed nothing. No published note has a task list yet.
+- **Why:** a checkbox should show its state.
+- **Evidence:** the style guide's Markdown sample with the legacy CSS off.
+
+### Footnotes heading hidden
+
+- **Change:** the "Footnotes" heading above a note's footnotes is visually
+  hidden and still read by screen readers. Live showed it, because the
+  pipeline's `sr-only` class was never defined.
+- **Why:** the pipeline's intent; the footnote list is self-explanatory.
+- **Evidence:** the style guide's Markdown sample with the legacy CSS off.
+
+### Breakpoint edges
+
+- **Change:** layouts switch at exactly 800px, 1000px, and 1400px one pixel
+  earlier than live (for example, at exactly 800px the navbar shows the full
+  search button). Every other width matches.
+- **Why:** Tailwind's `max-*` breakpoints stop below the value; live's
+  `max-width` queries included it, and its navigation script switched at
+  1000px anyway.
+- **Evidence:** navigation computed-style diffs at 799, 800, 801, 999, 1000,
+  1399, 1400, and 1401px.
