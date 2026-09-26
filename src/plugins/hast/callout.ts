@@ -1,6 +1,9 @@
 import { defineHastPlugin, type HastNode } from "satteri";
 import type { Element, ElementContent } from "hast";
 
+import { getCalloutIconName } from "./callout-icons.ts";
+import { calloutIconToHast } from "./lucide-icon.ts";
+
 export const hastAdmonitionCalloutPlugin = defineHastPlugin({
   name: "hast-admonition-callout",
   element: {
@@ -17,7 +20,11 @@ function transformBlockquoteToCallout(blockquoteNode: Element): HastNode {
 
   if (!parsedCallout) return blockquoteNode;
 
-  const { titleNode: calloutTitle, calloutContent, metadata } = parsedCallout;
+  const {
+    titleNodes: calloutTitleNodes,
+    calloutContent,
+    metadata,
+  } = parsedCallout;
   const existingClasses = blockquoteNode.properties.className ?? [];
   const calloutClasses = [
     ...(Array.isArray(existingClasses) ? existingClasses : [existingClasses]),
@@ -46,7 +53,10 @@ function transformBlockquoteToCallout(blockquoteNode: Element): HastNode {
         ? { "data-callout-metadata": metadata.calloutMetadata }
         : {}),
     },
-    children: [wrapCalloutTitleNode(calloutTitle), calloutBodyElement],
+    children: [
+      wrapCalloutTitleNode(calloutTitleNodes, metadata.type),
+      calloutBodyElement,
+    ],
   } as HastNode;
 }
 
@@ -56,7 +66,7 @@ interface Callout {
     calloutMetadata?: string;
     collapse: "open" | "closed";
   };
-  titleNode: Element;
+  titleNodes: ElementContent[];
   calloutContent: ElementContent[];
 }
 
@@ -118,16 +128,12 @@ function parseCallout(blockquoteNode: Element): Callout | null {
       calloutMetadata,
       collapse: calloutCollapseMarker === "-" ? "closed" : "open",
     },
-    titleNode: {
-      ...openingParagraph,
-      properties: {
-        className: ["callout-title-content"],
-      },
-      children:
-        titleNodes.length > 0
-          ? titleNodes
-          : [{ type: "text", value: toTitleCase(calloutType) }],
-    },
+    // No wrapping <p>: the title's inline content goes directly inside
+    // .callout-title-inner, matching the live site's markup.
+    titleNodes:
+      titleNodes.length > 0
+        ? titleNodes
+        : [{ type: "text", value: toTitleCase(calloutType) }],
     calloutContent: [
       ...wrapCalloutContentNodes(titleBodyPartition.contentNodes),
       ...remainingBlockquoteChildren,
@@ -157,7 +163,13 @@ function getOpeningParagraph(
   return [null, null];
 }
 
-function wrapCalloutTitleNode(titleNode: Element): HastNode {
+// Order matches the live site's rendered DOM: icon, then title text, then
+// the fold chevron. Every callout this plugin builds is collapsible (see
+// transformBlockquoteToCallout), so the fold icon is unconditional here too.
+function wrapCalloutTitleNode(
+  titleNodes: ElementContent[],
+  calloutType: string
+): HastNode {
   return {
     type: "element",
     tagName: "div",
@@ -168,23 +180,22 @@ function wrapCalloutTitleNode(titleNode: Element): HastNode {
       {
         type: "element",
         tagName: "div",
+        properties: { className: ["callout-icon"] },
+        children: [calloutIconToHast(getCalloutIconName(calloutType))],
+      },
+      {
+        type: "element",
+        tagName: "div",
         properties: {
           className: ["callout-title-inner"],
         },
-        children: [titleNode],
+        children: titleNodes,
       },
       {
         type: "element",
         tagName: "div",
         properties: { className: ["callout-fold"] },
-        children: [
-          {
-            type: "element",
-            tagName: "i",
-            properties: { "icon-name": "chevron-down" },
-            children: [],
-          },
-        ],
+        children: [calloutIconToHast("chevron-down")],
       },
     ],
   };

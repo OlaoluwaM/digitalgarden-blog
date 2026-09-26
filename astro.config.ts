@@ -45,6 +45,24 @@ export default defineConfig({
       },
       transformers: [
         {
+          // Keep Eleventy's `shiki` class so the legacy code-block styles
+          // (line numbers, language label, copy button) still match
+          // (ADR 0003 phase 1).
+          pre(node) {
+            this.addClassToHast(node, "shiki");
+            // Astro's own transformer runs first and labels unlabelled fences
+            // "plaintext"; Eleventy labelled them "text".
+            if (node.properties.dataLanguage === "plaintext") {
+              node.properties.dataLanguage = "text";
+            }
+          },
+          // Eleventy's `<code>` carried `language-<name>`; custom.scss bolds
+          // `code[class*="language-"]`. Unlabelled fences were "text".
+          code(node) {
+            const language =
+              this.options.lang === "plaintext" ? "text" : this.options.lang;
+            this.addClassToHast(node, `language-${language}`);
+          },
           // Add line number data attributes for CSS counter styling
           line(node, line) {
             node.properties["data-line"] = line;

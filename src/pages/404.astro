@@ -1,0 +1,31 @@
+---
+// T4 (phase 1): standalone 404 page, not using BaseLayout
+import "../styles/legacy/index.scss";
+import { site } from "../lib/site.ts";
+---
+
+<!doctype html>
+<html lang={site.lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nothing here</title>
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link
+      rel="alternate"
+      type="application/atom+xml"
+      title={site.name}
+      href={new URL("/feed.xml", site.url).href}
+    />
+  </head>
+  <body class="theme-dark markdown-preview-view">
+    <main class="content centered">
+      <h1>There is nothing here</h1>
+      <p>If you got here from a link, this note is probably not made public</p>
+      <a href="/">Go back home</a>
+    </main>
+  </body>
+</html>

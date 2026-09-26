@@ -1,9 +1,46 @@
 ---
-// T2 (phase 1): note title, tags, and timestamps. Stub until then.
+// T2 (phase 1): note title, tags, and timestamps.
 import type { Post } from "../content/posts.ts";
+import Icon from "./Icon.astro";
+import { formatNoteDate } from "../lib/dates.ts";
 
 interface Props {
   post: Post;
-  isHome: boolean;
+}
+
+const { post } = Astro.props;
+const { title, tags, published, last_updated } = post.data.rawNoteProps;
+
+function tagHref(tag: string): string {
+  return `/?q=${encodeURIComponent(`#${tag}`)}`;
 }
 ---
+
+<header>
+  <h1>{title}</h1>
+  <div class="header-meta">
+    <div class="header-tags">
+      {
+        tags.map((tag: string) => (
+          <a class="tag" href={tagHref(tag)}>
+            #{tag}
+          </a>
+        ))
+      }
+    </div>
+    <div class="timestamps">
+      <div title="Created at" aria-label="Created at">
+        <Icon name="calendar-plus" />{" "}
+        <time class="human-date" datetime={published}>
+          {formatNoteDate(published)}
+        </time>
+      </div>
+      <div title="Updated at" aria-label="Updated at">
+        <Icon name="calendar-clock" />{" "}
+        <time class="human-date" datetime={last_updated}>
+          {formatNoteDate(last_updated)}
+        </time>
+      </div>
+    </div>
+  </div>
+</header>

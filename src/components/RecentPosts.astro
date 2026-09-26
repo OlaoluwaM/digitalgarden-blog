@@ -1,8 +1,38 @@
 ---
-// T4 (phase 1): the home page Recent Posts section. Stub until then.
+// T4 (phase 1): the home page Recent Posts section.
 import type { Post } from "../content/posts.ts";
+import { formatNoteDate } from "../lib/dates.ts";
+import { metaDescription } from "../lib/metadata.ts";
 
 interface Props {
   posts: Post[];
 }
+
+const { posts } = Astro.props;
 ---
+
+{
+  posts.length > 0 && (
+    <section class="recent-notes">
+      <h2>Recent Posts</h2>
+      <ul>
+        {posts.map(post => (
+          <li>
+            <a href={post.data.pluginProps.permalink} class="internal-link">
+              {post.data.rawNoteProps.title}
+            </a>
+            {metaDescription(post.data.rawNoteProps.description) && (
+              <p>{metaDescription(post.data.rawNoteProps.description)}</p>
+            )}
+            <time
+              class="human-date recent-note-date"
+              datetime={post.data.rawNoteProps.published}
+            >
+              {formatNoteDate(post.data.rawNoteProps.published)}
+            </time>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}

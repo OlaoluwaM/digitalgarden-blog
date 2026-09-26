@@ -23,7 +23,15 @@ function callout(
     ...(collapsible ? ["is-collapsible"] : []),
     ...(collapsed ? ["is-collapsed"] : []),
   ].join(" ");
-  return `<div class="${classes}" data-callout="${type}"><div class="callout-title"><div class="callout-title-inner"><p class="callout-title-content">${type}</p></div><div class="callout-fold"><i icon-name="chevron-down"></i></div></div><div class="callout-content">${body}</div></div>`;
+  // Matches the Astro build's title shape: an icon div, then the title text
+  // directly inside .callout-title-inner (no .callout-title-content
+  // wrapper), then the fold div -- both icon and fold hold a build-time
+  // Lucide SVG rather than the old `<i icon-name="...">` placeholder. Exact
+  // path data doesn't matter for these click/focus tests, so a minimal
+  // representative SVG stands in for the real one.
+  const svg = (lucideName: string) =>
+    `<svg class="lucide lucide-${lucideName}" data-lucide="${lucideName}" aria-hidden="true"><path d="M0 0"></path></svg>`;
+  return `<div class="${classes}" data-callout="${type}"><div class="callout-title"><div class="callout-icon">${svg("pencil")}</div><div class="callout-title-inner">${type}</div><div class="callout-fold">${svg("chevron-down")}</div></div><div class="callout-content">${body}</div></div>`;
 }
 
 function fixture(html: string) {
@@ -75,8 +83,10 @@ it("toggles the callout and title state on click", async () => {
 it("toggles when clicking inside the title's children", async () => {
   const { callouts, titleOf } = fixture(callout("note", "<p>Body</p>"));
   const [element] = callouts;
+  // .callout-icon's SVG is a grandchild of .callout-title, exercising click
+  // bubbling through both the icon wrapper and the title itself.
   await page
-    .elementLocator(element!.querySelector(".callout-title-content")!)
+    .elementLocator(element!.querySelector(".callout-icon svg")!)
     .click();
   expectState(element!, titleOf(element!), false);
 });

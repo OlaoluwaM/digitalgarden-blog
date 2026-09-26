@@ -1,0 +1,18 @@
+---
+// T3: the search trigger shown in both the mobile navbar and the sidebar
+// (Eleventy's `src/site/_includes/components/searchButton.njk`). Eleventy
+// rendered a `div[role=button]` with `onclick`/`onkeydown` handlers; here
+// it's a real `<button>`, which gets the same semantics (focusable,
+// activates on click and Enter/Space, announced as a button) for free.
+// Wiring the search overlay open is a later Client Behavior task, so this
+// button is inert for now.
+import Icon from "./Icon.astro";
+---
+
+<button type="button" class="search-button align-icon" aria-label="Search">
+  <span class="search-icon">
+    <Icon name="search" />
+  </span>
+  <span class="search-text">Search</span>
+  <span class="search-keys"><code>Ctrl</code>&nbsp;+&nbsp;<code>K</code></span>
+</button>

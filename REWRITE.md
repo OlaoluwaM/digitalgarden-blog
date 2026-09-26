@@ -45,29 +45,30 @@
 
 ## Routes and Data
 
-- [ ] Rebuild `/404`.
+- [x] Rebuild `/404`.
 - [ ] Rebuild `/~random/`.
 - [ ] Rebuild `/feed.xml`.
 - [ ] Rebuild `/sitemap.xml`.
 - [x] Rebuild `/searchIndex.json` from published entries.
+- [ ] Make `/sync-callouts` generate the callout icon map in `src/plugins/hast/callout-icons.ts`, and decide where its `--callout-color` output lives once phase 2 removes the legacy Sass.
 
 ## Markup and CSS
 
 Phase 1: parity shell ([ADR 0003](docs/adrs/0003-build-a-tailwind-token-design-system-before-cutover.md)).
 
-- [ ] Build the shared page layout.
-- [ ] Add metadata, canonical URLs, and social metadata.
-- [ ] Add fonts, icons, favicons, and static assets.
+- [x] Build the shared page layout.
+- [x] Add metadata, canonical URLs, and social metadata.
+- [x] Add fonts, icons, favicons, and static assets.
 - [x] Vendor the Obsidian theme CSS.
-- [ ] Load the Sass layers in the existing order.
-- [ ] Match titles, tags, dates, footer, and links.
-- [ ] Match callout title markup and styles.
-- [ ] Add callout icons from the theme's `--callout-icon` with Lucide.
-- [ ] Rebuild the Recent Posts list.
-- [ ] Port the navbar and home link.
-- [ ] Port the file tree.
-- [ ] Match the responsive layout.
-- [ ] Preserve accessibility and keyboard behavior.
+- [x] Load the Sass layers in the existing order.
+- [x] Match titles, tags, dates, footer, and links.
+- [x] Match callout title markup and styles.
+- [x] Add callout icons from the theme's `--callout-icon` with Lucide.
+- [x] Rebuild the Recent Posts list.
+- [x] Port the navbar and home link.
+- [x] Port the file tree.
+- [x] Match the responsive layout.
+- [x] Preserve accessibility and keyboard behavior.
 - [ ] Review phase 1 against the live site.
 
 Phase 2: design system.
@@ -96,6 +97,7 @@ Phase 2: design system.
 - [ ] Compare Eleventy and Astro route inventories.
 - [ ] Crawl for broken links and missing assets.
 - [ ] Compare desktop and mobile pages.
+- [ ] Upgrade Astro to 7.3.4+ ([#18070](https://github.com/withastro/astro/issues/18070) fixed); shrink the patch to the `glob.js` fix ([#18054](https://github.com/withastro/astro/issues/18054)).
 - [ ] Run the tests and a warning-free build.
 - [ ] Complete the vault tasks in [TODO.md](TODO.md), then test a publisher round trip.
 - [ ] Test a Vercel preview.

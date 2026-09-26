@@ -1,0 +1,68 @@
+---
+// T3: one row of the sidebar/mobile file tree — a collapsible folder or a
+// single note link — recursing into itself for a folder's children. Mirrors
+// Eleventy's `menuItem` macro (`src/site/_includes/components/filetree.njk`),
+// minus the Alpine.js state:
+//   - `menuItem`'s per-child wrapper (`<div class="{{'filelist' if step>0}}">`)
+//     becomes this component's own wrapper `<div>`, at every depth.
+//   - the folder's `x-data="{isOpen: $persist(false).as(path)}"` /
+//     `@click.stop="isOpen=!isOpen"` becomes a native
+//     `<details class="folder inner-folder">` / `<summary>`, which opens and
+//     closes without JS (closed by default, matching the live `false`
+//     default before a visitor has toggled it).
+//   - the two `<i data-lucide>` chevrons, each shown/hidden by `x-show`,
+//     are both still rendered; `_navigation.scss` swaps which one is visible
+//     based on the native `[open]` attribute instead of Alpine state.
+import type { FileTreeNode } from "../content/file-tree.ts";
+import Icon from "./Icon.astro";
+// Astro requires a recursive component to explicitly import itself.
+import FileTreeEntry from "./FileTreeEntry.astro";
+
+interface Props {
+  node: FileTreeNode;
+  /** 0 for a root-level entry; Eleventy's `step` in the ported macro. */
+  depth: number;
+  activePathname: string;
+}
+
+const { node, depth, activePathname } = Astro.props;
+// Eleventy: `class="{{'filelist' if step>0}}"` — no class at all at the
+// root, where step is 0.
+const wrapperClass = depth > 0 ? "filelist" : undefined;
+---
+
+<div class={wrapperClass}>
+  {
+    node.type === "folder" ? (
+      <details class="folder inner-folder">
+        <summary class="foldername-wrapper align-icon">
+          <Icon name="chevron-down" class="folder-chevron-open" />
+          <Icon name="chevron-right" class="folder-chevron-closed" />
+          <span class="foldername">{node.name}</span>
+        </summary>
+        {node.children.map(child => (
+          <FileTreeEntry
+            node={child}
+            depth={depth + 1}
+            activePathname={activePathname}
+          />
+        ))}
+      </details>
+    ) : (
+      <div
+        class={
+          node.href === activePathname ? "notelink active-note" : "notelink"
+        }
+      >
+        <a
+          data-note-icon=""
+          style="text-decoration:none"
+          class="filename"
+          href={node.href}
+        >
+          {node.title}{" "}
+        </a>
+      </div>
+    )
+  }
+</div>

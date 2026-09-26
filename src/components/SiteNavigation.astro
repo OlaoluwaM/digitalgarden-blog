@@ -1,3 +1,15 @@
 ---
-// T3 (phase 1): sidebar, mobile navbar, and file tree. Stub until then.
+// T3 (phase 1): sidebar, mobile navbar, and file tree. Thin data-fetching
+// wrapper — mirrors how `index.astro`/`[...slug].astro` source their own
+// data — around the presentational markup in `NavShell.astro`. See
+// `NavShell.astro`'s header comment for why the split exists and for the
+// Alpine.js-removal notes.
+import { getPublishedPosts } from "../content/posts.ts";
+import { buildFileTree } from "../content/file-tree.ts";
+import NavShell from "./NavShell.astro";
+
+const posts = await getPublishedPosts();
+const tree = buildFileTree(posts);
 ---
+
+<NavShell tree={tree} activePathname={Astro.url.pathname} />

@@ -6,8 +6,8 @@ import {
   getRecentArticles,
 } from "../content/posts";
 import BaseLayout from "../layouts/BaseLayout.astro";
+import { metaDescription } from "../lib/metadata";
 import SiteNavigation from "../components/SiteNavigation.astro";
-import NoteHeader from "../components/NoteHeader.astro";
 import RecentPosts from "../components/RecentPosts.astro";
 
 const posts = await getPublishedPosts();
@@ -17,9 +17,12 @@ const { Content: HomePageContent } = await render(home);
 const recentPosts = getRecentArticles(posts);
 ---
 
-<BaseLayout title={home.data.rawNoteProps.title}>
+<BaseLayout
+  title={home.data.rawNoteProps.title}
+  description={metaDescription(home.data.rawNoteProps.description)}
+  type="website"
+>
   <SiteNavigation slot="navigation" />
-  <NoteHeader post={home} isHome={true} />
   <HomePageContent />
   <RecentPosts posts={recentPosts} />
 </BaseLayout>

@@ -1,0 +1,12 @@
+// Phase 1 selector adaptations for rendered Markdown content that Astro emits
+// differently from Eleventy. Tie each rule to the Eleventy behavior it mirrors.
+
+// Eleventy's picture `<img>` had no height attribute, so `max-width: 100%`
+// scaled it proportionally. Astro's Markdown images carry width and height
+// attributes plus `data-astro-image`, but Astro emits no responsive image CSS
+// for them in this build (`image.responsiveStyles` is on), so a narrowed image
+// kept its 500px height and stretched. Restore proportional scaling.
+img[data-astro-image] {
+  max-width: 100%;
+  height: auto;
+}

@@ -2,6 +2,7 @@
 import { render } from "astro:content";
 import { getPublishedArticles, getPublishedPosts } from "../content/posts";
 import BaseLayout from "../layouts/BaseLayout.astro";
+import { metaDescription } from "../lib/metadata";
 import SiteNavigation from "../components/SiteNavigation.astro";
 import NoteHeader from "../components/NoteHeader.astro";
 import PostFooter from "../components/PostFooter.astro";
@@ -24,10 +25,11 @@ const { Content: PostContent } = await render(post);
 
 <BaseLayout
   title={post.data.rawNoteProps.title}
-  description={post.data.rawNoteProps.title}
+  description={metaDescription(post.data.rawNoteProps.description)}
+  type="article"
 >
   <SiteNavigation slot="navigation" />
-  <NoteHeader post={post} isHome={false} />
+  <NoteHeader post={post} />
   <PostContent />
   <PostFooter />
 </BaseLayout>

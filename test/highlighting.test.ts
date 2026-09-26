@@ -125,3 +125,38 @@ it("leaves inline code without block labels or line numbers", async () => {
   assert.equal(document.querySelector("[data-line]"), null);
   assert.equal(document.querySelector("[data-language]"), null);
 });
+
+// Why: ADR 0003 phase 1 keeps Eleventy's class names. The legacy
+// `user/code-blocks.scss` draws line numbers, the language label, and the
+// copy button through `pre.shiki`, the class Eleventy's Shiki plugin emitted.
+// Without it, code blocks silently lose their numbers and labels. The
+// `astro-code` class stays because the copy-button script selects it.
+it("keeps Eleventy's shiki class alongside Astro's own classes", async () => {
+  const { document } = await render("```js\nconst value = 1;\n```");
+  const block = document.querySelector("pre");
+  assert.ok(block);
+  assert.ok(block.classList.contains("shiki"));
+  assert.ok(block.classList.contains("astro-code"));
+});
+
+// Why: user/custom.scss sets `code[class*="language-"] { font-weight: 600 }`.
+// Eleventy's `<code>` carried `language-<name>`, so code rendered at 600;
+// without the class it silently drops to 400.
+it("marks the code element with Eleventy's language class", async () => {
+  const { document } = await render("```yaml\nkey: value\n```");
+  assert.ok(
+    document.querySelector("pre code")?.classList.contains("language-yaml")
+  );
+});
+
+// Why: Eleventy labelled unlabelled fences "text" (shown as "Text" by the
+// label CSS). Astro would say "plaintext", visibly changing the label on
+// pages such as the Maths note. There must still be exactly one label.
+it("labels unlabelled code blocks as text, like Eleventy", async () => {
+  const { html, document } = await render("```\nplain words\n```");
+  const block = document.querySelector("pre");
+  assert.equal(block?.getAttribute("data-language"), "text");
+  assert.ok(block?.querySelector("code")?.classList.contains("language-text"));
+  const openingTag = html.match(/<pre\b[^>]*>/)?.[0] ?? "";
+  assert.equal((openingTag.match(/\sdata-language\s*=/g) ?? []).length, 1);
+});

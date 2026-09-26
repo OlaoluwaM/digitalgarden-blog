@@ -1,15 +1,20 @@
 ---
 import "../styles/legacy/index.scss";
 import { site } from "../lib/site";
+import { canonicalUrl } from "../lib/metadata";
 
 // The document shell every page shares: head metadata, the legacy stylesheet
 // cascade (ADR 0003 phase 1), and the page-wide client scripts.
 interface Props {
   title: string;
-  description?: string;
+  /** Already filtered through `metaDescription`; omitted when undefined. */
+  description?: string | undefined;
+  /** Open Graph type: posts are articles, Home is the website itself. */
+  type: "website" | "article";
 }
 
-const { title, description } = Astro.props;
+const { title, description, type } = Astro.props;
+const canonical = canonicalUrl(Astro.url.pathname);
 ---
 
 <!doctype html>
@@ -19,6 +24,14 @@ const { title, description } = Astro.props;
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title}</title>
     {description && <meta name="description" content={description} />}
+    <link rel="canonical" href={canonical} />
+    <meta property="og:type" content={type} />
+    <meta property="og:title" content={title} />
+    {description && <meta property="og:description" content={description} />}
+    <meta property="og:url" content={canonical} />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:locale" content={site.lang} />
+    <meta name="twitter:card" content="summary" />
     <link rel="icon" href="/favicon.ico" sizes="any" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />

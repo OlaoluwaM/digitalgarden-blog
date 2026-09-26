@@ -1,0 +1,80 @@
+---
+// T3: the presentational half of `SiteNavigation` — desktop sidebar, mobile
+// navbar, and file tree — split out so it can be component-tested with a
+// hand-built `tree` fixture instead of a real content collection.
+//
+// Why the split: Astro's experimental Container API cannot resolve
+// `astro:content` collections in this project's `vitest.astro.config.mts`
+// setup (`getCollection("posts")` reports the collection as empty even right
+// after a real `astro build` populated it in-process) — see
+// `test/components/site-navigation.test.ts`'s header comment. `SiteNavigation`
+// stays the thin, untested data-fetching wrapper (`getPublishedPosts()` +
+// `buildFileTree()`, exercised by `npm run build:astro` and by
+// `test/file-tree.test.ts` and `test/posts.test.ts`); everything about the
+// actual markup lives here, fully covered without touching real content.
+//
+// Rebuilds Eleventy's `filetree.njk` (root) / `filetreeNavbar.njk` (mobile)
+// without Alpine.js:
+//   - the outer `x-data="{isDesktop, showFilesMobile}"` div, and the two
+//     `x-show.important` wrappers that swapped the navbar and the sidebar at
+//     1000px, are gone. The same swap is a CSS media query now
+//     (`adaptations/_navigation.scss`), applied directly to `.navbar` and
+//     `.filetree-wrapper`.
+//   - the hamburger button and `.fullpage-overlay` are still rendered
+//     (`aria-expanded="false"`, no `onclick`), but inert: opening the mobile
+//     sidebar is a later Client Behavior task.
+//   - the file tree itself is `FileTreeEntry`, recursing over
+//     `buildFileTree`'s output; folders are native `<details>`/`<summary>`
+//     instead of an `x-data` `isOpen` flag.
+import type { FileTreeNode } from "../content/file-tree.ts";
+import { site } from "../lib/site.ts";
+import FileTreeEntry from "./FileTreeEntry.astro";
+import NavSearchButton from "./NavSearchButton.astro";
+import Icon from "./Icon.astro";
+
+interface Props {
+  tree: readonly FileTreeNode[];
+  activePathname: string;
+}
+
+const { tree, activePathname } = Astro.props;
+---
+
+<nav class="navbar">
+  <div class="navbar-inner">
+    <button
+      type="button"
+      class="hamburger-btn"
+      aria-label="Toggle navigation"
+      aria-expanded="false"
+    >
+      <Icon name="menu" />
+    </button>
+    <a href="/" style="text-decoration:none">
+      <h1 class="site-name-header">{site.name}</h1>
+    </a>
+  </div>
+  <NavSearchButton />
+</nav>
+
+<div class="fullpage-overlay"></div>
+
+<div class="filetree-wrapper">
+  <nav class="filetree-sidebar">
+    <a href="/" style="text-decoration:none">
+      <h1>{site.name}</h1>
+    </a>
+    <NavSearchButton />
+    <div class="folder">
+      {
+        tree.map(node => (
+          <FileTreeEntry
+            node={node}
+            depth={0}
+            activePathname={activePathname}
+          />
+        ))
+      }
+    </div>
+  </nav>
+</div>

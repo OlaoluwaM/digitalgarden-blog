@@ -17,4 +17,5 @@
   @include meta.load-css("adaptations/navigation");
   @include meta.load-css("adaptations/home");
   @include meta.load-css("adaptations/callouts");
+  @include meta.load-css("adaptations/content");
 }

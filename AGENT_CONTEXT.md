@@ -605,6 +605,48 @@ Eleventy's markdown-it options. Olaolu put all resulting items in scope.
 - Analytics are deferred until after markup (their own REWRITE.md section).
   The live site has them, so they must land before cutover.
 
+### Phase 1 parity shell (2026-09-26)
+
+- Integrated: `BaseLayout.astro` (head, metadata, legacy CSS, scripts);
+  `NoteHeader`, `PostFooter`, `RecentPosts`; `SiteNavigation` (thin data
+  wrapper) → `NavShell`, `FileTreeEntry`, `NavSearchButton`;
+  `src/content/file-tree.ts` (Eleventy `sortTree` port); `src/pages/404.astro`;
+  callout titles with build-time icons (`src/plugins/hast/callout-icons.ts`,
+  `lucide-icon.ts`); `src/lib/{site,dates,metadata}.ts`.
+- Selector adaptations live in `src/styles/legacy/adaptations/_*.scss`, one
+  per area. Links and real buttons do not match legacy `button` rules, so the
+  header and navigation adaptations copy the relevant `button` properties
+  (height, shadow, transition, weight). Code blocks keep Eleventy's `shiki`
+  and `language-*` classes and label unlabelled fences "text" (Shiki
+  transformers in `astro.config.ts`). Markdown images get `height: auto`
+  because Astro emits no responsive-image CSS for them.
+- Parity evidence: pixel diffs against thunk.blog at 1440x900 and 390x844
+  (posts within 0.01%; Home differs by the removed empty header) plus
+  computed-style comparisons of tags, search buttons, code blocks, callouts,
+  and Recent Posts. Intentional changes: `docs/design-changes.md`.
+- Tests: unit (`dates`, `metadata`, `file-tree`), component
+  (`test/components/*`, Container API), build (`site-build`,
+  `head-metadata` with plain-text snapshots, `not-found-page`), and
+  `test/layout/site-layout.test.ts` (Playwright + axe-core on every page;
+  `npm run test:layout`). Known live-site accessibility issues are listed in
+  that file and must still occur.
+- Component tests cannot use real content collections (Container API sees
+  an empty collection), so data-fetching components stay thin wrappers.
+- Adversarial review (Sonnet): no confirmed defects; its two notes were
+  applied (Recent Posts filters placeholder descriptions; axe runs on all
+  pages).
+- npm 11 skipped the root `postinstall` (`patch-package`) after dependency
+  installs in this session, silently dropping `patches/astro+7.2.9.patch`;
+  `test:images-build` caught it. Reapplied with `npx patch-package`. Fresh
+  installs (including Vercel) may drop it too; decision pending.
+- Worktree-isolated subagents cannot run agent-browser `eval`; verify
+  computed styles from the lead session.
+- Type checking: `npm run typecheck` (`astro check`, first step of
+  `npm test`) checks `.astro` and `.ts` files in the tsconfig project.
+  `typescript` 6.0.3 and `@astrojs/check` 0.9.10 are pinned; TypeScript 7
+  is outside `@astrojs/check`'s peer range. `test/` is not in the tsconfig
+  `include`, so test files are not type-checked.
+
 ## Verification and deployment
 
 ```sh

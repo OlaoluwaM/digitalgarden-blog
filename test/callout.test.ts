@@ -44,6 +44,14 @@ function body(element: HTMLElement): HTMLElement {
   return content;
 }
 
+function icon(element: HTMLElement): HTMLElement {
+  return required(required(element, ".callout-title"), ".callout-icon");
+}
+
+function fold(element: HTMLElement): HTMLElement {
+  return required(required(element, ".callout-title"), ".callout-fold");
+}
+
 const text = (value: string): Text => ({ type: "text", value });
 const element = (
   tagName: string,
@@ -450,9 +458,10 @@ describe("callout title and body splitting", () => {
       ),
       text(" after\nlater"),
     ]);
-    const heading = required(title(callout), ".callout-title-content");
+    // Title content now lives directly in .callout-title-inner (no
+    // .callout-title-content wrapper), matching the live site's markup.
     assert.equal(
-      heading.innerHTML,
+      title(callout).innerHTML,
       '<strong class="keep-me">A <em>title</em></strong>'
     );
     assert.equal(
@@ -485,8 +494,10 @@ describe("callout title and body splitting", () => {
         text(" three"),
       ]),
     ]);
+    // No .callout-title-content wrapper: content is a direct child of
+    // .callout-title-inner.
     assert.equal(
-      required(title(callout), ".callout-title-content").innerHTML,
+      title(callout).innerHTML,
       "<strong>One <em>two</em> three</strong>"
     );
     assert.equal(
@@ -573,8 +584,10 @@ describe("callout title and body splitting", () => {
       ]),
       text("  \nBody"),
     ]);
+    // No .callout-title-content wrapper: content is a direct child of
+    // .callout-title-inner.
     assert.equal(
-      required(title(callout), ".callout-title-content").innerHTML,
+      title(callout).innerHTML,
       "<strong>A <em>bold </em> title</strong>"
     );
     assert.equal(body(callout).innerHTML, "<p>Body</p>");
@@ -741,4 +754,135 @@ describe("callout plugin composition", () => {
       assert.ok(missing.classList.contains("is-unresolved"));
     });
   }
+});
+
+// Why this group exists: Astro must reproduce, at build time, the title
+// markup Lucide's browser bundle produces on the live site after it resolves
+// `[data-lucide]` placeholders and CSS resolves `--callout-icon`. These tests
+// live at the rendered-HTML level (like the rest of this file) rather than
+// unit-testing the icon helpers directly, because the plugin's only real
+// contract is the HTML it emits; `test/callout-icons.test.ts` covers the
+// type-to-icon-name map (and its drift from the CSS sources) in isolation.
+describe("callout title icon and fold", () => {
+  it("orders the title's children as icon, inner, fold", () => {
+    const element = callout("> [!note] Title\n>\n> Body");
+    const heading = required(element, ".callout-title");
+    assert.deepEqual(
+      heading.children.map(child => child.classList.value[0]),
+      ["callout-icon", "callout-title-inner", "callout-fold"]
+    );
+  });
+
+  it("renders the default (pencil) icon for a type with no --callout-icon override, like note", () => {
+    const element = callout("> [!note] Title\n>\n> Body");
+    const svg = required(icon(element), "svg");
+    assert.equal(svg.getAttribute("data-lucide"), "pencil");
+    assert.equal(svg.getAttribute("aria-hidden"), "true");
+    assert.equal(svg.classList.value.join(" "), "lucide lucide-pencil");
+    assert.equal(svg.getAttribute("class"), "lucide lucide-pencil");
+    assert.deepEqual(
+      {
+        xmlns: svg.getAttribute("xmlns"),
+        width: svg.getAttribute("width"),
+        height: svg.getAttribute("height"),
+        viewBox: svg.getAttribute("viewBox"),
+        fill: svg.getAttribute("fill"),
+        stroke: svg.getAttribute("stroke"),
+        "stroke-width": svg.getAttribute("stroke-width"),
+        "stroke-linecap": svg.getAttribute("stroke-linecap"),
+        "stroke-linejoin": svg.getAttribute("stroke-linejoin"),
+      },
+      {
+        xmlns: "http://www.w3.org/2000/svg",
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+        fill: "none",
+        stroke: "currentColor",
+        "stroke-width": "2",
+        "stroke-linecap": "round",
+        "stroke-linejoin": "round",
+      }
+    );
+    // Pencil's two path shapes from the pinned lucide package.
+    const paths = svg.querySelectorAll("path").map(p => p.getAttribute("d"));
+    assert.deepEqual(paths, [
+      "M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z",
+      "m15 5 4 4",
+    ]);
+  });
+
+  it("renders a custom type's icon from user/callouts.scss, like aside", () => {
+    const element = callout("> [!aside] Title\n>\n> Body");
+    const svg = required(icon(element), "svg");
+    assert.equal(svg.getAttribute("data-lucide"), "message-square");
+    assert.equal(svg.getAttribute("class"), "lucide lucide-message-square");
+    assert.equal(
+      required(svg, "path").getAttribute("d"),
+      "M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z"
+    );
+  });
+
+  it("falls back to the default icon for an unknown type", () => {
+    const element = callout("> [!some-unmapped-type] Title\n>\n> Body");
+    const svg = required(icon(element), "svg");
+    assert.equal(svg.getAttribute("data-lucide"), "pencil");
+  });
+
+  it("emits an empty <i data-lucide> for an Obsidian icon name Lucide doesn't ship, like quote's quote-glyph", () => {
+    const element = callout("> [!quote] Title\n>\n> Body");
+    const placeholder = required(icon(element), "i");
+    assert.equal(placeholder.getAttribute("data-lucide"), "quote-glyph");
+    assert.equal(placeholder.innerHTML, "");
+    assert.equal(icon(element).querySelector("svg"), null);
+  });
+
+  it("renders the chevron-down fold icon for every collapsible callout", () => {
+    const element = callout("> [!note] Title\n>\n> Body");
+    const svg = required(fold(element), "svg");
+    assert.equal(svg.getAttribute("data-lucide"), "chevron-down");
+    assert.equal(svg.getAttribute("class"), "lucide lucide-chevron-down");
+    assert.equal(required(svg, "path").getAttribute("d"), "m6 9 6 6 6-6");
+  });
+
+  it("gives nested callouts their own independent icon and fold", () => {
+    const element = callout(
+      [
+        "> [!warning] Outer",
+        ">",
+        "> > [!aside] Inner",
+        "> >",
+        "> > Inside.",
+      ].join("\n")
+    );
+    assert.equal(
+      required(icon(element), "svg").getAttribute("data-lucide"),
+      "alert-triangle"
+    );
+    const inner = required(body(element), '.callout[data-callout="aside"]');
+    assert.equal(
+      required(icon(inner), "svg").getAttribute("data-lucide"),
+      "message-square"
+    );
+    assert.equal(
+      required(fold(inner), "svg").getAttribute("data-lucide"),
+      "chevron-down"
+    );
+  });
+
+  it("gives a converted ad-* callout the same icon and fold structure", () => {
+    const { html } = markdownToHtml("```ad-important\nBody\n```", {
+      mdastPlugins: [mkmdastAdmonitionCalloutPlugin({})],
+      hastPlugins: [hastAdmonitionCalloutPlugin],
+    });
+    const element = required(parse(html), ".callout");
+    assert.equal(
+      required(icon(element), "svg").getAttribute("data-lucide"),
+      "flame"
+    );
+    assert.equal(
+      required(fold(element), "svg").getAttribute("data-lucide"),
+      "chevron-down"
+    );
+  });
 });

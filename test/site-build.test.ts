@@ -183,6 +183,23 @@ describe("page structure", () => {
     }
   });
 
+  // Why: the live home page nests an empty `<h1></h1>` in its header,
+  // producing an empty band above the content and a second h1. Home
+  // deliberately renders no note header (an agreed change from live), and
+  // that is decided by the page not rendering `NoteHeader`, so only the
+  // built pages can show it. Posts are checked too so the assertion cannot
+  // pass by the header vanishing everywhere.
+  it("renders the note header on posts but not on Home", () => {
+    const noteHeader = (page: string) =>
+      documents.get(page)!.querySelector("main > header");
+    assert.equal(noteHeader("index.html"), null);
+    for (const page of site.pages.filter(
+      page => page !== "404.html" && page !== "index.html"
+    )) {
+      assert.ok(noteHeader(page)?.querySelector("h1"), page);
+    }
+  });
+
   // Why: the legacy theme applies its dark palette and preview typography
   // through these body classes; without them the page renders unstyled.
   it("sets the legacy body classes on every note page", () => {

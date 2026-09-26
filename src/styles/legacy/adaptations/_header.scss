@@ -1,2 +1,54 @@
 // Phase 1 selector adaptations for the header markup that Astro emits
 // differently from Eleventy. Tie each rule to the Eleventy selector it mirrors.
+
+// Mirrors src/site/styles/user/custom.scss:206-216 `.header-tags button.tag`.
+// T2 renders header tags as `<a class="tag">` (plain links that work without
+// JS) instead of live's `<button class="tag" onclick="toggleTagSearch(this)">`,
+// so give the anchor the same header-specific border/radius override that
+// selector gives the button. The rest of the look needs no adaptation:
+// obsidian-base.scss's `a.tag` rule (~line 12329) already mirrors
+// `button.tag`'s background, color, font, padding, and hover states exactly
+// (custom.scss's own comment at line 175 says it was built to replicate
+// `a.tag`), and the global `:focus-visible` rule (custom.scss:68-71) restores
+// the focus ring for any focusable element, links included.
+.header-tags a.tag {
+  --tag-border-width: 0px;
+  --tag-radius: 0.45rem;
+}
+
+// Mirrors obsidian-base.scss:6344 `button` (display, alignment, height, and
+// nowrap), which sized the live tag buttons to the theme's 32px input height.
+// Anchors do not match `button`, so without this the pills shrink to 22px.
+.header-tags a.tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--input-height);
+  white-space: nowrap;
+  // obsidian-base.scss's `button:not(.clickable-icon)` gave the live tag
+  // buttons this inset outline.
+  box-shadow: var(--input-shadow);
+}
+
+// Mirrors user/custom.scss:177-204 `button.tag` transitions and hover, and
+// its reduced-motion rule (custom.scss:370-375). obsidian-base.scss's `a.tag`
+// would otherwise give the links an opacity transition instead.
+.header-tags a.tag {
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease,
+    color 150ms ease;
+
+  @media (hover: hover) {
+    &:hover {
+      background-color: var(--tag-background-hover);
+      border: var(--tag-border-width) solid var(--tag-border-color-hover);
+      color: var(--tag-color-hover);
+      text-decoration: var(--tag-decoration-hover);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+}
