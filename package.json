@@ -24,6 +24,7 @@
     "test:posts": "node --test --test-isolation=none test/posts.test.ts",
     "test:site-build": "node --test --test-isolation=none test/site-build.test.ts",
     "test:head-metadata": "node --test --test-isolation=none test/head-metadata.test.ts",
+    "test:tokens": "node --test test/tokens.test.ts",
     "test:dates": "node --test --test-isolation=none test/dates.test.ts",
     "test:search-index": "node --test --test-isolation=none test/search-index.test.ts",
     "test:permalinks": "node --test --test-isolation=none test/permalinks.test.ts",
@@ -55,6 +56,7 @@
     "@11ty/eleventy": "^3.1.2",
     "@11ty/eleventy-plugin-rss": "^2.0.4",
     "@astrojs/check": "0.9.10",
+    "@tailwindcss/vite": "4.3.3",
     "@types/mdast": "^4.0.4",
     "@types/node": "^26.4.0",
     "@vitest/browser-playwright": "^5.0.1",
@@ -68,6 +70,7 @@
     "prettier": "^3.9.6",
     "prettier-plugin-astro": "^0.14.1",
     "sass": "^1.99.0",
+    "tailwindcss": "4.3.3",
     "typescript": "6.0.3",
     "vitest": "^5.0.1"
   },

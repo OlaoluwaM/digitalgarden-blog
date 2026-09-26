@@ -1,0 +1,22 @@
+/*
+ * Stylesheet entry (ADR 0003). The first statement fixes the cascade layer
+ * order: a later layer wins regardless of specificity, and unlayered CSS
+ * beats every layer. The legacy Eleventy cascade sits lowest until phase 2
+ * removes it. Tailwind's Preflight reset (the `base` layer) is not loaded
+ * until then.
+ */
+@layer legacy, theme, base, components, utilities;
+
+@import "tailwindcss/theme.css" layer(theme);
+@import "./tokens.css";
+/*
+ * Generate utilities only from the Astro templates and client scripts. The
+ * default scans the whole repository, including note text and the Eleventy
+ * templates, and turns ordinary words ("table", "hidden", "collapse") into
+ * utilities that would restyle any element with a matching class.
+ */
+@import "tailwindcss/utilities.css" layer(utilities) source(none);
+@source "../components";
+@source "../layouts";
+@source "../pages";
+@source "../scripts";

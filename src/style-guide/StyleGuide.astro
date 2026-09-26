@@ -1,0 +1,176 @@
+---
+// Dev-only style guide (ADR 0003 phase 2), served at /style-guide/ by
+// `npm run dev:astro` and never built. It lists every token straight from
+// tokens.css, so it cannot drift from the file, then shows the chrome
+// components and a Markdown sample with every element the notes can use.
+import postcss from "postcss";
+import tokensSource from "../styles/tokens.css?raw";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import SiteNavigation from "../components/SiteNavigation.astro";
+import NoteHeader from "../components/NoteHeader.astro";
+import RecentPosts from "../components/RecentPosts.astro";
+import PostFooter from "../components/PostFooter.astro";
+import type { Post } from "../content/posts.ts";
+import { Content as Sample } from "./sample.md";
+
+const tokens: { name: string; value: string }[] = [];
+postcss.parse(tokensSource).walkDecls(decl => {
+  if (!decl.prop.endsWith("*")) {
+    tokens.push({ name: decl.prop, value: decl.value.replace(/\s+/g, " ") });
+  }
+});
+const group = (prefix: string) =>
+  tokens.filter(
+    token => token.name.startsWith(prefix) && !token.name.includes("--", 2)
+  );
+const colors = group("--color-");
+const fonts = group("--font-").filter(token => !token.name.includes("weight"));
+const sizes = group("--text-");
+const radii = group("--radius-");
+const other = tokens.filter(
+  token =>
+    !["--color-", "--font-", "--text-", "--radius-"].some(prefix =>
+      token.name.startsWith(prefix)
+    ) || token.name.startsWith("--font-weight")
+);
+
+function fakePost(
+  title: string,
+  description: string,
+  published: string,
+  tags: string[] = []
+): Post {
+  return {
+    data: {
+      pluginProps: { permalink: "/style-guide/" },
+      rawNoteProps: {
+        title,
+        description,
+        tags,
+        published,
+        last_updated: published,
+      },
+    },
+  } as unknown as Post;
+}
+const headerPost = fakePost("Note header", "", "2026-09-26T12:00", [
+  "style-guide",
+  "tokens",
+]);
+const recent = [
+  fakePost("A recent post", "Its description.", "2026-09-20T09:00"),
+  fakePost("A post without a description", "", "2026-09-01T09:00"),
+];
+---
+
+<BaseLayout title="Style guide" type="website">
+  <SiteNavigation slot="navigation" />
+  <h1>Style guide</h1>
+  <p>
+    Tokens from <code>src/styles/tokens.css</code>. Each one is a CSS custom
+    property and, in Tailwind, a utility.
+  </p>
+
+  <h2>Colors</h2>
+  <ul class="sg-grid">
+    {
+      colors.map(token => (
+        <li class="sg-swatch">
+          <span class="sg-chip" style={`background: var(${token.name})`} />
+          <code>{token.name}</code>
+          <span class="sg-value">{token.value}</span>
+          <span style={`color: var(${token.name})`}>Aa text</span>
+        </li>
+      ))
+    }
+  </ul>
+
+  <h2>Fonts</h2>
+  {
+    fonts.map(token => (
+      <p style={`font-family: var(${token.name})`}>
+        <code>{token.name}</code> The quick brown fox jumps over the lazy dog
+        0123456789
+      </p>
+    ))
+  }
+
+  <h2>Type scale</h2>
+  {
+    sizes.map(token => (
+      <p
+        style={`font-size: var(${token.name}); line-height: var(${token.name}--line-height, normal); letter-spacing: var(${token.name}--letter-spacing, normal); margin: 0.5rem 0; font-family: ${token.name.startsWith("--text-h") || token.name === "--text-site-name" ? "var(--font-serif); font-weight: 400" : "var(--font-sans)"}`}
+      >
+        {token.name.replace("--text-", "")} · {token.value}
+      </p>
+    ))
+  }
+
+  <h2>Radii</h2>
+  <ul class="sg-grid">
+    {
+      radii.map(token => (
+        <li class="sg-swatch">
+          <span
+            class="sg-chip"
+            style={`border-radius: var(${token.name}); background: var(--color-surface-sidebar); border: 1px solid var(--color-border)`}
+          />
+          <code>{token.name}</code>
+          <span class="sg-value">{token.value}</span>
+        </li>
+      ))
+    }
+  </ul>
+
+  <h2>Other tokens</h2>
+  <table>
+    <tbody>
+      {
+        other.map(token => (
+          <tr>
+            <td>
+              <code>{token.name}</code>
+            </td>
+            <td>{token.value}</td>
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+
+  <h2>Components</h2>
+  <NoteHeader post={headerPost} />
+  <RecentPosts posts={recent} />
+  <PostFooter />
+
+  <h2>Markdown sample</h2>
+  <Sample />
+</BaseLayout>
+
+<style>
+  .sg-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+    gap: 1rem;
+    padding: 0;
+    list-style: none;
+  }
+  .sg-swatch {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    font-size: var(--text-xs);
+    /* Obsidian indents every li by --list-indent for its bullet. */
+    margin-inline-start: 0;
+  }
+  .sg-chip {
+    display: block;
+    height: 3rem;
+    border-radius: var(--radius-box);
+    box-shadow: var(--shadow-input);
+  }
+  .sg-value {
+    color: var(--color-faint);
+    overflow-wrap: anywhere;
+  }
+</style>

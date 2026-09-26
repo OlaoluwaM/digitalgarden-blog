@@ -646,7 +646,40 @@ Eleventy's markdown-it options. Olaolu put all resulting items in scope.
   `npm test`) checks `.astro` and `.ts` files in the tsconfig project.
   `typescript` 6.0.3 and `@astrojs/check` 0.9.10 are pinned; TypeScript 7
   is outside `@astrojs/check`'s peer range. `test/` is not in the tsconfig
-  `include`, so test files are not type-checked.
+  `include`, so test files are not type-checked; `astro.config.ts` is.
+
+### Phase 2 design system (2026-09-26)
+
+- Token set approved by Olaolu. Decisions: muted text raised to AA (`--color-faint` #8c8c8c); 404 stays
+  site-consistent; quote/cite callouts get Lucide `quote`; builds reapply
+  patches.
+- `src/styles/global.css` (imported before the legacy Sass) declares
+  `legacy < theme < base < components < utilities`, loads Tailwind 4.3.3
+  theme and utilities only (no Preflight), and limits utility scanning to
+  components, layouts, pages, and scripts (`source(none)`): the default scan
+  turned note words into `.table`, `.hidden`, `.collapse` utilities.
+- Lightning CSS rewrites the order statement when minifying; tests check the
+  effective order (first appearance of each layer name).
+- `src/styles/tokens.css` (`@theme static`) clears Tailwind's default
+  namespaces. Token names must not reuse a legacy custom property name: a
+  `body` declaration beats the `:root` token regardless of layers
+  (`--color-accent` rendered Obsidian purple, hence `--color-link`; radii are
+  named by role). `test/site-build.test.ts` checks for clashes.
+- Style guide: `src/style-guide/StyleGuide.astro`, injected at
+  `/style-guide/` by `astro dev` only. Lists tokens from `tokens.css` and
+  renders the chrome components and `sample.md`.
+- Found on live and phase 1: Obsidian's CSS masks `.lucide-<name>` icons, so
+  every built-in callout icon (note, info, tip, warning, …) is invisible;
+  only the vault's custom types show one. Decided: show them once the
+  legacy CSS is gone (log it in docs/design-changes.md then).
+- Open: the vault's `aside` callout color (#7f849c) is 3.98:1 on its tinted
+  background; it comes from `/sync-callouts`, so change it in the vault.
+- Recent Posts items sit 2.25em right of their heading on live and phase 1:
+  Obsidian's `li { margin-inline-start: var(--list-indent) }` survives
+  `custom.scss` removing the bullets. Candidate fix when Recent Posts moves
+  to tokens.
+- Evidence harness (scratchpad, not committed): full-page screenshots of all
+  15 pages at 1440 and 390 against the phase 1 baseline; step 1 diff 0%.
 
 ## Verification and deployment
 

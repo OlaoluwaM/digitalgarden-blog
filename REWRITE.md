@@ -69,12 +69,12 @@ Phase 1: parity shell ([ADR 0003](docs/adrs/0003-build-a-tailwind-token-design-s
 - [x] Port the file tree.
 - [x] Match the responsive layout.
 - [x] Preserve accessibility and keyboard behavior.
-- [ ] Review phase 1 against the live site.
+- [x] Review phase 1 against the live site.
 
 Phase 2: design system.
 
-- [ ] Add Tailwind v4 with the cascade layer order.
-- [ ] Define tokens from the live site and add a style guide page.
+- [x] Add Tailwind v4 with the cascade layer order.
+- [x] Define tokens from the live site and add a style guide page.
 - [ ] Revise the chrome styles into token-based components.
 - [ ] Revise the Markdown content styles into a token-based stylesheet.
 - [ ] Remove the legacy stylesheets and vendored theme; add Preflight.

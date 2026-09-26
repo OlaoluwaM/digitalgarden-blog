@@ -1,0 +1,133 @@
+/*
+ * Design tokens (ADR 0003 phase 2).
+ *
+ * Every value comes from the live site's computed styles (thunk.blog,
+ * 2026-09-26) unless a comment says otherwise; intentional changes are
+ * logged in docs/design-changes.md. Tailwind generates a utility for each
+ * token (`bg-surface`, `text-muted`, `font-serif`, `text-h1`, `rounded-md`),
+ * and plain CSS reads the same values as custom properties
+ * (`var(--color-surface)`).
+ *
+ * Tailwind's default palette, fonts, type scale, radii, and breakpoints are
+ * cleared, so these tokens are the whole vocabulary. Spacing keeps
+ * Tailwind's 0.25rem step (`p-4` is 1rem).
+ *
+ * `static` emits every token even when no utility uses it, because the
+ * Markdown content stylesheet reads them as custom properties.
+ */
+@theme static {
+  --color-*: initial;
+  --font-*: initial;
+  --text-*: initial;
+  --radius-*: initial;
+  --breakpoint-*: initial;
+  --shadow-*: initial;
+
+  /* Gray ramp: Obsidian's dark base scale, named by its steps. */
+  --color-gray-00: #1e1e1e;
+  --color-gray-05: #212121;
+  --color-gray-10: #242424;
+  --color-gray-20: #262626;
+  --color-gray-25: #2a2a2a;
+  --color-gray-30: #363636;
+  --color-gray-35: #3f3f3f;
+  --color-gray-40: #555555;
+  --color-gray-50: #666666;
+  /* New step: the lightest gray below --color-gray-60 that meets WCAG AA
+     (4.5:1) on both the page (#1e1e1e) and the sidebar (#262626). */
+  --color-gray-55: #8c8c8c;
+  --color-gray-60: #999999;
+  --color-gray-70: #b3b3b3;
+  --color-gray-100: #dadada;
+
+  /* Surfaces */
+  --color-surface: var(--color-gray-00);
+  --color-surface-sidebar: var(--color-gray-20);
+  --color-surface-raised: var(--color-gray-10);
+
+  /* Text */
+  --color-text: var(--color-gray-100);
+  --color-muted: var(--color-gray-70);
+  /* Was #666 (2.9:1) on live; raised to pass AA. */
+  --color-faint: var(--color-gray-55);
+  --color-code: #abb2bf;
+
+  /* Links, focus rings, and tags (tags tint it: bg-link/10). Not named
+     "accent": the legacy Obsidian CSS already defines --color-accent. */
+  --color-link: var(--color-gray-60);
+  --color-link-hover: var(--color-gray-70);
+
+  /* Lines and non-text marks (list markers, blockquote rule): #666 stays,
+     because contrast rules for text do not apply to decoration. */
+  --color-border: var(--color-gray-30);
+  --color-border-hover: var(--color-gray-35);
+  --color-decoration: var(--color-gray-50);
+
+  --color-selection: rgb(153 153 153 / 0.3);
+  --color-highlight: rgb(255 208 0 / 0.4);
+
+  /* Fonts: all self-hosted (src/styles/fonts.css). */
+  --font-sans:
+    "Instrument Sans", "Inter", ui-sans-serif, -apple-system,
+    BlinkMacSystemFont, system-ui, "Segoe UI", Roboto, sans-serif;
+  --font-serif: "Instrument Serif", serif;
+  --font-mono:
+    "Commit Mono", "JetBrains Mono", ui-monospace, SFMono-Regular,
+    "Cascadia Mono", "Roboto Mono", monospace;
+
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* Type scale. Headings follow a Major Third (1.25) from h1 = 3rem. */
+  --text-h1: 3rem;
+  --text-h1--line-height: 1.1;
+  --text-h1--letter-spacing: -0.02em;
+  --text-h2: 2.4rem;
+  --text-h2--line-height: 1.2;
+  --text-h2--letter-spacing: -0.015em;
+  --text-h3: 1.92rem;
+  --text-h3--line-height: 1.3;
+  --text-h3--letter-spacing: -0.01em;
+  --text-h4: 1.536rem;
+  --text-h4--line-height: 1.35;
+  --text-h5: 1.229rem;
+  --text-h5--line-height: 1.6;
+  --text-h6: 1.07rem;
+  --text-h6--line-height: 1.6;
+  --text-site-name: 2rem;
+  --text-site-name--line-height: 1.1;
+  /* Reading text in notes. */
+  --text-content: 1.03rem;
+  --text-content--line-height: 1.5;
+  /* Interface text: the default for chrome. */
+  --text-ui: 1rem;
+  --text-ui--line-height: 1.6;
+  /* Sidebar, search button. */
+  --text-sm: 0.85rem;
+  --text-sm--line-height: 1.6;
+  /* Dates, footer, Recent Posts metadata. */
+  --text-xs: 0.8rem;
+  --text-xs--line-height: 1.5;
+
+  /* Named by role; Obsidian's legacy CSS owns the --radius-xs..xl names. */
+  --radius-key: 4px;
+  --radius-code: 6px;
+  --radius-tag: 0.45rem;
+  --radius-box: 8px;
+  --radius-full: 9999px;
+
+  --shadow-input: inset 0 0 0 1px var(--color-border);
+
+  /* Layout */
+  --container-content: 700px;
+  --container-sidebar: 17.5rem;
+  --container-sidebar-min: 250px;
+
+  /* Desktop navigation starts at 1000px (live: innerWidth >= 1000). */
+  --breakpoint-lg: 1000px;
+
+  --default-transition-duration: 150ms;
+  --default-transition-timing-function: ease;
+}

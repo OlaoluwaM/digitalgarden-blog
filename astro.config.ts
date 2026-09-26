@@ -1,6 +1,8 @@
 import { fileURLToPath } from "node:url";
+import type { AstroIntegration } from "astro";
 import { defineConfig } from "astro/config";
 import { satteri } from "@astrojs/markdown-satteri";
+import tailwindcss from "@tailwindcss/vite";
 import { wikilinkIndex } from "./src/generated/wikilink-index.ts";
 import { mkmdastWikilinksPlugin } from "./src/plugins/mdast/wikilinks.ts";
 import { mkmdastAdmonitionCalloutPlugin } from "./src/plugins/mdast/admonitions.ts";
@@ -16,9 +18,28 @@ const mdastDigitalGardenImagesPlugin = mkmdastDigitalGardenImagesPlugin(
   fileURLToPath(new URL("./src/site/img/user/", import.meta.url))
 );
 
+// The style guide (ADR 0003 phase 2) is a development tool: serve it from
+// `astro dev` only, so it never ships with the site.
+const styleGuide: AstroIntegration = {
+  name: "style-guide",
+  hooks: {
+    "astro:config:setup": ({ command, injectRoute }) => {
+      if (command !== "dev") return;
+      injectRoute({
+        pattern: "/style-guide",
+        entrypoint: "./src/style-guide/StyleGuide.astro",
+      });
+    },
+  },
+};
+
 export default defineConfig({
   site: "https://thunk.blog",
   outDir: "dist-astro",
+  integrations: [styleGuide],
+  vite: {
+    plugins: [tailwindcss()],
+  },
   image: {
     layout: "constrained",
     responsiveStyles: true,

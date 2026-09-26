@@ -7,7 +7,7 @@
  * whole file.
  */
 import assert from "node:assert/strict";
-import { access } from "node:fs/promises";
+import { access, readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { after, before, describe, it } from "node:test";
 import { parse, type HTMLElement } from "node-html-parser";
@@ -22,7 +22,15 @@ before(async () => {
   documents = new Map(
     await Promise.all(
       site.pages.map(
-        async page => [page, parse(await site.read(page))] as const
+        async page =>
+          [
+            page,
+            // Parse <pre> contents as HTML (the default keeps them as raw
+            // text), so code-block classes are visible to the tests.
+            parse(await site.read(page), {
+              blockTextElements: { script: true, style: true },
+            }),
+          ] as const
       )
     )
   );
@@ -101,7 +109,7 @@ describe("every page's head", () => {
   });
 });
 
-describe("the legacy stylesheet bundle (ADR 0003 phase 1)", () => {
+describe("the stylesheet bundle (ADR 0003)", () => {
   async function stylesheets(page: string) {
     const hrefs = head(page)
       .querySelectorAll('link[rel="stylesheet"]')
@@ -109,22 +117,103 @@ describe("the legacy stylesheet bundle (ADR 0003 phase 1)", () => {
     return Promise.all(hrefs.map(href => site.read(href.replace(/^\//, ""))));
   }
 
-  // Why: phase 2 depends on the whole legacy cascade sitting in one
-  // low-priority layer, so Tailwind layers can be ordered above it. An
-  // unlayered legacy rule would beat every utility regardless of specificity.
-  // Phase 2 changes this test when it adds its own layers.
-  it("puts all legacy CSS inside @layer legacy", async () => {
-    for (const css of await stylesheets("index.html")) {
-      const topLevel = postcss
-        .parse(css)
-        .nodes.filter(
-          node => !(node.type === "atrule" && node.name === "charset")
-        )
-        .map(node =>
-          node.type === "atrule" ? `@${node.name} ${node.params}` : node.type
-        );
-      assert.deepEqual(topLevel, ["@layer legacy"]);
+  // Why: unlayered CSS beats every layered rule regardless of specificity,
+  // and a layer's position is fixed where its name first appears. The
+  // legacy cascade must come first (lowest) so utilities beat it, and no
+  // style rule may sit outside a layer. The minifier rewrites the declared
+  // order statement, so this checks the effective order, not the source.
+  it("orders the layers legacy < theme < base < components < utilities", async () => {
+    const css = (await stylesheets("index.html")).join("\n");
+    const topLevel = postcss
+      .parse(css)
+      .nodes.filter(
+        node => !(node.type === "atrule" && node.name === "charset")
+      );
+    const order: string[] = [];
+    for (const node of topLevel) {
+      if (node.type !== "atrule" || node.name !== "layer") continue;
+      for (const name of node.params.split(",").map(name => name.trim())) {
+        if (!order.includes(name)) order.push(name);
+      }
     }
+    // Tailwind's `properties` layer only holds custom-property fallbacks
+    // for older browsers; it may come first (lowest) or be absent.
+    assert.deepEqual(
+      order.filter(name => name !== "properties"),
+      ["legacy", "theme", "base", "components", "utilities"]
+    );
+    // `@property` registers custom properties for utilities; it is not a
+    // style rule and cannot be layered.
+    const unlayered = topLevel
+      .filter(
+        node =>
+          !(
+            node.type === "atrule" &&
+            (node.name === "layer" || node.name === "property")
+          )
+      )
+      .map(node => node.toString().slice(0, 80));
+    assert.deepEqual(unlayered, []);
+  });
+
+  // Why: Tailwind generates a utility for every class-like word it finds in
+  // its sources. A utility named like a class the Markdown pipeline emits
+  // (`table`, `hidden`, `collapse`, ...) would restyle note content from the
+  // top layer. global.css limits sources to the templates; this catches a
+  // template word that still collides.
+  it("generates no utility named like a class in rendered notes", async () => {
+    const utilities = new Set<string>();
+    postcss
+      .parse((await stylesheets("index.html")).join("\n"))
+      .walkAtRules("layer", layer => {
+        if (layer.params !== "utilities") return;
+        layer.walkRules(rule => {
+          for (const match of rule.selector.matchAll(/\.((?:\\.|[\w-])+)/g))
+            utilities.add(match[1]!.replace(/\\/g, ""));
+        });
+      });
+    const collisions = new Set<string>();
+    for (const page of site.pages) {
+      const main = documents.get(page)!.querySelector("main");
+      for (const element of main?.querySelectorAll("*") ?? []) {
+        if (element.closest("header, footer, section.recent-notes")) continue;
+        for (const name of element.classList.values())
+          if (utilities.has(name)) collisions.add(`${page}: .${name}`);
+      }
+    }
+    assert.deepEqual([...collisions], []);
+  });
+
+  // Why: a custom property declared on `body` by the legacy CSS beats the
+  // same name inherited from the tokens on `:root`, whatever the layers.
+  // Obsidian defines hundreds of variables; a token that reuses one of
+  // their names (as `--color-accent` once did) silently takes the legacy
+  // value everywhere until the legacy layer is gone.
+  it("defines no token that the legacy CSS also defines", async () => {
+    const legacy = new Set<string>();
+    postcss
+      .parse((await stylesheets("index.html")).join("\n"))
+      .walkAtRules("layer", layer => {
+        if (layer.params !== "legacy") return;
+        layer.walkDecls(decl => {
+          if (decl.prop.startsWith("--")) legacy.add(decl.prop);
+        });
+      });
+    const clashes: string[] = [];
+    postcss
+      .parse(await readFile("src/styles/tokens.css", "utf8"))
+      .walkDecls(decl => {
+        if (legacy.has(decl.prop)) clashes.push(decl.prop);
+      });
+    assert.deepEqual(clashes, []);
+  });
+
+  // Why: ADR 0003 adds Tailwind's Preflight reset only after the legacy CSS
+  // is gone. Before that, Preflight would restyle every element underneath
+  // the legacy cascade (margins, list styles, heading sizes) and break parity.
+  it("ships no Preflight reset while the legacy layer exists", async () => {
+    const css = (await stylesheets("index.html")).join("\n");
+    assert.doesNotMatch(css, /::file-selector-button\s*\{[^}]*box-sizing/);
   });
 
   // Why: parity depends on the live cascade order. Later files override
@@ -167,6 +256,15 @@ describe("the legacy stylesheet bundle (ADR 0003 phase 1)", () => {
 });
 
 describe("page structure", () => {
+  // Why: the style guide is a development tool (astro.config.ts injects it
+  // only for `astro dev`). Shipping it would publish a page of fake posts.
+  it("does not ship the dev-only style guide", () => {
+    assert.ok(
+      !site.pages.some(page => page.startsWith("style-guide")),
+      site.pages.join(", ")
+    );
+  });
+
   // Why: note content must stay inside `main.content.cm-s-obsidian`. The
   // legacy CSS positions and styles the note column through that selector,
   // and later components are placed relative to it.
