@@ -6,13 +6,48 @@
 // activates on click and Enter/Space, announced as a button) for free.
 // Wiring the search overlay open is a later Client Behavior task, so this
 // button is inert for now.
+//
+// Styling (ADR 0003 phase 2): the box is the same in both places; the
+// placement sets how it sits in its parent. The button's `color` is
+// inherited, so it is the sidebar's muted gray there and the body text color
+// in the navbar, as on the live site.
 import Icon from "./Icon.astro";
+
+interface Props {
+  placement: "navbar" | "sidebar";
+}
+
+const { placement } = Astro.props;
+const navbar = placement === "navbar";
+// Each key looks like inline code in a note.
+const keyClass =
+  "rounded-code border border-border bg-surface-raised px-key-x py-1 font-mono text-key-code font-normal text-code box-decoration-clone [corner-shape:var(--corner-shape-soft)]";
 ---
 
-<button type="button" class="search-button align-icon" aria-label="Search">
-  <span class="search-icon">
-    <Icon name="search" />
+<button
+  type="button"
+  class:list={[
+    "search-button align-icon",
+    "my-2.5 flex h-search-button cursor-pointer appearance-none items-center justify-evenly gap-2 rounded-box border border-border bg-surface px-2.5 py-0 text-left font-sans text-sm/[normal] font-normal whitespace-nowrap text-inherit transition-none select-none hover:border-muted",
+    navbar
+      ? "mx-0 grow-[0.035] max-md:min-w-9"
+      : "mx-0 w-full shrink-0 max-xl:mr-2.5 max-md:m-0.5",
+  ]}
+  aria-label="Search"
+>
+  <span class="search-icon flex items-center">
+    <Icon name="search" class="pointer-events-none size-icon opacity-70" />
   </span>
-  <span class="search-text">Search</span>
-  <span class="search-keys"><code>Ctrl</code>&nbsp;+&nbsp;<code>K</code></span>
+  <span
+    class:list={[
+      "search-text flex-1",
+      navbar && "flex justify-center max-md:hidden",
+    ]}>Search</span
+  >
+  <span
+    class="search-keys rounded-key bg-key-surface px-1.5 py-0.75 text-key-hint text-faint max-lg:py-key-y-narrow max-md:hidden"
+    ><code class={keyClass}>Ctrl</code>&nbsp;+&nbsp;<code class={keyClass}
+      >K</code
+    ></span
+  >
 </button>

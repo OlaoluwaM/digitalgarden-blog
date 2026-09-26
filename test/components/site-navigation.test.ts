@@ -93,10 +93,10 @@ describe("structure", () => {
 
     const sidebar = wrapper!.querySelector("nav.filetree-sidebar");
     expect(sidebar).not.toBeNull();
-    // Eleventy renders a bare <h1> (no class) in the sidebar, unlike the
-    // navbar's h1.site-name-header.
+    // Eleventy renders the sidebar's <h1> without the navbar's
+    // `site-name-header` class, which the legacy navbar rules select on.
     const heading = sidebar!.querySelector(":scope > a > h1");
-    expect(heading?.classList.value).toEqual([]);
+    expect(heading?.classList.contains("site-name-header")).toBe(false);
     expect(heading?.text).toBe("Thunks & Thoughts");
   });
 
@@ -161,10 +161,8 @@ describe("folders", () => {
   it("uses a summary with the foldername-wrapper classes as the folder's header", async () => {
     const root = await renderNav("/");
     const summary = root.querySelector("details.folder.inner-folder > summary");
-    expect(summary?.classList.value).toEqual([
-      "foldername-wrapper",
-      "align-icon",
-    ]);
+    expect(summary?.classList.contains("foldername-wrapper")).toBe(true);
+    expect(summary?.classList.contains("align-icon")).toBe(true);
     expect(summary!.querySelectorAll("svg.lucide-chevron-down")).toHaveLength(
       1
     );

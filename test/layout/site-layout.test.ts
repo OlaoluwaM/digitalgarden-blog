@@ -171,6 +171,8 @@ describe("responsive layout", () => {
 describe("navigation without JavaScript", () => {
   // Why: the live folder toggle needed Alpine. The Astro file tree uses
   // native <details>, so readers without JavaScript can still reach posts.
+  // The chevron that shows the folder's state is swapped by CSS alone, so
+  // only a styled page in a browser can show that it follows the toggle.
   it("opens and closes the Posts folder with JavaScript disabled", async () => {
     await withPage(
       1440,
@@ -181,9 +183,19 @@ describe("navigation without JavaScript", () => {
         const folder = page
           .locator(".filetree-sidebar details.inner-folder")
           .first();
+        const chevrons = async () => ({
+          open: await folder
+            .locator(":scope > summary .folder-chevron-open")
+            .isVisible(),
+          closed: await folder
+            .locator(":scope > summary .folder-chevron-closed")
+            .isVisible(),
+        });
         assert.equal(await folder.getAttribute("open"), null);
+        assert.deepEqual(await chevrons(), { open: false, closed: true });
         await folder.locator("summary").click();
         assert.equal(await folder.getAttribute("open"), "");
+        assert.deepEqual(await chevrons(), { open: true, closed: false });
         assert.ok(
           await page.isVisible(
             '.filetree-sidebar a[href="/posts/be-deliberate/"]'
@@ -231,8 +243,11 @@ describe("keyboard access", () => {
         "summary.foldername-wrapper.align-icon",
         "a.tag",
       ]) {
+        // Utility classes follow the legacy class names in the label.
         assert.ok(
-          [...reached].includes(expected),
+          [...reached].some(
+            label => label === expected || label.startsWith(`${expected}.`)
+          ),
           `Tab never reached ${expected}; reached ${[...reached].join(", ")}`
         );
       }

@@ -133,4 +133,40 @@
 
   --default-transition-duration: 150ms;
   --default-transition-timing-function: ease;
+
+  /* Agent B additions: navigation (NavShell, FileTreeEntry, NavSearchButton).
+     Sources: digital-garden-base.scss and user/custom.scss unless noted. */
+  /* File tree row hover (--dg-notelink-hover-bg) and the search key hint
+     background (`.search-keys`). */
+  --color-row-hover: rgb(255 255 255 / 0.05);
+  --color-key-surface: rgb(255 255 255 / 0.08);
+  /* Search key hint (0.7rem) and its <code> keys (Obsidian inline code,
+     0.8em of the hint). Buttons keep line-height: normal. */
+  --text-key-hint: 0.7rem;
+  --text-key-hint--line-height: normal;
+  --text-key-code: 0.56rem;
+  --text-key-code--line-height: normal;
+  /* Navbar site name below md. */
+  --text-site-name-sm: 1.5rem;
+  --text-site-name-sm--line-height: 1;
+  /* Icons beside text in the search button and folder rows. */
+  --spacing-icon: 0.875em;
+  /* The navbar hamburger icon's width (stretched; see NavShell). */
+  --spacing-hamburger-icon: 1.45rem;
+  --spacing-search-button: 2.3rem;
+  --spacing-navbar-y: 0.4rem;
+  /* Between the hamburger and the site name, md and up. */
+  --spacing-navbar-gap: 2.05rem;
+  /* Search key hint: <code> key side padding (Obsidian inline code), and
+     the hint's block padding below lg. */
+  --spacing-key-x: 0.4rem;
+  --spacing-key-y-narrow: 3.5px;
+  /* The sidebar site name wraps at this width. */
+  --container-site-name: 8ch;
+  /* The theme's softer corners on rendered code, blocks, and images
+     (vendor/obsidian-theme.css --corner-shape); here the search keys. */
+  --corner-shape-soft: superellipse(1.1);
+  /* Obsidian's button easing (--anim-motion-baseline), which the live
+     hamburger kept (obsidian-base.scss). */
+  --ease-overshoot: cubic-bezier(0.1, 0, 0.1, 1.25);
 }

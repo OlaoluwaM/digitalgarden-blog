@@ -11,8 +11,9 @@
 //     closes without JS (closed by default, matching the live `false`
 //     default before a visitor has toggled it).
 //   - the two `<i data-lucide>` chevrons, each shown/hidden by `x-show`,
-//     are both still rendered; `_navigation.scss` swaps which one is visible
-//     based on the native `[open]` attribute instead of Alpine state.
+//     are both still rendered; `styles/components/navigation.css` swaps
+//     which one is visible based on the native `[open]` attribute instead of
+//     Alpine state.
 import type { FileTreeNode } from "../content/file-tree.ts";
 import Icon from "./Icon.astro";
 // Astro requires a recursive component to explicitly import itself.
@@ -26,18 +27,31 @@ interface Props {
 }
 
 const { node, depth, activePathname } = Astro.props;
+const nested = depth > 0;
+const active = node.type === "file" && node.href === activePathname;
+const chevronClass = "mr-0.5 size-icon opacity-50";
 // Eleventy: `class="{{'filelist' if step>0}}"` — no class at all at the
-// root, where step is 0.
-const wrapperClass = depth > 0 ? "filelist" : undefined;
+// root, where step is 0. Nested rows draw the depth line.
+const wrapperClass = nested
+  ? "filelist ml-2 border-l border-l-muted/40"
+  : undefined;
+// Note links use `hover:underline!` because their inline
+// `text-decoration:none` would otherwise win over a utility.
 ---
 
 <div class={wrapperClass}>
   {
     node.type === "folder" ? (
-      <details class="folder inner-folder">
-        <summary class="foldername-wrapper align-icon">
-          <Icon name="chevron-down" class="folder-chevron-open" />
-          <Icon name="chevron-right" class="folder-chevron-closed" />
+      <details class="folder inner-folder ml-3 py-0.75">
+        <summary class="foldername-wrapper align-icon my-1 ml-0.5 inline-flex cursor-pointer list-none items-center justify-evenly text-sm">
+          <Icon
+            name="chevron-down"
+            class={`folder-chevron-open ${chevronClass}`}
+          />
+          <Icon
+            name="chevron-right"
+            class={`folder-chevron-closed ${chevronClass}`}
+          />
           <span class="foldername">{node.name}</span>
         </summary>
         {node.children.map(child => (
@@ -50,14 +64,28 @@ const wrapperClass = depth > 0 ? "filelist" : undefined;
       </details>
     ) : (
       <div
-        class={
-          node.href === activePathname ? "notelink active-note" : "notelink"
-        }
+        class:list={[
+          "notelink",
+          active && "active-note",
+          "relative flex items-center py-1 pr-2 pl-3 text-sm hover:bg-row-hover",
+          // Nested notes carry a 2px left rule (colored when active) over
+          // the folder's depth line; root notes have none and are indented
+          // past the folder chevrons.
+          nested
+            ? [
+                "-ml-px border-l-2",
+                active ? "border-l-link" : "border-l-transparent",
+              ]
+            : "ml-5.5 border-l-0",
+        ]}
       >
         <a
           data-note-icon=""
           style="text-decoration:none"
-          class="filename"
+          class:list={[
+            "filename hover:underline!",
+            active ? "text-text" : "text-link hover:text-link-hover",
+          ]}
           href={node.href}
         >
           {node.title}{" "}
