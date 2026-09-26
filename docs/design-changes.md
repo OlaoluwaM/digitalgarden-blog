@@ -310,3 +310,29 @@ computed-style comparison of each dialog state against thunk.blog at
 - Keyboard hints use `<kbd>`, and the two navigation landmarks are named
   "Site" (the mobile navbar) and "Notes" (the file tree), so they stay
   distinct when both show. Neither changes the look.
+
+## 2026-09-26: Search
+
+### The search index loads on first use
+
+- **Change:** the search index (`/searchIndex.json`) and FlexSearch load
+  when the search field is first focused or typed in, from the site's own
+  origin. Live loaded FlexSearch from a CDN and downloaded the index on every
+  page load.
+- **Why:** most visits never search, and first-party scripts are not
+  blocked as third-party.
+- **Evidence:** `test/site-build.test.ts` (FlexSearch is in a chunk no page
+  loads up front) and `test/layout/site-layout.test.ts` (no index request
+  until the dialog opens, then one).
+
+### Search fixes
+
+- **Change:** pasting, the clear button, and dictation now search (live
+  searched on `keydown`). Search waits for a 150ms pause in typing (live:
+  200ms), and clearing the field shows the hint at once. Titles, tags, excerpts, and the no-results query
+  show as text, so an entry such as `<options-to-pass-to-executable>` reads
+  as written (live parsed it as HTML, and stripped it from excerpts).
+  Queries such as `span` or `class` highlight correctly (live matched its
+  own highlight markup).
+- **Why:** the three defects REWRITE.md lists for the port.
+- **Evidence:** `test/browser/search.test.ts` and `test/search-engine.test.ts`.

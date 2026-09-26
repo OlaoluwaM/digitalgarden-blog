@@ -1,7 +1,9 @@
 ---
 // The search dialog (Eleventy's `searchContainer.njk`), rendered once by
-// NavShell. Its markup is a contract with the search script, which fills
-// the results and preview and sets the state; the static text lives here.
+// NavShell. Its markup is a contract with the search scripts, which fill
+// the results and preview and set the state; the static text lives here.
+// scripts/search.ts searches as the field changes and writes the results,
+// the no-results query, and the state.
 //
 // - Open with `showModal()` and close with `close()`. The dialog keeps focus
 //   inside, makes the page inert, closes on Escape, and focuses `#term`

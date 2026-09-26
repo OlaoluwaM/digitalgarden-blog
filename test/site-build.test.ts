@@ -7,7 +7,7 @@
  * whole file.
  */
 import assert from "node:assert/strict";
-import { access } from "node:fs/promises";
+import { access, readdir } from "node:fs/promises";
 import { join } from "node:path";
 import { after, before, describe, it } from "node:test";
 import { parse, type HTMLElement } from "node-html-parser";
@@ -292,5 +292,48 @@ describe("page structure", () => {
       const classes = documents.get(page)!.querySelector("body")?.classList;
       assert.ok(classes?.contains("markdown-rendered"), page);
     }
+  });
+});
+
+describe("page scripts", () => {
+  // A string only FlexSearch's code (and the engine configuring it) holds.
+  const FLEXSEARCH = "latin:extra";
+  const staticImports = (code: string) =>
+    [
+      ...code.matchAll(/import(?:[\w\s{},*$]*from)?\s*["']\.\/([^"']+)["']/g),
+    ].map(match => match[1]!);
+
+  // Why: FlexSearch is most of the search code, and most visits never
+  // search. It must arrive with the index, in a chunk the page imports only
+  // when search is used, not in the scripts every page loads up front
+  // (live loaded it from a CDN on every page).
+  it("loads FlexSearch only when search is used", async () => {
+    const read = (file: string) => site.read(join("_astro", file));
+    const upfront = new Set<string>();
+    const queue = site.pages.flatMap(page =>
+      documents
+        .get(page)!
+        .querySelectorAll("script[src]")
+        .map(script => script.getAttribute("src")!)
+        .filter(src => src.startsWith("/_astro/"))
+        .map(src => src.slice("/_astro/".length))
+    );
+    for (let file; (file = queue.pop());) {
+      if (upfront.has(file)) continue;
+      upfront.add(file);
+      queue.push(...staticImports(await read(file)));
+    }
+    for (const file of upfront) {
+      assert.ok(!(await read(file)).includes(FLEXSEARCH), file);
+    }
+
+    const chunks = (await readdir(join(site.outDir, "_astro"))).filter(file =>
+      file.endsWith(".js")
+    );
+    const withFlexSearch = [];
+    for (const file of chunks) {
+      if ((await read(file)).includes(FLEXSEARCH)) withFlexSearch.push(file);
+    }
+    assert.equal(withFlexSearch.length, 1, String(withFlexSearch));
   });
 });

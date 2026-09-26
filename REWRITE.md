@@ -87,7 +87,7 @@ Phase 2: design system.
 ## Client Behavior
 
 - [x] Port callout collapsing and keyboard toggling.
-- [ ] Port FlexSearch search and tag filtering, escaping inserted text, highlighting safely, and searching on `input`.
+- [x] Port FlexSearch search and tag filtering, escaping inserted text, highlighting safely, and searching on `input`.
 - [x] Build the search dialog's markup and styles (`SearchDialog.astro`).
 - [ ] Wire the search dialog: open and close, results, keyboard selection, preview, and tag search.
 - [x] Style the open mobile file tree and its `.fullpage-overlay` (shown while the hamburger's `aria-expanded` is `true`).

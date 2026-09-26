@@ -741,6 +741,38 @@ Eleventy's markdown-it options. Olaolu put all resulting items in scope.
 - Design changes logged in `docs/design-changes.md` ("Search dialog and
   mobile file tree").
 
+### FlexSearch port (2026-09-26)
+
+- Olaolu handed this item to Claude ("handle the flex search impl TDD
+  style"); the dialog wiring stays with him unless he hands it over.
+- `src/scripts/searchEngine.ts`: `createSearchEngine(entries)` wraps a
+  FlexSearch 0.7.43 (pinned) `Document` index with live's settings (encoder,
+  `latin:extra`, reverse content / forward title and tags, limits 5 + 10);
+  `search(query)` returns entries, title matches first, each once; `#tag`
+  searches tags only. The package's types declare named exports but both
+  builds export one default object, bridged in one commented line.
+- `src/scripts/searchText.ts`: `searchTerms`, `excerpt` (live's 50/120
+  window, keeps `<...>` text), `highlightSegments` (ranges on the text,
+  overlaps merged; no HTML strings).
+- `src/scripts/search.ts`: `initializeSearch(loadDocuments?)`, called from
+  `BaseLayout`. On `input` it searches after a 150ms pause (live: 200ms;
+  clearing shows the hint at once) and writes the dialog per the
+  SearchDialog contract (options with the first selected,
+  `aria-activedescendant`, `data-state`, the no-results query as text);
+  results are built with `createElement` and text nodes. The index and the
+  engine module load together on first focus or input (dynamic import, so
+  FlexSearch is its own chunk), retry after a failure, and a query number
+  drops stale searches.
+- Left for "Wire the search dialog": open/close (buttons, Ctrl/⌘+K, `?q=`),
+  arrow-key selection and Enter, the preview (call
+  `initializeScrollRegions()` after filling it), tag buttons searching
+  `#tag`, the Mac ⌘ label.
+- Tests: `test/search-engine.test.ts` (16, Node), `test/browser/search.test.ts`
+  (12, Chrome), two built-site tests in `test/layout/site-layout.test.ts`,
+  and a `page scripts` build test. 11 mutations (the three live defects
+  reintroduced, the race guard, retry, idempotence, excerpt stripping,
+  overlap merge, tag search) each fail a test.
+
 ## Verification and deployment
 
 ```sh

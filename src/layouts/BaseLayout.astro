@@ -56,10 +56,12 @@ const canonical = canonicalUrl(Astro.url.pathname);
       import { initializeCopyButtons } from "../scripts/copyCode";
       import { initializeCalloutToggles } from "../scripts/callouts";
       import { initializeScrollRegions } from "../scripts/scrollRegions";
+      import { initializeSearch } from "../scripts/search";
 
       initializeCopyButtons();
       initializeCalloutToggles();
       initializeScrollRegions();
+      initializeSearch();
     </script>
     <!-- Custom elements, so they belong in the body, not the head. -->
     <Analytics />

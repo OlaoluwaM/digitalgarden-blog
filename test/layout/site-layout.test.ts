@@ -655,6 +655,89 @@ describe("search dialog", () => {
   });
 });
 
+describe("search", () => {
+  const openDialog = (page: Page) =>
+    page.evaluate(() =>
+      document.querySelector<HTMLDialogElement>("#globalsearch")!.showModal()
+    );
+  const resultTitles = (page: Page) =>
+    page.$$eval(".searchresult .result-title", titles =>
+      titles.map(title => title.textContent)
+    );
+
+  // Why: the script, the bundled FlexSearch, and the built
+  // `/searchIndex.json` must work together on a real page: words find
+  // notes (titles first), `#tag` finds tagged notes, and an unknown word
+  // shows the no-results message.
+  it("searches the built index as the reader types", async () => {
+    await withPage(1440, async page => {
+      await page.goto(origin + "/", { waitUntil: "load" });
+      await openDialog(page);
+
+      await page.fill("#term", "haskell");
+      await page.waitForSelector(".searchresult");
+      const titles = await resultTitles(page);
+      assert.deepEqual(
+        new Set(titles.slice(0, 2)),
+        new Set([
+          "IO in Haskell, an epiphany",
+          "Implementing Redis INFO in Haskell",
+        ])
+      );
+      assert.equal(
+        await page.textContent(".searchresult .search-highlight"),
+        "Haskell"
+      );
+
+      await page.fill("#term", "#linux");
+      await page.waitForFunction(
+        () =>
+          document.querySelector(".searchresult .result-title")?.textContent !==
+          "IO in Haskell, an epiphany"
+      );
+      const tags = await page.$$eval(".searchresult", results =>
+        results.map(result =>
+          [...result.querySelectorAll(".tag")].map(tag => tag.textContent)
+        )
+      );
+      assert.equal(tags.length, 4);
+      assert.ok(
+        tags.every(list => list.includes("#linux")),
+        String(tags)
+      );
+
+      await page.fill("#term", "zzqqxx");
+      await page.waitForSelector(".no-results", { state: "visible" });
+      assert.equal(await page.textContent(".no-results-query"), "zzqqxx");
+    });
+  });
+
+  // Why: every page carries the search dialog, but most visits never
+  // search, so the index downloads when the dialog opens (it focuses the
+  // field), once, instead of on every page load as live did.
+  it("downloads the index only when search is used, once", async () => {
+    await withPage(1440, async page => {
+      const requested: string[] = [];
+      page.on("request", request => requested.push(request.url()));
+      await page.goto(origin + "/", { waitUntil: "networkidle" });
+      const index = () =>
+        requested.filter(url => new URL(url).pathname === "/searchIndex.json");
+      assert.deepEqual(index(), []);
+
+      await openDialog(page);
+      await page.fill("#term", "nix");
+      await page.waitForSelector(".searchresult");
+      await page.fill("#term", "redis");
+      await page.waitForFunction(
+        () =>
+          document.querySelector(".searchresult .result-title")?.textContent ===
+          "Implementing Redis INFO in Haskell"
+      );
+      assert.equal(index().length, 1);
+    });
+  });
+});
+
 describe("mobile file tree", () => {
   // Why: on phones and tablets the file tree opens over the page when the
   // hamburger's `aria-expanded` is "true" (the navigation script flips
