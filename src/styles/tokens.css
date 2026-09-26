@@ -170,9 +170,68 @@
   /* The sidebar site name wraps at this width. */
   --container-site-name: 8ch;
   /* The theme's softer corners on rendered code, blocks, and images
-     (vendor/obsidian-theme.css --corner-shape); here the search keys. */
+     (vendor/obsidian-theme.css --corner-shape): search keys, blockquotes,
+     images. */
   --corner-shape-soft: superellipse(1.1);
   /* Obsidian's button easing (--anim-motion-baseline), which the live
      hamburger kept (obsidian-base.scss). */
   --ease-overshoot: cubic-bezier(0.1, 0, 0.1, 1.25);
+
+  /* Agent C1 additions: rendered Markdown (content/typography.css). Values
+     are the phase 1 computed styles; the source rule is named per token. */
+
+  /* Block rhythm. Obsidian --p-spacing: paragraphs, lists, tables, and
+     heading margins. */
+  --spacing-paragraph: 1.75rem;
+  /* Obsidian --heading-spacing: a heading after p, pre, table, ul, or ol. */
+  --spacing-heading: 2em;
+  /* custom.scss `.content h2` / `.content h3` margin-top (other cases). */
+  --spacing-h2: 1.75em;
+  --spacing-h3: 1.5em;
+  /* Obsidian `hr { margin: 2rem 0 }` and --hr-thickness. */
+  --spacing-rule: 2rem;
+  --rule-width: 2px;
+
+  /* Lists. Obsidian `ul > li { margin-inline-start: 3ch }` (top level),
+     --list-indent (0.5625em * 4, nested), --list-spacing (item padding). */
+  --spacing-list-marker: 3ch;
+  --spacing-list-indent: 2.25em;
+  --spacing-list-item: 0.175em;
+
+  /* Blockquotes. Obsidian --blockquote-size, the 16px padding and rule
+     inset, and --blockquote-border-thickness. */
+  --text-quote: 1rem;
+  --spacing-quote: 1rem;
+  --quote-rule-width: 2px;
+
+  /* Tables. Obsidian --table-text-size / --table-header-size,
+     --table-line-height, the 8px cell padding, --table-column-min-width. */
+  --text-table: 0.933em;
+  --text-table--line-height: 1.3;
+  --spacing-cell: 0.5rem;
+  --table-cell-min-width: 6ch;
+
+  /* Highlights (==text==): the live theme's mark padding. */
+  --spacing-mark-x: 4px;
+  --spacing-mark-y: 2px;
+
+  /* Obsidian --footnote-size. */
+  --text-footnote: 0.875em;
+
+  /* Links. Obsidian --anim-duration-fast (the opacity transition) and
+     --link-unresolved-opacity; digital-garden-base.scss external-link icon
+     (custom.scss --dg-external-link-icon-size, --dg-external-link-padding,
+     background-position-y). */
+  --duration-link: 160ms;
+  --opacity-unresolved: 0.7;
+  --external-link-icon-size: 0.8125em;
+  --external-link-icon-offset: 4px;
+  --spacing-external-link: 1rem;
+
+  /* Task-list checkboxes. Obsidian --checkbox-size, --checkbox-radius, the
+     6px margin-inline-end, and --checkbox-color-hover (#dadada at 80%). */
+  --size-checkbox: 1rem;
+  --radius-checkbox: 4px;
+  --spacing-checkbox: 6px;
+  --color-checkbox-hover: rgb(from var(--color-text) r g b / 80%);
 }

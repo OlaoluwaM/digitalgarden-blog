@@ -1,5 +1,306 @@
 /*
- * Rendered Markdown: text, headings, links, lists, tables, quotes, rules, media, footnotes, math.
+ * Rendered Markdown: text, headings, links, lists, tables, quotes, rules,
+ * media, footnotes, math. Values reproduce the phase 1 look (Obsidian's
+ * `.markdown-rendered` rules, the vendored theme, and custom.scss); each
+ * token names its source in tokens.css.
+ *
+ * `@scope` limits these rules to the Markdown in the note column: the note
+ * header, the post footer, and Recent Posts sit in `main.content` too but
+ * style themselves. The 404 page's `main.content` holds no Markdown, and its
+ * body lacks the `markdown-rendered` class, as on live. Scoped selectors add
+ * no specificity, so `p` stays (0,0,1) and class-based component rules
+ * (callouts) still win over it.
  */
 @layer components {
+  @scope (.markdown-rendered main.content) to (header, footer, .recent-notes) {
+    /* Inherited text behavior (Obsidian sets both on .markdown-rendered). */
+    :scope {
+      overflow-wrap: break-word;
+      tab-size: 4;
+    }
+
+    /* Block rhythm. These margins use :where() (zero specificity) so the
+       edge rules below can override them by source order, and so component
+       stylesheets can set the edges of their own content. */
+    :where(p, ul, ol, table, h1, h2, h3, h4, h5, h6) {
+      margin-block: var(--spacing-paragraph);
+    }
+    :where(blockquote) {
+      margin-block: var(--spacing-quote);
+    }
+    :where(hr) {
+      margin-block: var(--spacing-rule);
+    }
+    :where(h2) {
+      margin-block-start: var(--spacing-h2);
+    }
+    :where(h3) {
+      margin-block-start: var(--spacing-h3);
+    }
+    :where(:is(p, pre, table, ul, ol) + :is(h1, h2, h3, h4, h5, h6)) {
+      margin-block-start: var(--spacing-heading);
+    }
+    :where(:is(ul, ol) :is(ul, ol)) {
+      margin-block: 0;
+    }
+    :where(:is(ul, ol) li p:first-of-type) {
+      margin-block-start: 0;
+    }
+    :where(:is(ul, ol) li p:last-of-type) {
+      margin-block-end: 0;
+    }
+    :where(blockquote > :first-child) {
+      margin-block-start: 0;
+    }
+    :where(blockquote > :last-child) {
+      margin-block-end: 0;
+    }
+    /* A callout's first block takes its top margin from the callout styles
+       (content/callouts.css), not from the rhythm above. */
+    :where(.callout-content > :first-child) {
+      margin-block-start: revert-layer;
+    }
+
+    /* Paragraphs and inline text */
+    p {
+      unicode-bidi: plaintext;
+    }
+    :is(strong, b) {
+      font-weight: var(--font-weight-bold);
+    }
+    mark {
+      padding: var(--spacing-mark-y) var(--spacing-mark-x);
+      border-radius: var(--radius-box);
+      background-color: var(--color-highlight);
+      color: var(--color-text);
+      font-weight: var(--font-weight-medium);
+      box-decoration-break: clone;
+    }
+
+    /* Headings: Major Third scale in Instrument Serif. Weight 400: the
+       self-hosted face has one weight, and live rendered its regular glyphs. */
+    :is(h1, h2, h3, h4, h5, h6) {
+      font-family: var(--font-serif);
+      font-weight: var(--font-weight-normal);
+      text-wrap: pretty;
+    }
+    h1 {
+      font-size: var(--text-h1);
+      line-height: var(--text-h1--line-height);
+    }
+    h2 {
+      font-size: var(--text-h2);
+      line-height: var(--text-h2--line-height);
+    }
+    h3 {
+      font-size: var(--text-h3);
+      line-height: var(--text-h3--line-height);
+    }
+    h4 {
+      font-size: var(--text-h4);
+      line-height: var(--text-h4--line-height);
+    }
+    h5 {
+      font-size: var(--text-h5);
+      line-height: var(--text-h5--line-height);
+    }
+    h6 {
+      font-size: var(--text-h6);
+      line-height: var(--text-h6--line-height);
+      text-transform: uppercase;
+    }
+
+    /* Links: gray, underlined on hover. Unresolved wikilinks are dimmed. */
+    /* Links keep the regular weight (even in table headers and highlights)
+       unless they sit in bold text. */
+    a:is(.internal-link, .external-link) {
+      color: var(--color-link);
+      font-weight: var(--font-weight-normal);
+      text-decoration-line: none;
+      cursor: pointer;
+      transition: opacity var(--duration-link) ease-in-out;
+
+      &:hover {
+        color: var(--color-link-hover);
+        text-decoration-line: underline;
+      }
+    }
+    :is(b, strong) a:is(.internal-link, .external-link) {
+      font-weight: var(--font-weight-bold);
+    }
+    mark .internal-link {
+      color: var(--color-text);
+    }
+    a.internal-link.is-unresolved {
+      opacity: var(--opacity-unresolved);
+
+      &:hover {
+        opacity: 1;
+      }
+    }
+    /* The outgoing-arrow icon after external links
+       (digital-garden-base.scss). */
+    a.external-link {
+      padding-inline-end: var(--spacing-external-link);
+      background-image: url("/img/outgoing.svg");
+      background-position: right var(--external-link-icon-offset);
+      background-size: var(--external-link-icon-size);
+      background-repeat: no-repeat;
+    }
+
+    /* Lists. Top-level items indent by 3ch; nested items of the same list
+       type by --spacing-list-indent (Obsidian's selectors, kept as is). */
+    :is(ul, ol) {
+      padding-inline-start: 0;
+    }
+    ul {
+      list-style-type: disc;
+    }
+    :is(ul, ol) > li {
+      position: relative;
+      margin-inline-start: var(--spacing-list-marker);
+      padding-block: var(--spacing-list-item);
+
+      &::marker {
+        color: var(--color-decoration);
+      }
+    }
+    :is(ul ul, ol ol) > li {
+      margin-inline-start: var(--spacing-list-indent);
+    }
+
+    /* Task lists. The live theme masks the whole checkbox with a check
+       mark, so a done task shows a light check and an open task shows
+       nothing; kept for parity. */
+    ul > li.task-list-item {
+      list-style: none;
+    }
+    .task-list-item input[type="checkbox"] {
+      position: relative;
+      flex-shrink: 0;
+      width: var(--size-checkbox);
+      height: var(--size-checkbox);
+      margin: 0;
+      margin-inline-end: var(--spacing-checkbox);
+      padding: 0;
+      border: 1px solid var(--color-decoration);
+      border-radius: var(--radius-checkbox);
+      appearance: none;
+      mask-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='none' viewBox='0 0 20 20'%3e%3cpath fill='black' d='m12.998 6.084-4.17 6.7-1.982-2.56c-.244-.322-.46-.41-.742-.41a.788.788 0 0 0-.782.801c0 .225.088.44.235.635l2.45 3.008c.255.342.528.478.86.478.332 0 .615-.156.82-.478l4.59-7.227c.118-.205.245-.43.245-.644 0-.46-.4-.752-.83-.752-.255 0-.508.156-.694.449Z'/%3e%3c/svg%3e");
+      transition: box-shadow var(--default-transition-duration) ease-in-out;
+
+      &:hover {
+        border-color: var(--color-muted);
+      }
+      &:checked {
+        border: none;
+        background-color: var(--color-text);
+
+        &:hover {
+          background-color: var(--color-checkbox-hover);
+        }
+        &::after {
+          content: "";
+          display: block;
+          position: absolute;
+          top: 0;
+          inset-inline-start: 0;
+          width: var(--size-checkbox);
+          height: var(--size-checkbox);
+          background-color: var(--color-surface);
+          mask-image: inherit;
+          mask-position: center;
+          mask-size: 100% 100%;
+          mask-repeat: no-repeat;
+        }
+      }
+    }
+
+    /* Blockquotes: a raised box with a rounded rule inset on the left. */
+    blockquote {
+      position: relative;
+      margin-inline: 0;
+      padding: var(--spacing-quote);
+      padding-inline-start: calc(
+        2 * var(--spacing-quote) + var(--quote-rule-width)
+      );
+      border-radius: var(--radius-box);
+      corner-shape: var(--corner-shape-soft);
+      background-color: var(--color-surface-raised);
+      font-size: var(--text-quote);
+
+      &::before {
+        content: "";
+        position: absolute;
+        top: var(--spacing-quote);
+        bottom: var(--spacing-quote);
+        inset-inline-start: var(--spacing-quote);
+        width: var(--quote-rule-width);
+        border-radius: var(--radius-box);
+        background-color: var(--color-decoration);
+        pointer-events: none;
+      }
+    }
+
+    /* Horizontal rules */
+    hr {
+      width: 100%;
+      margin-inline: 0;
+      border: none;
+      border-top: var(--rule-width) solid var(--color-border);
+    }
+
+    /* Tables: full width, 1px cell borders (transparent in the header),
+       top-aligned cells. Alignment from Markdown arrives as inline
+       text-align and overrides the start default. */
+    table {
+      min-width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      line-height: var(--text-table--line-height);
+      word-break: break-word;
+    }
+    :is(th, td) {
+      min-width: var(--table-cell-min-width);
+      padding: var(--spacing-cell);
+      overflow: hidden;
+      border: 1px solid var(--color-border);
+      font-size: var(--text-table);
+      text-align: start;
+      text-overflow: ellipsis;
+      white-space: break-spaces;
+      vertical-align: top;
+    }
+    th {
+      border-color: transparent;
+      font-weight: var(--font-weight-bold);
+      line-height: var(--text-table--line-height);
+    }
+
+    /* Images: rounded corners; an image alone in a paragraph is centered
+       (custom.scss). Astro's images carry width and height attributes, so
+       height: auto keeps a narrowed image in proportion. */
+    img {
+      border-radius: var(--radius-box);
+      corner-shape: var(--corner-shape-soft);
+      image-rendering: -webkit-optimize-contrast;
+    }
+    img[data-astro-image] {
+      height: auto;
+    }
+    p > :is(img, picture):only-child,
+    p > picture:only-child img {
+      display: block;
+      margin-inline: auto;
+    }
+
+    /* Footnotes: smaller text; the list, references, and back-links use the
+       list and link rules above. */
+    .footnotes {
+      font-size: var(--text-footnote);
+    }
+
+    /* Math: MathJax inlines its own layout (display blocks are centered with
+       a 1em margin); nothing to add. */
+  }
 }
