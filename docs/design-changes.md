@@ -107,7 +107,9 @@ entry.
 ### Muted text passes WCAG AA
 
 - **Change:** muted text (Recent Posts descriptions and dates, the post
-  footer, search key hints) is #8c8c8c instead of #666. List markers and the
+  footer) is #8c8c8c instead of #666. The "+" between the search key hints
+  also uses it; on its lighter chip it is 3.9:1, better than live's 2.6:1
+  but still below AA. List markers and the
   blockquote rule stay #666; contrast rules for text do not apply to them.
 - **Why:** #666 on the page background is 2.9:1; #8c8c8c is 4.96:1 on the
   page and 4.5:1 on the sidebar.
@@ -189,7 +191,18 @@ entry.
 
 ### Reduced motion
 
-- **Change:** the callout chevron and the copy button no longer animate when
-  the reader asks for reduced motion (tags and footer links already didn't).
+- **Change:** nothing animates when the reader asks for reduced motion. Live
+  stopped only the tag and footer link transitions; link fades, the
+  hamburger, the callout chevron, and the copy button still moved.
 - **Why:** accessibility.
-- **Evidence:** `test/browser/content-styles.test.ts`.
+- **Evidence:** `test/layout/site-layout.test.ts` checks every element of
+  Home and a post at 390px and 1440px.
+
+### Sizes follow the reader's font size
+
+- **Change:** text, code, callouts, math, and spacing scale with the
+  browser's default font size. Live fixed many of them in pixels (callouts
+  and math at 16px, code at 12.8px). At the default 16px nothing changes;
+  at 20px, a post is about 18% longer than live at the same setting. Layout stays intact at 20px and 24px.
+- **Why:** readers who enlarge the default text get larger text everywhere.
+- **Evidence:** computed sizes with Chrome's default font size set to 20px.

@@ -9,9 +9,18 @@
     max-width: var(--container-content);
     margin-block: 0;
     margin-right: auto;
-    /* Never under the file tree (250px + 80px gap); otherwise centered in
-       the viewport, shifted left to leave 350px + 80px + 20px on the right. */
-    margin-left: max(330px, min((100vw - 700px) / 2, 100vw - 1150px));
+    /* Never under the file tree (its minimum width plus the gap); otherwise
+       centered in the viewport, shifted left to leave room on the right for
+       the Digital Garden's 350px side panel (unused here) plus the gap and
+       20px. */
+    margin-left: max(
+      var(--container-sidebar-min) + var(--container-sidebar-gap),
+      min(
+        (100vw - var(--container-content)) / 2,
+        100vw - var(--container-content) - 350px -
+          var(--container-sidebar-gap) - 20px
+      )
+    );
     padding-top: 90px;
     padding-bottom: 60px;
     color: var(--color-text);

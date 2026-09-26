@@ -9,7 +9,7 @@
  */
 @layer components {
   /* Inline code. Code blocks reset the box below. */
-  .markdown-rendered code {
+  .content code {
     padding: 0.25rem 0.4rem;
     border: 1px solid var(--color-border);
     border-radius: var(--radius-code);
@@ -27,7 +27,7 @@
   /* Code blocks. The language label and copy button inherit the block's
      font. (Live left the `pre` on the browser's generic monospace, which is
      Courier on some systems; see docs/design-changes.md.) */
-  .markdown-rendered pre.astro-code {
+  .content pre.astro-code {
     position: relative;
     font-family: var(--font-mono);
     min-height: 38px;
@@ -42,7 +42,7 @@
     tab-size: 4;
   }
 
-  .markdown-rendered pre.astro-code > code {
+  .content pre.astro-code > code {
     padding: 0;
     border: 0;
     background: none;
@@ -57,13 +57,13 @@
   }
 
   /* Every Shiki block carries a `language-*` class. */
-  .markdown-rendered code[class*="language-"] {
+  .content code[class*="language-"] {
     font-weight: var(--font-weight-semibold);
   }
 
   /* Line numbers: Shiki's transformer writes `data-line` on each line. The
      number sits in the block's left padding. */
-  .markdown-rendered pre.astro-code .line[data-line]::before {
+  .content pre.astro-code .line[data-line]::before {
     content: attr(data-line);
     display: inline-block;
     width: 2rem;
@@ -74,7 +74,7 @@
   }
 
   /* Language label, top right. It gives way to the copy button. */
-  .markdown-rendered pre.astro-code[data-language]::before {
+  .content pre.astro-code[data-language]::before {
     content: attr(data-language);
     position: absolute;
     top: 0.5rem;
@@ -89,7 +89,7 @@
   /* Copy button (src/scripts/copyCode.ts adds it). Hidden until the block is
      hovered or holds focus, so it stays reachable by keyboard: tabbing into
      the focusable `pre` or onto the button shows it. */
-  .markdown-rendered pre.astro-code .copy-code-btn {
+  .content pre.astro-code .copy-code-btn {
     position: absolute;
     top: 0.4rem;
     right: 0.5rem;
@@ -121,6 +121,8 @@
 
     &:hover {
       background: color-mix(in srgb, currentColor 10%, transparent);
+      /* Obsidian's --input-shadow-hover. */
+      box-shadow: inset 0 0 0 1px var(--color-border-hover);
     }
 
     &:focus-visible {
@@ -128,14 +130,13 @@
     }
   }
 
-  .markdown-rendered pre.astro-code:is(:hover, :focus-within) .copy-code-btn,
-  .markdown-rendered pre.astro-code .copy-code-btn:focus-visible {
+  .content pre.astro-code:is(:hover, :focus-within) .copy-code-btn,
+  .content pre.astro-code .copy-code-btn:focus-visible {
     opacity: 1;
     pointer-events: auto;
   }
 
-  .markdown-rendered
-    pre.astro-code[data-language]:is(:hover, :focus-within)::before {
+  .content pre.astro-code[data-language]:is(:hover, :focus-within)::before {
     opacity: 0;
   }
 }

@@ -26,8 +26,9 @@ afterEach(() => {
 
 function mount(html: string) {
   root = document.createElement("main");
-  // The content rules are scoped to rendered Markdown (the site's <body>).
-  root.className = "markdown-rendered";
+  // The content rules are scoped to rendered Markdown (the site's <body>)
+  // and code styles to the note column (`main.content`).
+  root.className = "markdown-rendered content";
   root.innerHTML = html;
   document.body.append(root);
 }

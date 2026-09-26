@@ -148,29 +148,31 @@ const recent = [
 </BaseLayout>
 
 <style>
-  .sg-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
-    gap: 1rem;
-    padding: 0;
-    list-style: none;
-  }
-  .sg-swatch {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-    font-size: var(--text-xs);
-    /* Obsidian indents every li by --list-indent for its bullet. */
-    margin-inline-start: 0;
-  }
-  .sg-chip {
-    display: block;
-    height: 3rem;
-    border-radius: var(--radius-box);
-    box-shadow: var(--shadow-input);
-  }
-  .sg-value {
-    color: var(--color-faint);
-    overflow-wrap: anywhere;
+  @layer components {
+    .sg-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+      gap: 1rem;
+      padding: 0;
+      list-style: none;
+    }
+    .sg-swatch {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      font-size: var(--text-xs);
+      /* Browsers indent list items for their bullet. */
+      margin-inline-start: 0;
+    }
+    .sg-chip {
+      display: block;
+      height: 3rem;
+      border-radius: var(--radius-box);
+      box-shadow: var(--shadow-input);
+    }
+    .sg-value {
+      color: var(--color-faint);
+      overflow-wrap: anywhere;
+    }
   }
 </style>

@@ -89,7 +89,7 @@ Phase 2: design system.
 - [x] Port callout collapsing and keyboard toggling.
 - [ ] Port FlexSearch search and tag filtering, escaping inserted text, highlighting safely, and searching on `input`.
 - [ ] Build the search and tag-filtering interface.
-- [ ] Port mobile navigation and file-tree folder state to TypeScript (no Alpine).
+- [ ] Port mobile navigation (and style its `.fullpage-overlay`) and file-tree folder state to TypeScript (no Alpine).
 - [ ] Keep usable fallbacks where JavaScript is not essential.
 
 ## Cutover

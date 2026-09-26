@@ -264,42 +264,64 @@ describe("keyboard access", () => {
 
 describe("reduced motion", () => {
   // Why: readers who ask the system for reduced motion should get no
-  // animated transitions. Transitions are declared in several stylesheets
-  // (tags, footer links, callout chevrons, the copy button), so only the
-  // built page with the media feature emulated shows whether each one
-  // honors it.
-  it("drops transitions when the reader prefers reduced motion", async () => {
-    await withPage(1440, async page => {
-      await page.emulateMedia({ reducedMotion: "reduce" });
-      await page.goto(`${origin}/posts/on-maths-and-engineering/`, {
-        waitUntil: "load",
+  // animated transitions. Transitions are declared in many places (tags,
+  // links, the hamburger, callout chevrons, the copy button), so this checks
+  // every element of pages that have them, at phone and desktop width,
+  // on the built page with the media feature emulated.
+  for (const width of [390, 1440]) {
+    it(`drops every transition at ${width}px when motion is reduced`, async () => {
+      await withPage(width, async page => {
+        await page.emulateMedia({ reducedMotion: "reduce" });
+        const animated: string[] = [];
+        for (const route of ["/", "/posts/on-maths-and-engineering/"]) {
+          await page.goto(origin + route, { waitUntil: "load" });
+          animated.push(
+            ...(await page.evaluate(() =>
+              [...document.querySelectorAll("body *")].flatMap(element => {
+                const style = getComputedStyle(element);
+                // No transition means no animated property or no duration
+                // (Tailwind's `transition-none` clears only the property).
+                const still =
+                  style.transitionProperty === "none" ||
+                  style.transitionDuration
+                    .split(",")
+                    .every(duration => parseFloat(duration) === 0);
+                return still
+                  ? []
+                  : [
+                      `${element.tagName.toLowerCase()}.${[...element.classList].slice(0, 2).join(".")}: ${style.transitionProperty} ${style.transitionDuration}`,
+                    ];
+              })
+            ))
+          );
+        }
+        assert.deepEqual([...new Set(animated)], []);
       });
-      // No transition means no animated property or no duration (Tailwind's
-      // `transition-none` clears the property and keeps the duration).
-      const animated = await page.evaluate(() =>
-        [
-          ".header-tags a.tag",
-          "footer.post-cta a",
-          ".callout-fold svg",
-          "pre.astro-code .copy-code-btn",
-        ].flatMap(selector => {
-          const element = document.querySelector(selector);
-          if (!element) return [`${selector}: missing`];
-          const style = getComputedStyle(element);
-          const still =
-            style.transitionProperty === "none" ||
-            style.transitionDuration
-              .split(",")
-              .every(duration => parseFloat(duration) === 0);
-          return still
-            ? []
-            : [
-                `${selector}: ${style.transitionProperty} ${style.transitionDuration}`,
-              ];
-        })
-      );
-      assert.deepEqual(animated, []);
     });
+  }
+});
+
+describe("print", () => {
+  // Why: the navbar and file tree are fixed-position chrome; printed, they
+  // would repeat over every page of the note. The legacy CSS hid everything
+  // but the note (`body > :not(.print)`); the token styles must too, and
+  // only the print media emulation shows it.
+  it("prints the note without the navigation", async () => {
+    for (const width of [720, 1440]) {
+      await withPage(width, async page => {
+        await page.emulateMedia({ media: "print" });
+        await page.goto(`${origin}/posts/on-maths-and-engineering/`, {
+          waitUntil: "load",
+        });
+        const shown = await page.evaluate(() =>
+          [...document.body.children]
+            .filter(element => getComputedStyle(element).display !== "none")
+            .map(element => element.tagName.toLowerCase())
+            .filter(tag => tag !== "script")
+        );
+        assert.deepEqual(shown, ["main"], `${width}px`);
+      });
+    }
   });
 });
 
@@ -307,9 +329,9 @@ describe("accessibility checks (axe-core)", () => {
   // Known issues that the live site has too, matched by rule and target.
   // They are listed, not ignored: each must still occur somewhere (so the
   // list shrinks when one is fixed), and any other violation fails.
-  // - color-contrast: muted #666 text on #1e1e1e (2.9:1) in Recent Posts
-  //   and the post footer, and some callout titles. Fixing it changes the
-  //   design, so it waits for a decision.
+  // - color-contrast: the vault's `aside` callout title color (#7f849c,
+  //   3.98:1 on its tinted background). It comes from the Obsidian vault
+  //   through /sync-callouts, so the fix belongs there.
   // - scrollable-region-focusable: a callout whose math overflows at phone
   //   width scrolls sideways with nothing keyboard-focusable inside.
   // - link-in-text-block: internal links distinguished from body text by
@@ -318,7 +340,7 @@ describe("accessibility checks (axe-core)", () => {
     {
       rule: "color-contrast",
       target:
-        /^(li:nth-child\(\d+\) > p|time\[datetime=".+"\]|footer > p|\.callout-title-inner)$/,
+        /^div\[data-callout="aside"\] > \.callout-title > \.callout-title-inner$|^\.callout-title-inner$/,
     },
     {
       rule: "scrollable-region-focusable",

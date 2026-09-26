@@ -680,6 +680,22 @@ Eleventy's markdown-it options. Olaolu put all resulting items in scope.
   to tokens.
 - Evidence harness (scratchpad, not committed): full-page screenshots of all
   15 pages at 1440 and 390 against the phase 1 baseline; step 1 diff 0%.
+- Work happens on `astro-rewrite-phase2` until Olaolu approves the legacy
+  removal checkpoint. Four worktree agents restyled navigation; header,
+  footer, Recent Posts, 404; Markdown typography; code and callouts. An
+  adversarial review found 10 issues (print, tests only on the legacy build,
+  stale axe allowlist, reduced motion, copy button hover, synthesized bold,
+  rem sizing, key-hint contrast claim, overlay styles, hygiene); all fixed.
+- `LEGACY_CSS=off` is the target state. `npm run test:layout` runs the
+  layout suite on both builds, because legacy `!important` rules hide phase 2
+  changes (callout icons, heading letter-spacing, Recent Posts alignment) in
+  the legacy build.
+- Olaolu's rule: fix inherited Obsidian defects like a regular website
+  (checkboxes, footnotes heading, heading letter-spacing, list indent) and
+  log each in docs/design-changes.md.
+- Open for the checkpoint: `link-in-text-block` (links distinguished by color
+  only) and the focusable scroll region for wide math in callouts remain on
+  the axe allowlist.
 
 ## Verification and deployment
 

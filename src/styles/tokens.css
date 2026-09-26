@@ -130,6 +130,8 @@
   --container-content: 700px;
   --container-sidebar: 17.5rem;
   --container-sidebar-min: 250px;
+  /* Between the file tree and the note column (--dg-filetree-gap). */
+  --container-sidebar-gap: 80px;
 
   /* Phones and small tablets end below md; desktop navigation starts at
      lg (live: innerWidth >= 1000); the content column stops widening at xl. */
@@ -230,11 +232,10 @@
   --spacing-external-link: 1rem;
 
   /* Task-list checkboxes. Obsidian --checkbox-size, --checkbox-radius, the
-     6px margin-inline-end, and --checkbox-color-hover (#dadada at 80%). */
+     and 6px margin-inline-end. */
   --size-checkbox: 1rem;
   --radius-checkbox: 4px;
   --spacing-checkbox: 6px;
-  --color-checkbox-hover: rgb(from var(--color-text) r g b / 80%);
 
   /* Agent C2 additions */
   /* Code, inline and in blocks: Obsidian's --code-size (0.8em of the

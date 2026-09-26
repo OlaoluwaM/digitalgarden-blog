@@ -55,11 +55,6 @@
     :where(blockquote > :last-child) {
       margin-block-end: 0;
     }
-    /* A callout's first block takes its top margin from the callout styles
-       (content/callouts.css), not from the rhythm above. */
-    :where(.callout-content > :first-child) {
-      margin-block-start: revert-layer;
-    }
 
     /* Paragraphs and inline text */
     p {

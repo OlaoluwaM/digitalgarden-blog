@@ -60,4 +60,23 @@
   img {
     max-width: 100%;
   }
+
+  /* Instrument Serif has one weight. Bold inside a heading would otherwise
+     be synthesized; live rendered the regular glyphs. */
+  :is(h1, h2, h3, h4, h5, h6) {
+    font-synthesis-weight: none;
+  }
+
+  /* Readers who ask for reduced motion get no transitions or animations
+     anywhere. `!important` beats every normal declaration in any layer. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      transition-duration: 0s !important;
+      animation-duration: 0s !important;
+      animation-iteration-count: 1 !important;
+      scroll-behavior: auto !important;
+    }
+  }
 }

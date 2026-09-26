@@ -18,7 +18,7 @@
     "test": "npm run typecheck && npm run test:unit && npm run test:components && npm run test:layout && npm run test:browser",
     "test:unit": "node --test \"test/*.test.{ts,js}\"",
     "test:components": "vitest run --config vitest.astro.config.mts",
-    "test:layout": "node --env-file-if-exists=.env.browser.local --test --test-isolation=none \"test/layout/*.test.ts\"",
+    "test:layout": "node --env-file-if-exists=.env.browser.local --test --test-isolation=none \"test/layout/*.test.ts\" && cross-env LEGACY_CSS=off node --env-file-if-exists=.env.browser.local --test --test-isolation=none \"test/layout/*.test.ts\"",
     "test:browser": "node --env-file-if-exists=.env.browser.local node_modules/vitest/vitest.mjs run --config vitest.browser.config.mts",
     "browser": "node --env-file-if-exists=.env.browser.local node_modules/agent-browser/bin/agent-browser.js",
     "test:posts": "node --test --test-isolation=none test/posts.test.ts",

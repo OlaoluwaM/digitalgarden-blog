@@ -9,7 +9,7 @@
      value, as in layout.css. */
   .filetree-wrapper {
     width: max(
-      (100vw - var(--container-content)) / 2 - --spacing(20),
+      (100vw - var(--container-content)) / 2 - var(--container-sidebar-gap),
       var(--container-sidebar-min)
     );
 
