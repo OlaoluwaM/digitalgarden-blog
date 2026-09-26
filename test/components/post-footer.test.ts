@@ -18,14 +18,18 @@ beforeAll(async () => {
 });
 
 describe("PostFooter", () => {
-  // Why: pins the footer to the exact live markup (tag, class, and full copy)
-  // so a rewording or a dropped sentence is caught immediately, not noticed
-  // only on a visual diff against thunk.blog.
+  // Why: pins the footer to its exact tags, href/target/rel attributes, and
+  // full copy so a rewording or a dropped sentence is caught immediately, not
+  // noticed only on a visual diff against thunk.blog. `class` attributes are
+  // stripped first: phase 2 styles this component with Tailwind utilities
+  // (ADR 0003), and pinning that string would make the test fail on every
+  // styling change instead of only on a markup or copy change.
   it("renders the live footer markup exactly, whitespace normalized", async () => {
     const html = await container.renderToString(PostFooter, {});
-    const normalized = html.replace(/\s+/g, " ").trim();
+    const withoutClasses = html.replace(/\s+class="[^"]*"/g, "");
+    const normalized = withoutClasses.replace(/\s+/g, " ").trim();
     expect(normalized).toBe(
-      '<footer class="post-cta"><p>That\'s all folks. If you like what you see, ' +
+      "<footer><p>That's all folks. If you like what you see, " +
         'feel free to connect with me on <a href="https://www.linkedin.com/in/olaoluwam/" ' +
         'target="_blank" rel="noopener noreferrer">LinkedIn</a> or follow me on ' +
         '<a href="https://x.com/ola_musta" target="_blank" rel="noopener noreferrer">X</a> or ' +

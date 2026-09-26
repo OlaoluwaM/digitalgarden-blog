@@ -17,26 +17,41 @@ function tagHref(tag: string): string {
 ---
 
 <header>
-  <h1>{title}</h1>
+  <h1 class="font-serif font-normal text-h1 tracking-normal mt-7 mb-11">
+    {title}
+  </h1>
   <div class="header-meta">
-    <div class="header-tags">
+    <div class="header-tags flex flex-wrap gap-2">
       {
         tags.map((tag: string) => (
-          <a class="tag" href={tagHref(tag)}>
+          <a
+            class="tag inline-flex h-8 items-center justify-center whitespace-nowrap rounded-tag border-0 border-solid border-link/20 bg-link/10 px-2 py-1 text-[0.875em] leading-none font-medium text-link no-underline shadow-input transition-colors motion-reduce:transition-none"
+            href={tagHref(tag)}
+          >
             #{tag}
           </a>
         ))
       }
     </div>
-    <div class="timestamps">
-      <div title="Created at" aria-label="Created at">
-        <Icon name="calendar-plus" />{" "}
+    <div
+      class="timestamps mt-5 flex gap-2.5 text-[0.8em] text-muted tabular-nums"
+    >
+      <div
+        title="Created at"
+        aria-label="Created at"
+        class="flex items-center gap-[3px]"
+      >
+        <Icon name="calendar-plus" class="size-4" />{" "}
         <time class="human-date" datetime={published}>
           {formatNoteDate(published)}
         </time>
       </div>
-      <div title="Updated at" aria-label="Updated at">
-        <Icon name="calendar-clock" />{" "}
+      <div
+        title="Updated at"
+        aria-label="Updated at"
+        class="flex items-center gap-[3px]"
+      >
+        <Icon name="calendar-clock" class="size-4" />{" "}
         <time class="human-date" datetime={last_updated}>
           {formatNoteDate(last_updated)}
         </time>

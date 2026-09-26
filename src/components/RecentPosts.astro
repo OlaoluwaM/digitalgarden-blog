@@ -13,19 +13,34 @@ const { posts } = Astro.props;
 
 {
   posts.length > 0 && (
-    <section class="recent-notes">
-      <h2>Recent Posts</h2>
-      <ul>
+    <section class="recent-notes mt-8">
+      <h2 class="font-serif font-normal text-h2 tracking-normal mt-[1.75em] mb-7">
+        Recent Posts
+      </h2>
+      <ul class="my-7 list-none p-0">
         {posts.map(post => (
-          <li>
-            <a href={post.data.pluginProps.permalink} class="internal-link">
+          <li
+            class:list={[
+              "relative mb-5 py-[0.175em] last:mb-0",
+              // Obsidian's list indent (`.markdown-rendered ul > li { margin-inline-start: 3ch }`).
+              // Kept for now per the phase 2 parity decision on this list; drop
+              // this utility once that decision changes.
+              "ml-[3ch]",
+            ]}
+          >
+            <a
+              href={post.data.pluginProps.permalink}
+              class="internal-link text-link no-underline hover:text-link-hover hover:underline"
+            >
               {post.data.rawNoteProps.title}
             </a>
             {metaDescription(post.data.rawNoteProps.description) && (
-              <p>{metaDescription(post.data.rawNoteProps.description)}</p>
+              <p class="m-0 text-[0.9rem] text-faint">
+                {metaDescription(post.data.rawNoteProps.description)}
+              </p>
             )}
             <time
-              class="human-date recent-note-date"
+              class="human-date recent-note-date mt-[0.4rem] block text-xs text-faint not-italic"
               datetime={post.data.rawNoteProps.published}
             >
               {formatNoteDate(post.data.rawNoteProps.published)}

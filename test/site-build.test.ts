@@ -176,7 +176,13 @@ describe("the stylesheet bundle (ADR 0003)", () => {
     for (const page of site.pages) {
       const main = documents.get(page)!.querySelector("main");
       for (const element of main?.querySelectorAll("*") ?? []) {
-        if (element.closest("header, footer, section.recent-notes")) continue;
+        // `main.centered` is the 404 page's own chrome (src/pages/404.astro),
+        // not rendered Markdown: it carries utility classes the same way
+        // header/footer/Recent Posts do.
+        if (
+          element.closest("header, footer, section.recent-notes, main.centered")
+        )
+          continue;
         for (const name of element.classList.values())
           if (utilities.has(name)) collisions.add(`${page}: .${name}`);
       }

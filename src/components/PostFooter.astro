@@ -1,26 +1,36 @@
 ---
 // T2 (phase 1): the social call-to-action footer on posts.
+// Idle/hover colors and the transition itself are all expressible as
+// utilities, unlike the header tags (see src/styles/components/header.css):
+// the live `.post-cta p a:hover` rule isn't guarded by `@media (hover: hover)`.
+const linkClass =
+  "text-muted underline transition-colors hover:text-text motion-reduce:transition-none";
 ---
 
-<footer class="post-cta">
-  <p>
+<footer class="post-cta mt-12 border-t border-border pt-5">
+  <p class="m-0 text-xs text-faint">
     That's all folks. If you like what you see, feel free to connect with me on <a
+      class={linkClass}
       href="https://www.linkedin.com/in/olaoluwam/"
       target="_blank"
       rel="noopener noreferrer">LinkedIn</a
     > or follow me on <a
+      class={linkClass}
       href="https://x.com/ola_musta"
       target="_blank"
       rel="noopener noreferrer">X</a
     > or <a
+      class={linkClass}
       href="https://bsky.app/profile/olamusta.bsky.social"
       target="_blank"
       rel="noopener noreferrer">Bluesky</a
     >. I also stream sometimes @ola_musta on <a
+      class={linkClass}
       href="https://www.twitch.tv/ola_musta"
       target="_blank"
       rel="noopener noreferrer">Twitch</a
     > and <a
+      class={linkClass}
       href="https://www.youtube.com/@ola_musta"
       target="_blank"
       rel="noopener noreferrer">Youtube</a

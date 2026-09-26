@@ -213,11 +213,15 @@ describe("keyboard access", () => {
   // Why: obsidian-base.scss removes focus outlines globally and
   // user/custom.scss restores them with `:focus-visible`. New elements
   // (real <button>s, tag links, <summary>) must still show a ring when
-  // reached by keyboard, or keyboard users lose their place.
+  // reached by keyboard, or keyboard users lose their place. Matching is by
+  // tag name + a required class, not the full class list: phase 2 (ADR 0003)
+  // styles tag links with Tailwind utilities, and pinning the exact class
+  // string here would fail on every styling change instead of only when a
+  // control stops being reachable or loses its ring.
   it("shows a focus ring on every control reached with Tab", async () => {
     await withPage(1440, async page => {
       await page.goto(`${origin}/posts/be-deliberate/`, { waitUntil: "load" });
-      const reached = new Set<string>();
+      const reached: { label: string; tag: string; classes: string[] }[] = [];
       for (let step = 0; step < 12; step++) {
         await page.keyboard.press("Tab");
         const focused = await page.evaluate(() => {
@@ -225,6 +229,8 @@ describe("keyboard access", () => {
           if (!element || element === document.body) return null;
           const style = getComputedStyle(element);
           return {
+            tag: element.tagName.toLowerCase(),
+            classes: [...element.classList],
             label: `${element.tagName.toLowerCase()}.${[...element.classList].join(".")}`,
             outline:
               style.outlineStyle !== "none" &&
@@ -232,23 +238,24 @@ describe("keyboard access", () => {
           };
         });
         if (!focused) continue;
-        reached.add(focused.label);
+        reached.push(focused);
         assert.ok(
           focused.outline,
           `${focused.label} has no visible focus ring`
         );
       }
       for (const expected of [
-        "button.search-button.align-icon",
-        "summary.foldername-wrapper.align-icon",
-        "a.tag",
+        { tag: "button", requiredClass: "search-button" },
+        { tag: "summary", requiredClass: "foldername-wrapper" },
+        { tag: "a", requiredClass: "tag" },
       ]) {
-        // Utility classes follow the legacy class names in the label.
         assert.ok(
-          [...reached].some(
-            label => label === expected || label.startsWith(`${expected}.`)
+          reached.some(
+            r =>
+              r.tag === expected.tag &&
+              r.classes.includes(expected.requiredClass)
           ),
-          `Tab never reached ${expected}; reached ${[...reached].join(", ")}`
+          `Tab never reached ${expected.tag}.${expected.requiredClass}; reached ${reached.map(r => r.label).join(", ")}`
         );
       }
     });
