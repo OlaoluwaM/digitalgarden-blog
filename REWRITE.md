@@ -41,7 +41,7 @@
 - [x] Turn off smart punctuation to match Eleventy.
 - [x] Add `external-link`/`internal-link` classes and `target="_blank"` to links.
 - [x] Render inline math at build time.
-- [ ] Remove unexplained Markdown and Shiki warnings.
+- [x] Remove unexplained Markdown and Shiki warnings.
 
 ## Routes and Data
 
@@ -53,8 +53,9 @@
 
 ## Client Behavior
 
-- [ ] Port search and tag filtering.
-- [ ] Port mobile navigation logic.
+- [x] Port callout collapsing and keyboard toggling.
+- [ ] Port FlexSearch search and tag filtering.
+- [ ] Port mobile navigation and file-tree folder state to TypeScript (no Alpine).
 - [ ] Keep usable fallbacks where JavaScript is not essential.
 
 ## Markup and CSS
@@ -66,6 +67,7 @@
 - [ ] Load the Sass layers in the existing order.
 - [ ] Match titles, tags, dates, footer, and links.
 - [ ] Match callout title markup and styles.
+- [ ] Add callout icons from the theme's `--callout-icon` with Lucide.
 - [ ] Rebuild the Recent Posts list.
 - [ ] Port the navbar and home link.
 - [ ] Port the file tree.
@@ -83,4 +85,6 @@
 - [ ] Test a Vercel preview.
 - [ ] Switch Vercel to Astro and restore working default build/start scripts.
 - [ ] Update the README and publishing instructions.
+- [ ] Document each Markdown plugin and the Eleventy behavior it replaces.
 - [ ] Remove Eleventy and migration-only code.
+- [ ] Add `"type": "module"` to `package.json` to remove `MODULE_TYPELESS_PACKAGE_JSON` warnings.

@@ -26,6 +26,7 @@
     "test:math": "node --test --test-isolation=none test/math.test.ts",
     "test:smart-punctuation": "node --test --test-isolation=none test/smart-punctuation.test.ts",
     "test:copy-code": "npm run test:browser -- copyCode",
+    "test:callouts-browser": "npm run test:browser -- callouts",
     "test:images": "node --test --test-isolation=none test/digital-garden-images.test.ts",
     "test:images-plugin": "node --test --test-isolation=none test/images-plugin.test.ts",
     "test:images-build": "node --test --test-isolation=none test/images-build.test.ts",

@@ -470,6 +470,60 @@ Eleventy's markdown-it options. Olaolu put all resulting items in scope.
   errors render as MathJax error output, as in Eleventy, without failing the
   build.
 
+### Remaining Node warning (deferred 2026-09-25)
+
+- The Markdown and Shiki warnings are gone. Builds and `npm test` still emit
+  `MODULE_TYPELESS_PACKAGE_JSON` when Node runs ESM `.ts` files directly
+  (the wikilink-index generator, tests, and imported `src` modules).
+- A `.mts` rename only moves the warning to imported `.ts` modules such as
+  `src/content/permalinks.ts`. `"type": "module"` would fix it but breaks the
+  CommonJS Eleventy config, helpers, and data files.
+- Olaolu deferred the fix until Eleventy is removed (cutover checklist). Do not
+  suppress it with flags or nested `package.json` files in the meantime.
+- Before removing Eleventy, document each Markdown plugin against the Eleventy
+  behavior it replaces (cutover checklist), while the reference still exists.
+
+### Client behavior decisions (2026-09-26)
+
+- Search: port Eleventy's FlexSearch search (`searchScript.njk`: previews,
+  keyboard navigation, highlighting, tag search via `toggleTagSearch`) over a
+  rebuilt `/searchIndex.json`. This supersedes the earlier Pagefind idea.
+- Alpine.js (mobile hamburger/overlay, per-path persisted folder state in
+  `filetree.njk`) is replaced with tested vanilla TypeScript modules; no
+  Alpine or CDN scripts.
+- Pattern: write behavior as TS modules bound to Eleventy's DOM contract, test
+  them in Chrome with Vitest (like `copyCode.ts`), and wire them in at the
+  layout stage when the markup does not exist yet.
+- Callouts first: Astro already emits callout markup. Eleventy's
+  `calloutScript.njk` gives `.callout.is-collapsible` titles `tabindex="0"`,
+  `role="button"`, and `aria-expanded`, and toggles `is-collapsed` on click,
+  Enter, or Space. Hiding the content is CSS. Icons read the theme's
+  `--callout-icon` and use Lucide, so they wait for the CSS stage.
+- Eleventy makes only top-level callouts collapsible (nested ones need
+  `+`/`-`); the Astro HAST plugin makes every callout collapsible. Olaolu kept
+  the Astro behavior on 2026-09-26.
+
+### Callout toggles (2026-09-26)
+
+- `src/scripts/callouts.ts` (Olaolu's implementation) exports
+  `initializeCalloutToggles()`. For each `.callout.is-collapsible`, its direct
+  `:scope > .callout-title` gets `tabindex="0"`, `role="button"`, and
+  `aria-expanded`; click, Enter, and Space toggle `is-collapsed` on the
+  callout and `aria-expanded` on the title. A `has-callout-toggle` marker
+  prevents duplicate listeners. Both page routes call it beside
+  `initializeCopyButtons()`. Eleventy's runtime icon and auto-collapsible code
+  is not ported: the HAST plugin marks every callout at build time, and icons
+  wait for the CSS stage.
+- Not written test-first. `npm run test:callouts-browser` runs 13 Chrome tests;
+  they were then checked against seven broken module variants (state on the
+  wrong element, missing guard, no `preventDefault`, Enter only, all callouts,
+  fixed initial ARIA), and each variant fails at least one test.
+- Verified: 316 Node tests and 28 Chrome tests, TypeScript, Prettier, and a
+  forced 14-page build. On `astro preview`, agent-browser saw both Maths
+  callout titles as expanded buttons; clicking the nested aside, then Enter
+  and Space on the outer note, toggled only the targeted callout, with no page
+  errors on the Maths page or home. Collapse is not visible until the CSS stage.
+
 ## Verification and deployment
 
 ```sh

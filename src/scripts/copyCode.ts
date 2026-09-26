@@ -1,4 +1,4 @@
-const COPY_BUTTON_CLASS_NAME = "has-copy-button"; // TODO: Needs a better name
+const COPY_BUTTON_CLASS_NAME = "has-copy-button";
 
 export function initializeCopyButtons() {
   document.querySelectorAll("pre.astro-code").forEach(pre => {
