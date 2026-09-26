@@ -5,6 +5,7 @@ import { defineHastPlugin, markdownToHtml } from "satteri";
 import type { Element, ElementContent, Text } from "hast";
 
 import { hastAdmonitionCalloutPlugin } from "../src/plugins/hast/callout.ts";
+import { calloutIconToHast } from "../src/plugins/hast/lucide-icon.ts";
 import { mkmdastAdmonitionCalloutPlugin } from "../src/plugins/mdast/admonitions.ts";
 import { mkmdastWikilinksPlugin } from "../src/plugins/mdast/wikilinks.ts";
 
@@ -829,12 +830,31 @@ describe("callout title icon and fold", () => {
     assert.equal(svg.getAttribute("data-lucide"), "pencil");
   });
 
-  it("emits an empty <i data-lucide> for an Obsidian icon name Lucide doesn't ship, like quote's quote-glyph", () => {
-    const element = callout("> [!quote] Title\n>\n> Body");
-    const placeholder = required(icon(element), "i");
-    assert.equal(placeholder.getAttribute("data-lucide"), "quote-glyph");
-    assert.equal(placeholder.innerHTML, "");
-    assert.equal(icon(element).querySelector("svg"), null);
+  // Why: Obsidian's quote icon (`quote-glyph`) is not in Lucide, so live
+  // showed quote callouts without an icon. The Lucide `quote` icon replaces
+  // it deliberately; this pins the rendered result, not just the map entry.
+  it("renders Lucide's quote icon for quote and cite callouts", () => {
+    for (const type of ["quote", "cite"]) {
+      const element = callout(`> [!${type}] Title\n>\n> Body`);
+      const svg = required(icon(element), "svg");
+      assert.equal(svg.getAttribute("data-lucide"), "quote");
+      assert.equal(svg.getAttribute("class"), "lucide lucide-quote");
+      assert.equal(svg.querySelectorAll("path").length, 2);
+    }
+  });
+
+  // Why: no callout type maps to a missing icon today, but the map is
+  // synced from Obsidian, which has icons Lucide lacks. The helper must
+  // then emit the live site's empty placeholder instead of failing the
+  // build. No Markdown fixture reaches this path, so the helper is called
+  // directly.
+  it("emits an empty <i data-lucide> for an icon name Lucide doesn't ship", () => {
+    assert.deepEqual(calloutIconToHast("quote-glyph"), {
+      type: "element",
+      tagName: "i",
+      properties: { dataLucide: "quote-glyph" },
+      children: [],
+    });
   });
 
   it("renders the chevron-down fold icon for every collapsible callout", () => {

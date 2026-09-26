@@ -1,5 +1,135 @@
 /*
  * Rendered Markdown: inline code and Shiki code blocks (line numbers, language label, copy button).
+ *
+ * Sources: Obsidian's `.markdown-rendered code` and `pre` rules (resolved
+ * from the live theme's computed styles), src/site/styles/user/
+ * code-blocks.scss, and custom.scss (`code[class*="language-"]`). Shiki
+ * writes each block's background and text color as inline styles
+ * (the `dark-plus` theme); these rules never set them on the `pre`.
  */
 @layer components {
+  /* Inline code. Code blocks reset the box below. */
+  .markdown-rendered code {
+    padding: 0.25rem 0.4rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-code);
+    corner-shape: var(--corner-shape-soft);
+    background-color: var(--color-surface-raised);
+    color: var(--color-code);
+    font-family: var(--font-mono);
+    font-size: var(--text-code);
+    /* Keeps a code span on one line. */
+    white-space: nowrap;
+    /* Obsidian's: if a span ever breaks, each piece gets the full box. */
+    box-decoration-break: clone;
+  }
+
+  /* Code blocks. The `pre` keeps the browser's monospace font, which the
+     language label and copy button inherit (as on live). */
+  .markdown-rendered pre.astro-code {
+    position: relative;
+    min-height: 38px;
+    /* The wide left padding holds the line numbers. */
+    padding: 1rem 1rem 1rem 2.25rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-box);
+    corner-shape: var(--corner-shape-soft);
+    overflow-x: auto;
+    /* Long lines wrap instead of scrolling. */
+    white-space: pre-wrap;
+    tab-size: 4;
+  }
+
+  .markdown-rendered pre.astro-code > code {
+    padding: 0;
+    border: 0;
+    background: none;
+    line-height: var(--text-code--line-height);
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    word-break: normal;
+    word-spacing: normal;
+    text-align: left;
+    hyphens: none;
+    direction: ltr;
+  }
+
+  /* Every Shiki block carries a `language-*` class. */
+  .markdown-rendered code[class*="language-"] {
+    font-weight: var(--font-weight-semibold);
+  }
+
+  /* Line numbers: Shiki's transformer writes `data-line` on each line. The
+     number sits in the block's left padding. */
+  .markdown-rendered pre.astro-code .line[data-line]::before {
+    content: attr(data-line);
+    display: inline-block;
+    width: 2rem;
+    margin-right: 0.5rem;
+    margin-left: -2.5rem;
+    text-align: right;
+    opacity: 0.3;
+  }
+
+  /* Language label, top right. It gives way to the copy button. */
+  .markdown-rendered pre.astro-code[data-language]::before {
+    content: attr(data-language);
+    position: absolute;
+    top: 0.5rem;
+    right: 0.75rem;
+    font-size: var(--text-2xs);
+    line-height: var(--text-2xs--line-height);
+    text-transform: capitalize;
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  /* Copy button (src/scripts/copyCode.ts adds it). Hidden until the block is
+     hovered or holds focus, so it stays reachable by keyboard: tabbing into
+     the focusable `pre` or onto the button shows it. */
+  .markdown-rendered pre.astro-code .copy-code-btn {
+    position: absolute;
+    top: 0.4rem;
+    right: 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    /* Obsidian's --input-height. */
+    height: 32px;
+    padding: 0.25rem 0.5rem;
+    border: 0;
+    border-radius: var(--radius-key);
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    box-shadow: var(--shadow-input);
+    color: inherit;
+    font-family: inherit;
+    font-size: var(--text-2xs);
+    font-weight: var(--font-weight-medium);
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--default-transition-duration)
+      var(--default-transition-timing-function);
+
+    &:hover {
+      background: color-mix(in srgb, currentColor 10%, transparent);
+    }
+
+    &:focus-visible {
+      box-shadow: var(--shadow-focus);
+    }
+  }
+
+  .markdown-rendered pre.astro-code:is(:hover, :focus-within) .copy-code-btn,
+  .markdown-rendered pre.astro-code .copy-code-btn:focus-visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .markdown-rendered
+    pre.astro-code[data-language]:is(:hover, :focus-within)::before {
+    opacity: 0;
+  }
 }

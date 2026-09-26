@@ -59,6 +59,16 @@ function parseCalloutIconsFromCss(cssPath: string): Map<string, string> {
   return found;
 }
 
+// Deliberate departures from the CSS sources, as [source icon, map icon].
+// Obsidian's quote/cite callouts declare `quote-glyph`, which Lucide does
+// not ship, so live showed no icon; the Astro site uses Lucide's `quote`
+// (ADR 0003 phase 2). Each entry records the source value too, so a change
+// to the source still fails the drift check below.
+const DELIBERATE_OVERRIDES: Readonly<Record<string, [string, string]>> = {
+  quote: ["quote-glyph", "quote"],
+  cite: ["quote-glyph", "quote"],
+};
+
 function parseCalloutIconsFromAllSources(): Map<string, string> {
   const merged = new Map<string, string>();
   for (const source of CALLOUT_ICON_SOURCES) {
@@ -77,10 +87,21 @@ describe("callout icon map", () => {
   // exported map is the only thing that catches drift after someone edits
   // one side and forgets the other -- in particular, re-running
   // `/sync-callouts` must not be able to silently desync icons.
-  it("matches every --callout-icon declaration in the CSS/Sass sources exactly", () => {
+  it("matches every --callout-icon declaration in the CSS/Sass sources, except the listed overrides", () => {
     const fromCss = parseCalloutIconsFromAllSources();
     const defaultFromCss = fromCss.get(DEFAULT_KEY);
     fromCss.delete(DEFAULT_KEY);
+
+    for (const [type, [sourceIcon, mapIcon]] of Object.entries(
+      DELIBERATE_OVERRIDES
+    )) {
+      assert.equal(
+        fromCss.get(type),
+        sourceIcon,
+        `the source's ${type} icon changed; review DELIBERATE_OVERRIDES`
+      );
+      fromCss.set(type, mapIcon);
+    }
 
     assert.equal(
       defaultFromCss,
@@ -103,18 +124,17 @@ describe("callout icon map", () => {
     assert.ok(fromCss.size > 10, `expected many types, found ${fromCss.size}`);
   });
 
-  // Why: documents, in code, the one behavior the plugin can't fully mirror
-  // from CSS -- an Obsidian icon name Lucide doesn't ship. If this ever
-  // stops being true (Lucide adds `quote-glyph`, or a future sync adds
-  // another Obsidian-only name), the callout.test.ts fallback test would
-  // need a different fixture, and this list is the map to check.
-  it("lists every mapped icon name that Lucide's package doesn't export", async () => {
+  // Why: a name Lucide doesn't ship renders as an empty `<i>` (no icon),
+  // which is how live lost the quote icon. Checking the map against the
+  // pinned package catches a sync that copies another Obsidian-only name,
+  // before it silently drops a callout's icon.
+  it("maps every callout type to an icon Lucide's package exports", async () => {
     const lucide = await import("lucide");
     const nonLucideNames = Object.entries(CALLOUT_ICON_NAMES)
       .filter(([, iconName]) => !(toPascalCase(iconName) in lucide))
       .map(([type]) => type);
 
-    assert.deepEqual(nonLucideNames.sort(), ["cite", "quote"]);
+    assert.deepEqual(nonLucideNames, []);
   });
 
   for (const [type, expected] of [
@@ -122,7 +142,8 @@ describe("callout icon map", () => {
     ["info", "info"],
     ["warning", "alert-triangle"],
     ["aside", "message-square"],
-    ["quote", "quote-glyph"],
+    ["quote", "quote"],
+    ["cite", "quote"],
     ["some-completely-unmapped-type", DEFAULT_CALLOUT_ICON_NAME],
   ] as const) {
     it(`resolves "${type}" to "${expected}"`, () => {

@@ -171,7 +171,8 @@
   --container-site-name: 8ch;
   /* The theme's softer corners on rendered code, blocks, and images
      (vendor/obsidian-theme.css --corner-shape): search keys, blockquotes,
-     images. */
+     images, code blocks, callouts. Chrome draws it; other browsers keep
+     round corners. */
   --corner-shape-soft: superellipse(1.1);
   /* Obsidian's button easing (--anim-motion-baseline), which the live
      hamburger kept (obsidian-base.scss). */
@@ -234,4 +235,24 @@
   --radius-checkbox: 4px;
   --spacing-checkbox: 6px;
   --color-checkbox-hover: rgb(from var(--color-text) r g b / 80%);
+
+  /* Agent C2 additions */
+  /* Code, inline and in blocks: Obsidian's --code-size (0.8em of the
+     surrounding text). Code blocks use Obsidian's --line-height-normal
+     (1.6); inline code keeps the line height of its paragraph. */
+  --text-code: 0.8em;
+  --text-code--line-height: 1.6;
+  /* Code block language label and copy button (code-blocks.scss). */
+  --text-2xs: 0.75rem;
+  --text-2xs--line-height: 1.5;
+  /* Callout box and title: Obsidian's --callout-size and
+     --callout-title-size (1rem at the site's 16px root) and the title's
+     --line-height-tight. */
+  --text-callout: 1rem;
+  --text-callout--line-height: 1.5;
+  --text-callout-title: 1rem;
+  --text-callout-title--line-height: 1.3;
+  /* Focus ring shadow on buttons (Obsidian's `button:focus-visible`, 3px of
+     --background-modifier-border-focus), drawn with the outline. */
+  --shadow-focus: 0 0 0 3px var(--color-gray-40);
 }

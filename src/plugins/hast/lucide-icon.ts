@@ -11,8 +11,9 @@ import type { Element } from "hast";
 // class (to match Eleventy's `lucide.createIcons({ attrs: { class:
 // ["svg-icon"] } })` call) and throws on an unknown name, but the live
 // callout markup carries no `svg-icon` class, and an unresolved Obsidian
-// icon name (Lucide has no `quote-glyph`, which Obsidian's `quote`/`cite`
-// callouts use) must degrade gracefully rather than fail the build --
+// icon name (such as Obsidian's `quote-glyph`, which Lucide lacks, copied
+// into the icon map by a future `/sync-callouts`) must degrade gracefully
+// rather than fail the build --
 // `replaceElement` itself only `console.warn`s and leaves the placeholder
 // element in the DOM, and that placeholder's tag/attribute in the live
 // pre-JS HTML is `<i data-lucide="...">`, which is what we reproduce here.

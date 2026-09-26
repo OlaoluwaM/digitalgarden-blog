@@ -1,5 +1,183 @@
 /*
  * Rendered Markdown: callouts (colors per type, title, icon, fold, nesting).
+ *
+ * Markup: src/plugins/hast/callout.ts. Collapse: src/scripts/callouts.ts
+ * toggles `is-collapsed` on the callout. Sources: Obsidian's callout rules
+ * (resolved from the live theme's computed styles),
+ * src/site/styles/user/callout-overrides.scss, and custom.scss.
+ *
+ * Only the callout's own structure lives here. Its body text (paragraphs,
+ * lists, code) uses the ordinary content styles.
  */
 @layer components {
+  /*
+   * Per-type colors, as "R, G, B" so the box can tint them. These are
+   * callout data, not design tokens.
+   *
+   * Built-in types: Obsidian's callout types (src/site/styles/obsidian-base.scss),
+   * resolved to the dark theme's colors as rendered on the live site.
+   * `.callout` alone is the default: note, and any type without a rule.
+   */
+  .callout {
+    --callout-color: 86, 148, 218;
+  }
+  .callout[data-callout="abstract"],
+  .callout[data-callout="summary"],
+  .callout[data-callout="tldr"],
+  .callout[data-callout="important"],
+  .callout[data-callout="tip"],
+  .callout[data-callout="hint"] {
+    --callout-color: 63, 186, 182;
+  }
+  .callout[data-callout="info"],
+  .callout[data-callout="todo"] {
+    --callout-color: 86, 148, 218;
+  }
+  .callout[data-callout="success"],
+  .callout[data-callout="check"],
+  .callout[data-callout="done"] {
+    --callout-color: 72, 196, 90;
+  }
+  .callout[data-callout="question"],
+  .callout[data-callout="help"],
+  .callout[data-callout="faq"],
+  .callout[data-callout="warning"],
+  .callout[data-callout="caution"],
+  .callout[data-callout="attention"] {
+    --callout-color: 219, 134, 80;
+  }
+  .callout[data-callout="failure"],
+  .callout[data-callout="fail"],
+  .callout[data-callout="missing"],
+  .callout[data-callout="danger"],
+  .callout[data-callout="error"],
+  .callout[data-callout="bug"] {
+    --callout-color: 217, 90, 95;
+  }
+  .callout[data-callout="example"] {
+    --callout-color: 142, 125, 194;
+  }
+  .callout[data-callout="quote"],
+  .callout[data-callout="cite"] {
+    --callout-color: 158, 158, 158;
+  }
+
+  /*
+   * Custom types from the Obsidian vault. Copied from
+   * src/site/styles/user/callouts.scss, which `/sync-callouts` writes. That
+   * file is deleted with the legacy CSS, so the skill must write these
+   * rules (and the icon map in src/plugins/hast/callout-icons.ts) instead.
+   */
+  .callout[data-callout="ai-text"] {
+    --callout-color: 116, 227, 161;
+  }
+  .callout[data-callout="wikipedia"] {
+    --callout-color: 232, 230, 227;
+  }
+  .callout[data-callout="highlight"] {
+    --callout-color: 250, 179, 135;
+  }
+  .callout[data-callout="remember"] {
+    --callout-color: 249, 226, 175;
+  }
+  .callout[data-callout="aside"] {
+    --callout-color: 127, 132, 156;
+  }
+  .callout[data-callout="exercise"] {
+    --callout-color: 183, 148, 246;
+  }
+
+  /* The box. Nested callouts get the same box inside their parent's
+     content. */
+  .callout {
+    margin: 1em 0;
+    padding: 1rem;
+    overflow: hidden;
+    border: 1px solid rgba(var(--callout-color), 0.25);
+    border-radius: var(--radius-box);
+    corner-shape: var(--corner-shape-soft);
+    background-color: rgba(var(--callout-color), 0.1);
+    font-family: var(--font-sans);
+    font-size: var(--text-callout);
+    line-height: var(--text-callout--line-height);
+    overflow-wrap: break-word;
+  }
+
+  /* Title row: icon, title text, fold chevron. The toggle script makes a
+     collapsible callout's title a focusable button. */
+  .callout-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: rgb(var(--callout-color));
+    font-size: var(--text-callout-title);
+    line-height: var(--text-callout-title--line-height);
+  }
+
+  .callout.is-collapsible > .callout-title {
+    cursor: pointer;
+  }
+
+  .callout-title-inner {
+    font-weight: var(--font-weight-bold);
+  }
+
+  /* Lucide icons are 24px; draw them at the title's text size. */
+  .callout-icon {
+    display: flex;
+    flex: none;
+    align-items: center;
+    scale: 0.95;
+
+    & svg {
+      width: 1em;
+      height: 1em;
+    }
+  }
+
+  .callout-fold {
+    display: flex;
+    align-items: center;
+
+    & svg {
+      scale: 0.9;
+      transition: transform 100ms ease-in-out;
+    }
+  }
+
+  /* Body. The left margin (icon width plus the title gap) lines the body up
+     with the title text. `overflow-y: hidden` prevents stray vertical
+     scrollbars on text-heavy callouts. */
+  .callout-content {
+    margin-left: calc(1em + 0.5rem);
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  .callout > .callout-content > :first-child {
+    margin-top: 0.5rem;
+  }
+
+  .callout > .callout-content > :last-child {
+    margin-bottom: 0;
+  }
+
+  /* Nested callouts sit a little further from the text above them. One that
+     opens its parent's body gets more room than the first line of text. */
+  .callout-content .callout {
+    margin-top: 1.25rem;
+  }
+
+  .callout > .callout-content > .callout:first-child {
+    margin-top: 1.2rem;
+  }
+
+  /* Collapsed: hide the body and point the chevron right. */
+  .callout.is-collapsed > .callout-content {
+    display: none;
+  }
+
+  .callout.is-collapsed > .callout-title > .callout-fold svg {
+    transform: rotate(-90deg);
+  }
 }
