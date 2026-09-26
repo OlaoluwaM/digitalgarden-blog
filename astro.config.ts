@@ -33,12 +33,27 @@ const styleGuide: AstroIntegration = {
   },
 };
 
+// ADR 0003 phase 2: `LEGACY_CSS=off` builds without the legacy Eleventy
+// cascade, so the token-based styles can be checked on their own. Removed
+// with the legacy stylesheets.
+const legacyStylesheet = fileURLToPath(
+  new URL("./src/styles/legacy/index.scss", import.meta.url)
+);
+const withoutLegacyCss = {
+  name: "without-legacy-css",
+  enforce: "pre" as const,
+  load(id: string) {
+    if (process.env.LEGACY_CSS !== "off") return;
+    if (id.split("?")[0] === legacyStylesheet) return "";
+  },
+};
+
 export default defineConfig({
   site: "https://thunk.blog",
   outDir: "dist-astro",
   integrations: [styleGuide],
   vite: {
-    plugins: [tailwindcss()],
+    plugins: [tailwindcss(), withoutLegacyCss],
   },
   image: {
     layout: "constrained",

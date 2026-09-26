@@ -9,6 +9,20 @@
 
 @import "tailwindcss/theme.css" layer(theme);
 @import "./tokens.css";
+@import "./fonts.css";
+@import "./base.css";
+@import "./layout.css";
+/* Rendered Markdown (a hand-written stylesheet: Markdown output carries no
+   utility classes). */
+@import "./content/typography.css";
+@import "./content/code.css";
+@import "./content/callouts.css";
+/* Chrome: utilities in the templates; these hold what utilities cannot. */
+@import "./components/header.css";
+@import "./components/footer.css";
+@import "./components/recent-posts.css";
+@import "./components/not-found.css";
+@import "./components/navigation.css";
 /*
  * Generate utilities only from the Astro templates and client scripts. The
  * default scans the whole repository, including note text and the Eleventy

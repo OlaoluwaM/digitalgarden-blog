@@ -1,0 +1,49 @@
+# Styles
+
+The Astro site's styles ([ADR 0003](../../docs/adrs/0003-build-a-tailwind-token-design-system-before-cutover.md)).
+Phase 2 is replacing the legacy Eleventy cascade with a Tailwind v4 token
+system.
+
+## Files
+
+| File            | Layer        | Holds                                                                         |
+| --------------- | ------------ | ----------------------------------------------------------------------------- |
+| `global.css`    | —            | Entry: layer order, imports, Tailwind sources.                                |
+| `tokens.css`    | `theme`      | Design tokens (`@theme`). The only colors, fonts, sizes, radii, breakpoints.  |
+| `fonts.css`     | —            | Self-hosted `@font-face` rules.                                               |
+| `base.css`      | `base`       | Element defaults (no Preflight while the legacy layer exists).                |
+| `layout.css`    | `components` | The page frame: where the note column sits beside the file tree.              |
+| `content/`      | `components` | Rendered Markdown. Markdown output carries no utility classes.                |
+| `components/`   | `components` | Chrome rules that utilities cannot express (pseudo-elements, calc, `[open]`). |
+| `legacy/`       | `legacy`     | Phase 1: the Eleventy Sass in live order. Deleted at the end of phase 2.      |
+| `vendor/`       | `legacy`     | The vendored live theme (ADR 0001). Deleted at the end of phase 2.            |
+| `style-guide/`¹ | —            | Dev-only page at `/style-guide/` listing the tokens.                          |
+
+¹ `src/style-guide/`.
+
+Layer order, lowest first: `legacy`, `theme`, `base`, `components`,
+`utilities`. Unlayered CSS beats every layer, so component `<style>` blocks
+must wrap their rules in `@layer components { … }`.
+
+## Conventions
+
+- Use tokens, never raw values: `bg-surface`, `text-faint`, `rounded-box`, or
+  `var(--color-link)` in CSS. Add a token (with its source) before using a new
+  value.
+- Chrome components (header, footer, Recent Posts, navigation, 404) use
+  utility classes in their templates. Put a rule in `components/<name>.css`
+  only when utilities cannot express it, and say why in a comment.
+- Keep the markup and its legacy class names: scripts, tests, and rendered
+  Markdown depend on them. Add utilities beside them.
+- Breakpoints: `md` 800px, `lg` 1000px (desktop navigation), `xl` 1400px. In
+  CSS, use `@variant max-lg { … }`; media queries cannot read custom
+  properties.
+- Headings use Instrument Serif at weight 400. The self-hosted face has one
+  weight, so 700 would synthesize a fake bold; live rendered the regular
+  glyphs.
+
+## Checking parity
+
+`LEGACY_CSS=off npm run build:astro` builds without the legacy layer. Every
+visible difference from the phase 1 site must be intended and recorded in
+[docs/design-changes.md](../../docs/design-changes.md).

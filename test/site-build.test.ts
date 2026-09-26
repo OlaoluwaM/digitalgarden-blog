@@ -142,14 +142,14 @@ describe("the stylesheet bundle (ADR 0003)", () => {
       order.filter(name => name !== "properties"),
       ["legacy", "theme", "base", "components", "utilities"]
     );
-    // `@property` registers custom properties for utilities; it is not a
-    // style rule and cannot be layered.
+    // `@property` (custom properties for utilities) and `@font-face` are
+    // not style rules; layers do not order them.
     const unlayered = topLevel
       .filter(
         node =>
           !(
             node.type === "atrule" &&
-            (node.name === "layer" || node.name === "property")
+            ["layer", "property", "font-face"].includes(node.name)
           )
       )
       .map(node => node.toString().slice(0, 80));

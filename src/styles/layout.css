@@ -1,0 +1,38 @@
+/*
+ * The page frame (ADR 0003 phase 2): where the note column sits beside the
+ * desktop file tree. The margin arithmetic needs calc(), min(), and max(),
+ * which read better here than as arbitrary-value utilities.
+ */
+@layer components {
+  main.content {
+    position: relative;
+    max-width: var(--container-content);
+    margin-block: 0;
+    margin-right: auto;
+    /* Never under the file tree (250px + 80px gap); otherwise centered in
+       the viewport, shifted left to leave 350px + 80px + 20px on the right. */
+    margin-left: max(330px, min((100vw - 700px) / 2, 100vw - 1150px));
+    padding-top: 90px;
+    padding-bottom: 60px;
+    color: var(--color-text);
+    font-size: var(--text-content);
+    line-height: var(--text-content--line-height);
+
+    /* Between lg and xl the file tree keeps its 250px width and the column
+       widens to fill the rest. */
+    @variant max-xl {
+      max-width: calc(100vw - 300px);
+      margin-left: 270px;
+    }
+
+    /* Below lg the file tree is hidden: center the column. */
+    @variant max-lg {
+      max-width: var(--container-content);
+      margin-inline: auto;
+    }
+
+    @variant max-md {
+      padding-top: 75px;
+    }
+  }
+}

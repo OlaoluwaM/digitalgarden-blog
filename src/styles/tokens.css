@@ -125,8 +125,11 @@
   --container-sidebar: 17.5rem;
   --container-sidebar-min: 250px;
 
-  /* Desktop navigation starts at 1000px (live: innerWidth >= 1000). */
+  /* Phones and small tablets end below md; desktop navigation starts at
+     lg (live: innerWidth >= 1000); the content column stops widening at xl. */
+  --breakpoint-md: 800px;
   --breakpoint-lg: 1000px;
+  --breakpoint-xl: 1400px;
 
   --default-transition-duration: 150ms;
   --default-transition-timing-function: ease;

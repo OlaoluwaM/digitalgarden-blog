@@ -1,0 +1,50 @@
+/*
+ * Element defaults (ADR 0003 phase 2), in the `base` layer. Tailwind's
+ * Preflight is not loaded while the legacy CSS exists, so the few resets the
+ * design relies on are declared here.
+ */
+@layer base {
+  *,
+  ::before,
+  ::after {
+    box-sizing: border-box;
+  }
+
+  html,
+  body {
+    height: 100%;
+  }
+
+  body {
+    position: relative;
+    margin: 0;
+    /* The page gutter on every width (Obsidian's --file-margins). */
+    padding: 2rem;
+    /* Propagates to the viewport: no sideways page scroll. */
+    overflow-x: hidden;
+    background-color: var(--color-surface);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    font-size: var(--text-ui);
+    line-height: var(--text-ui--line-height);
+    font-kerning: normal;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background-color: var(--color-selection);
+  }
+
+  /* Keyboard focus only; mouse clicks show no ring. */
+  :focus {
+    outline: none;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-link);
+    outline-offset: 0.3rem;
+  }
+
+  img {
+    max-width: 100%;
+  }
+}
