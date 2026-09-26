@@ -682,7 +682,7 @@ Eleventy's markdown-it options. Olaolu put all resulting items in scope.
   get a tab stop (`src/scripts/scrollRegions.ts`). The only axe allowlist
   entry left is the vault's `aside` callout color (#7f849c, 3.98:1), which
   comes from `/sync-callouts`.
-- `.fullpage-overlay` has no styles yet; the mobile-navigation task adds them.
+- `.fullpage-overlay` is styled by the search and mobile file tree work below.
 
 ### Analytics (2026-09-26)
 
@@ -695,6 +695,51 @@ Eleventy's markdown-it options. Olaolu put all resulting items in scope.
   404 harmlessly.
 - The images-build fixture symlinks `node_modules`; it sets
   `vite.resolve.preserveSymlinks` so dependency `.astro` components compile.
+
+### Search dialog and mobile file tree markup (2026-09-26)
+
+- Olaolu split the search work: Claude built the markup and styles of the
+  search dialog and the open mobile file tree (test-first); Olaolu writes the
+  FlexSearch port, the dialog and navigation scripts, and their tests, in
+  Learn / Guide mode.
+- `src/components/SearchDialog.astro` (rendered once by `NavShell`) is a
+  native `<dialog id="globalsearch">`, and its header comment is the
+  contract with the search script: open with `showModal()`, close with
+  `close()` (a click whose target is the dialog itself is outside the box);
+  `#term` is a combobox (script keeps `aria-expanded`,
+  `aria-activedescendant`); `#search-layout[data-state]` is `idle`,
+  `results`, or `empty`; results are `a.searchresult[role=option]
+[aria-selected]` appended to `#search-results` (listbox); matches are
+  `mark.search-highlight`; the query goes into `.no-results-query` as text;
+  the placeholder shows while `#preview-content` is empty. Script-built
+  markup is styled by class in `src/styles/components/search.css`.
+- After filling the preview, the script must call `initializeScrollRegions()`:
+  callouts with wide math overflow the narrow panel (axe
+  `scrollable-region-focusable`).
+- The preview body is a content root: `content/typography.css` scopes to
+  `:is(main.content, .preview-body)` and `content/code.css` to
+  `:is(.content, .preview-body)`. `search.css` hides the note's header and
+  footer and compacts text, headings, and inline code as live did.
+- Search buttons carry `aria-haspopup="dialog"` and
+  `aria-controls="globalsearch"`; the Ctrl key has `.search-key-modifier`
+  for the Mac ⌘ swap (set its text, not innerHTML).
+- Mobile file tree: the hamburger's `aria-expanded` is the only state
+  (`aria-controls="filetree"`). The `nav-open` custom variant in
+  `global.css` (`:root:has(.hamburger-btn[aria-expanded="true"]) &`) shows
+  `#filetree` and the fixed `.fullpage-overlay` below lg. The navbar and file
+  tree `<nav>`s are named "Site" and "Notes" (axe `landmark-unique` when both
+  show).
+- Live hid the browser's search clear button (Obsidian CSS); it stays
+  hidden. Searching on `input` still matters for paste.
+- Tests: `test/components/search-dialog.test.ts` (markup contract), new
+  NavShell cases, and `test/layout/site-layout.test.ts` (closed/open
+  geometry, each state, selection, highlight, preview placeholder and
+  styling, drawer and overlay, axe with the dialog and drawer open). The
+  layout tests fill the dialog themselves per the contract. Mutation check:
+  9 of 10 CSS/markup mutations fail a test; the survivor (removing one nav
+  label) is equivalent.
+- Design changes logged in `docs/design-changes.md` ("Search dialog and
+  mobile file tree").
 
 ## Verification and deployment
 

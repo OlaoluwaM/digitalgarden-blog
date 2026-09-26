@@ -33,6 +33,13 @@ rules in `@layer components { … }`.
   only when utilities cannot express it, and say why in a comment.
 - Keep the markup's class names (many come from Eleventy): scripts, tests,
   and rendered Markdown depend on them. Add utilities beside them.
+- Markup that a script builds (search results, the search preview) is styled
+  by class in `components/<name>.css`, so the script carries no styling.
+- Scripts set state, and CSS reads it: `aria-expanded` on the hamburger (the
+  `nav-open` variant in `global.css`), `aria-selected` on a search result,
+  `data-state` on the search layout. A component rule that shows or hides an
+  element loses to a utility on the same property, so such elements carry
+  no `display` utilities.
 - Breakpoints: `md` 800px, `lg` 1000px (desktop navigation), `xl` 1400px. In
   CSS, use `@variant max-lg { … }`; media queries cannot read custom
   properties.

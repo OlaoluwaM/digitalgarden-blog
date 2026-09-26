@@ -4,8 +4,7 @@
 // rendered a `div[role=button]` with `onclick`/`onkeydown` handlers; here
 // it's a real `<button>`, which gets the same semantics (focusable,
 // activates on click and Enter/Space, announced as a button) for free.
-// Wiring the search overlay open is a later Client Behavior task, so this
-// button is inert for now.
+// Both copies point at the one SearchDialog; the search script opens it.
 //
 // Styling (ADR 0003 phase 2): the box is the same in both places; the
 // placement sets how it sits in its parent. The button's `color` is
@@ -34,6 +33,8 @@ const keyClass =
       : "mx-0 w-full shrink-0 max-xl:mr-2.5 max-md:m-0.5",
   ]}
   aria-label="Search"
+  aria-haspopup="dialog"
+  aria-controls="globalsearch"
 >
   <span class="search-icon flex items-center">
     <Icon name="search" class="pointer-events-none size-icon opacity-70" />
@@ -46,8 +47,7 @@ const keyClass =
   >
   <span
     class="search-keys rounded-key bg-key-surface px-1.5 py-0.75 text-key-hint text-faint max-lg:py-key-y-narrow max-md:hidden"
-    ><code class={keyClass}>Ctrl</code>&nbsp;+&nbsp;<code class={keyClass}
-      >K</code
-    ></span
+    ><code class:list={["search-key-modifier", keyClass]}>Ctrl</code
+    >&nbsp;+&nbsp;<code class={keyClass}>K</code></span
   >
 </button>

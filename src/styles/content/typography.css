@@ -4,15 +4,16 @@
  * `.markdown-rendered` rules, the vendored theme, and custom.scss); each
  * token names its source in tokens.css.
  *
- * `@scope` limits these rules to the Markdown in the note column: the note
- * header, the post footer, and Recent Posts sit in `main.content` too but
- * style themselves. The 404 page's `main.content` holds no Markdown, and its
- * body lacks the `markdown-rendered` class, as on live. Scoped selectors add
- * no specificity, so `p` stays (0,0,1) and class-based component rules
+ * `@scope` limits these rules to the Markdown in the note column and in the
+ * search preview (a note's `main.content`): the note header, the post
+ * footer, and Recent Posts sit in `main.content` too but style themselves.
+ * The 404 page's `main.content` holds no Markdown, and its body lacks the
+ * `markdown-rendered` class, as on live. Scoped selectors add no
+ * specificity, so `p` stays (0,0,1) and class-based component rules
  * (callouts) still win over it.
  */
 @layer components {
-  @scope (.markdown-rendered main.content) to (header, footer, .recent-notes) {
+  @scope (.markdown-rendered :is(main.content, .preview-body)) to (header, footer, .recent-notes) {
     /* Inherited text behavior (Obsidian sets both on .markdown-rendered). */
     :scope {
       overflow-wrap: break-word;

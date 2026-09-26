@@ -1,0 +1,189 @@
+/*
+ * Search dialog (SearchDialog.astro, whose header describes the markup
+ * contract). The dialog's own markup is styled with utilities; this file
+ * holds what they cannot express:
+ *   - which parts each search state shows (`data-state` on .search-layout),
+ *   - the markup the search script builds (results, highlights, preview),
+ *     so the script carries no styling,
+ *   - the note shown in the preview.
+ * Values: digital-garden-base.scss's search rules, via tokens.
+ */
+@layer components {
+  /* The box never reaches closer to the bottom than it sits to the top. */
+  .search-box {
+    max-height: calc(100vh - 2 * var(--spacing-search-top));
+  }
+
+  /* States. The script sets one after each search; the results list keeps
+     whatever it holds until the next one, so the state alone decides. The
+     elements these rules show and hide, and the results panel's width,
+     carry no utilities for the same properties: utilities would win. */
+  .search-layout:not([data-state="idle"]) .search-idle,
+  .search-layout:not([data-state="results"]) #search-results,
+  .search-layout:not([data-state="empty"]) .no-results,
+  .search-layout:not([data-state="results"]) .search-preview-panel {
+    display: none;
+  }
+
+  /* With results, the list and the preview share the box, from md up.
+     Phones show only the list (live: below 768px). */
+  .search-results-panel {
+    width: 100%;
+  }
+  .search-layout[data-state="results"] .search-results-panel {
+    @variant md {
+      width: 45%;
+      padding-right: calc(var(--spacing) * 3);
+      border-right: 1px solid var(--color-border);
+    }
+  }
+  .search-preview-panel {
+    @variant max-md {
+      display: none;
+    }
+  }
+
+  /* Results. The selected one (`aria-selected`) is outlined: focus stays
+     in the search field, so the outline shows where Enter goes. */
+  .searchresult {
+    display: block;
+    margin-bottom: calc(var(--spacing) * 2);
+    padding: calc(var(--spacing) * 3);
+    border: 2px solid transparent;
+    border-radius: var(--radius-box);
+    background-color: var(--color-surface-sidebar);
+    color: inherit;
+    text-decoration: none;
+    cursor: pointer;
+    transition-property: background-color, border-color;
+    transition-duration: var(--default-transition-duration);
+
+    &:hover {
+      background-color: var(--color-surface-raised);
+    }
+    &[aria-selected="true"] {
+      border-color: var(--color-link);
+      background-color: var(--color-surface-raised);
+    }
+  }
+  .result-title {
+    display: block;
+    margin-bottom: calc(var(--spacing) * 1);
+    color: var(--color-link);
+    font-size: var(--text-result-title);
+    line-height: var(--text-result-title--line-height);
+    font-weight: var(--font-weight-medium);
+  }
+  .result-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: calc(var(--spacing) * 1);
+    margin-bottom: 6px;
+
+    .tag {
+      padding: 1px 6px;
+      border-radius: var(--radius-small);
+      background-color: var(--color-row-hover);
+      color: var(--color-muted);
+      font-size: var(--text-result-tag);
+      line-height: var(--text-result-tag--line-height);
+    }
+  }
+  /* Two lines of context (three on phones, where lines are short). */
+  .result-excerpt {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    color: var(--color-muted);
+    font-size: var(--text-excerpt);
+    line-height: var(--text-excerpt--line-height);
+
+    @variant max-md {
+      -webkit-line-clamp: 3;
+    }
+  }
+
+  /* A match. The text turns the body color: live kept the link or muted
+     gray, which fell below 4.5:1 on the highlight. */
+  .search-highlight {
+    padding: 0 2px;
+    border-radius: var(--radius-search-highlight);
+    background-color: var(--color-search-highlight);
+    color: var(--color-text);
+    font-weight: inherit;
+    box-decoration-break: clone;
+  }
+
+  /* The preview's header. */
+  .preview-title {
+    margin-bottom: calc(var(--spacing) * 2);
+    color: var(--color-link);
+    font-size: var(--text-preview-title);
+    line-height: var(--text-preview-title--line-height);
+    font-weight: var(--font-weight-semibold);
+  }
+  .preview-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: calc(var(--spacing) * 4);
+
+    .tag {
+      padding: 2px 8px;
+      border-radius: var(--radius-key);
+      background-color: var(--color-surface-sidebar);
+      color: var(--color-muted);
+      font-size: var(--text-preview-tag);
+      line-height: var(--text-preview-tag--line-height);
+      font-weight: var(--font-weight-medium);
+      cursor: pointer;
+
+      &:hover {
+        color: var(--color-text);
+      }
+    }
+  }
+
+  /* The note: content/ styles it as in the note column (both scope to
+     .preview-body). The preview's header already shows the title and tags,
+     so the note's own header goes, with the post footer and Recent Posts.
+     The text and headings are smaller, and the blocks closer, to fit the
+     panel. These selectors need their class: the content rules are scoped,
+     and a scoped rule wins a specificity tie over an unscoped one. */
+  .preview-body {
+    color: var(--color-text);
+
+    > header,
+    > footer,
+    > .recent-notes {
+      display: none;
+    }
+    :is(h1, h2, h3, h4, h5, h6) {
+      margin-block: 1em 0.5em;
+    }
+    h1 {
+      font-size: var(--text-preview-h1);
+    }
+    h2 {
+      font-size: var(--text-preview-h2);
+    }
+    h3 {
+      font-size: var(--text-preview-h3);
+    }
+    p {
+      margin-block: 0.5em;
+    }
+    :is(ul, ol) {
+      margin-block: 0.5em;
+      padding-left: 1.5em;
+    }
+    /* Inline code, compact as on live. */
+    :not(pre) > code {
+      padding: 2px 4px;
+      border-radius: var(--radius-small);
+      background-color: var(--color-surface-sidebar);
+      font-size: var(--text-preview-code);
+    }
+  }
+}

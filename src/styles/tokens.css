@@ -258,4 +258,48 @@
   /* Focus ring shadow on buttons (Obsidian's `button:focus-visible`, 3px of
      --background-modifier-border-focus), drawn with the outline. */
   --shadow-focus: 0 0 0 3px var(--color-gray-40);
+
+  /* Search dialog and the mobile file tree's overlay. Sources:
+     digital-garden-base.scss (--dg-search-*, --dg-overlay-bg, and the
+     search rules) and user/custom.scss (--dg-search-highlight-bg). */
+  /* Dims the page behind the search dialog and the open mobile file tree. */
+  --color-overlay: rgb(0 0 0 / 0.5);
+  --color-search-highlight: rgb(153 153 153 / 0.35);
+  --shadow-dialog: 0 25px 50px -12px rgb(0 0 0 / 0.5);
+  /* The search field's focus ring (Obsidian's input focus shadow). */
+  --shadow-field-focus: 0 0 0 2px var(--color-gray-40);
+  --radius-dialog: 12px;
+  /* Tags in the result list and inline code in the preview, and the
+     highlight behind a match. */
+  --radius-small: 3px;
+  --radius-search-highlight: 2px;
+  --container-search: 1100px;
+  /* The dialog's distance from the top of the viewport (and, doubled, the
+     room it leaves), and the tallest the results and preview get. */
+  --spacing-search-top: 80px;
+  --spacing-search-panel: 60vh;
+  --text-search-input: 0.9rem;
+  --text-search-input--line-height: normal;
+  --text-hint: 0.8rem;
+  --text-hint--line-height: 1.6;
+  /* The hint's keys: Obsidian inline code, 0.8em of the hint. */
+  --text-hint-key: 0.64rem;
+  --text-hint-key--line-height: 1.6;
+  --text-result-title: 1.1rem;
+  --text-result-title--line-height: 1.6;
+  --text-result-tag: 0.7rem;
+  --text-result-tag--line-height: 1.6;
+  --text-excerpt: 0.85rem;
+  --text-excerpt--line-height: 1.4;
+  /* The preview: its title, tags, and the note's text and headings. */
+  --text-preview: 0.95rem;
+  --text-preview--line-height: 1.6;
+  --text-preview-title: 1.4rem;
+  --text-preview-title--line-height: 1.6;
+  --text-preview-tag: 0.75rem;
+  --text-preview-tag--line-height: 1;
+  --text-preview-h1: 1.3rem;
+  --text-preview-h2: 1.2rem;
+  --text-preview-h3: 1.1rem;
+  --text-preview-code: 0.9em;
 }

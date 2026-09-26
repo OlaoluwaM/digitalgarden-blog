@@ -88,8 +88,10 @@ Phase 2: design system.
 
 - [x] Port callout collapsing and keyboard toggling.
 - [ ] Port FlexSearch search and tag filtering, escaping inserted text, highlighting safely, and searching on `input`.
-- [ ] Build the search and tag-filtering interface.
-- [ ] Port mobile navigation (and style its `.fullpage-overlay`) and file-tree folder state to TypeScript (no Alpine).
+- [x] Build the search dialog's markup and styles (`SearchDialog.astro`).
+- [ ] Wire the search dialog: open and close, results, keyboard selection, preview, and tag search.
+- [x] Style the open mobile file tree and its `.fullpage-overlay` (shown while the hamburger's `aria-expanded` is `true`).
+- [ ] Port mobile navigation and file-tree folder state to TypeScript (no Alpine).
 - [ ] Keep usable fallbacks where JavaScript is not essential.
 
 ## Cutover

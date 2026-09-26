@@ -77,10 +77,54 @@ after(async () => {
   await site?.cleanup();
 });
 
+// Known axe-core issues that the live site has too, matched by rule and
+// target. They are listed, not ignored: each must still occur somewhere (so
+// the list shrinks when one is fixed), and any other violation fails.
+// - color-contrast: the vault's `aside` callout title color (#7f849c,
+//   3.98:1 on its tinted background). It comes from the Obsidian vault
+//   through /sync-callouts, so the fix belongs there.
+const KNOWN = [
+  {
+    rule: "color-contrast",
+    target:
+      /^div\[data-callout="aside"\] > \.callout-title > \.callout-title-inner$|^\.callout-title-inner$/,
+  },
+];
+
+function isKnown(violation: { rule: string; target: string }) {
+  return KNOWN.find(
+    entry =>
+      entry.rule === violation.rule && entry.target.test(violation.target)
+  );
+}
+
 function routes() {
   return site.pages
     .filter(page => page !== "404.html")
     .map(page => "/" + page.replace(/index\.html$/, ""));
+}
+
+/** Run axe-core on the page as it is now; one entry per failing node. */
+async function axeViolations(page: Page) {
+  await page.addScriptTag({ content: axeSource });
+  return page.evaluate(async () => {
+    const axe = (
+      window as unknown as {
+        axe: {
+          run: (context: Document) => Promise<{
+            violations: { id: string; nodes: { target: string[] }[] }[];
+          }>;
+        };
+      }
+    ).axe;
+    const result = await axe.run(document);
+    return result.violations.flatMap(violation =>
+      violation.nodes.map(node => ({
+        rule: violation.id,
+        target: node.target.join(" "),
+      }))
+    );
+  });
 }
 
 async function withPage<T>(
@@ -360,21 +404,308 @@ describe("print", () => {
   });
 });
 
-describe("accessibility checks (axe-core)", () => {
-  // Known issues that the live site has too, matched by rule and target.
-  // They are listed, not ignored: each must still occur somewhere (so the
-  // list shrinks when one is fixed), and any other violation fails.
-  // - color-contrast: the vault's `aside` callout title color (#7f849c,
-  //   3.98:1 on its tinted background). It comes from the Obsidian vault
-  //   through /sync-callouts, so the fix belongs there.
-  const KNOWN = [
-    {
-      rule: "color-contrast",
-      target:
-        /^div\[data-callout="aside"\] > \.callout-title > \.callout-title-inner$|^\.callout-title-inner$/,
-    },
-  ];
+// What the search script puts in the dialog, as SearchDialog.astro's
+// contract describes it. The tests fill the dialog themselves, so they
+// check the stylesheet whatever the script does.
+const RESULTS_FIXTURE = [
+  ["/posts/io-in-haskell-an-epiphany/", "IO in ", "Haskell", ", an epiphany"],
+  [
+    "/posts/implementing-redis-info-in-haskell/",
+    "Implementing Redis INFO in ",
+    "Haskell",
+    "",
+  ],
+]
+  .map(
+    ([href, before, match, after], index) =>
+      `<a class="searchresult" id="search-result-${index}" role="option" aria-selected="${index === 0}" tabindex="-1" href="${href}"><span class="result-title">${before}<mark class="search-highlight">${match}</mark>${after}</span><span class="result-tags"><span class="tag">#haskell</span><span class="tag">#software-engineering</span></span><span class="result-excerpt">It seems to me like IO is <mark class="search-highlight">${match}</mark>'s way of modelling the general concept of a statement, an action with side effects that may or may not return a value.</span></a>`
+  )
+  .join("");
 
+type SearchState = "idle" | "results" | "empty";
+
+/** Open the dialog as the search script would, with results in the list. */
+async function openSearch(page: Page, state: SearchState) {
+  await page.evaluate(
+    ({ state, results }) => {
+      document.querySelector<HTMLDialogElement>("#globalsearch")!.showModal();
+      document.querySelector("#search-results")!.innerHTML = results;
+      document.querySelector<HTMLElement>("#search-layout")!.dataset.state =
+        state;
+    },
+    { state, results: RESULTS_FIXTURE }
+  );
+}
+
+/**
+ * Load a note's `main.content` into the preview, as the script does. The
+ * script must then call `initializeScrollRegions()` (src/scripts), which
+ * gives callouts that overflow the narrow panel a tab stop; the built page
+ * does not expose it, so this does the same.
+ */
+async function fillPreview(page: Page, route: string) {
+  await page.evaluate(async route => {
+    const html = await (await fetch(route)).text();
+    const main = new DOMParser()
+      .parseFromString(html, "text/html")
+      .querySelector("main.content")!;
+    document.querySelector("#preview-content")!.innerHTML =
+      `<div class="preview-title">On Maths and Engineering</div><div class="preview-tags"><button type="button" class="tag">#maths</button></div><div class="preview-body">${main.innerHTML}</div>`;
+    for (const region of document.querySelectorAll<HTMLElement>(
+      ".preview-body .callout-content"
+    )) {
+      if (region.scrollWidth <= region.clientWidth) continue;
+      region.tabIndex = 0;
+      region.setAttribute("role", "group");
+      region.setAttribute("aria-label", "Scrollable content");
+    }
+  }, route);
+}
+
+const box = (page: Page, selector: string) =>
+  page.evaluate(selector => {
+    const rect = document.querySelector(selector)!.getBoundingClientRect();
+    return [rect.x, rect.y, rect.width, rect.height].map(Math.round);
+  }, selector);
+
+describe("search dialog", () => {
+  // Why: utility classes that set `display` on a <dialog> beat the
+  // browser's rule that hides a closed dialog, so a styling slip shows an
+  // empty search box on every page. Open, it must sit where live put it:
+  // 80px from the top, 1100px wide on desktop and 95% on phones, over a
+  // dimmed page.
+  for (const [width, expected] of [
+    [1440, { x: 170, width: 1100 }],
+    [390, { x: 10, width: 371 }],
+  ] as const) {
+    it(`stays hidden until opened, then sits over the page at ${width}px`, async () => {
+      await withPage(width, async page => {
+        await page.goto(origin + "/", { waitUntil: "load" });
+        assert.equal(await page.isVisible("#globalsearch"), false);
+        assert.equal(await page.isVisible(".search-box"), false);
+
+        await openSearch(page, "idle");
+        const [x, y, boxWidth] = await box(page, ".search-box");
+        assert.deepEqual({ x, y, width: boxWidth }, { ...expected, y: 80 });
+        assert.equal(
+          await page.evaluate(
+            () =>
+              getComputedStyle(
+                document.querySelector("#globalsearch")!,
+                "::backdrop"
+              ).backgroundColor
+          ),
+          "rgba(0, 0, 0, 0.5)"
+        );
+        assert.equal(
+          await page.evaluate(() => document.activeElement?.id),
+          "term",
+          "opening the dialog focuses the search field"
+        );
+      });
+    });
+  }
+
+  // Why: the script sets one state after each search and leaves the rest to
+  // CSS: the hint before a search, the results and their preview after
+  // one, the message when nothing matches. The preview needs width, so
+  // phones show only the list (live: below 768px; here below md, 800px).
+  // The list is filled in every state, so the state alone must decide.
+  for (const width of [1440, 390]) {
+    it(`shows the parts that belong to each search state at ${width}px`, async () => {
+      await withPage(width, async page => {
+        await page.goto(origin + "/", { waitUntil: "load" });
+        const parts = async (state: SearchState) => {
+          await openSearch(page, state);
+          return {
+            hint: await page.isVisible(".search-idle"),
+            results: await page.isVisible("#search-results"),
+            noResults: await page.isVisible(".no-results"),
+            preview: await page.isVisible(".search-preview-panel"),
+          };
+        };
+        const none = {
+          hint: false,
+          results: false,
+          noResults: false,
+          preview: false,
+        };
+        assert.deepEqual(await parts("idle"), { ...none, hint: true });
+        assert.deepEqual(await parts("results"), {
+          ...none,
+          results: true,
+          preview: width >= 800,
+        });
+        assert.deepEqual(await parts("empty"), { ...none, noResults: true });
+      });
+    });
+  }
+
+  // Why: live split the box 45/55 between the list and the preview, and a
+  // divider separates them; on phones the list takes the full width.
+  it("splits the box between results and preview on desktop only", async () => {
+    for (const [width, share] of [
+      [1440, 0.45],
+      [390, 1],
+    ] as const) {
+      await withPage(width, async page => {
+        await page.goto(origin + "/", { waitUntil: "load" });
+        await openSearch(page, "results");
+        const [, , panel] = await box(page, ".search-results-panel");
+        const [, , layout] = await box(page, ".search-layout");
+        assert.ok(
+          Math.abs(panel! / layout! - share) < 0.01,
+          `${width}px: results panel is ${panel}px of ${layout}px`
+        );
+      });
+    }
+  });
+
+  // Why: the arrow keys move the selection while focus stays in the search
+  // field, so the selected result's outline is the only sign of where
+  // Enter will go. The script marks it with `aria-selected`, which screen
+  // readers announce too.
+  it("outlines the selected result only", async () => {
+    await withPage(1440, async page => {
+      await page.goto(origin + "/", { waitUntil: "load" });
+      await openSearch(page, "results");
+      const borders = await page.evaluate(() =>
+        [...document.querySelectorAll(".searchresult")].map(
+          result => getComputedStyle(result).borderColor
+        )
+      );
+      assert.deepEqual(borders, ["rgb(153, 153, 153)", "rgba(0, 0, 0, 0)"]);
+    });
+  });
+
+  // Why: a match is marked with a translucent gray behind the text, in the
+  // weight of the text around it. The text turns the body color: live kept
+  // the title's link gray and the excerpt's muted gray, which fall below
+  // 4.5:1 on the highlight.
+  it("highlights matches without changing their text", async () => {
+    await withPage(1440, async page => {
+      await page.goto(origin + "/", { waitUntil: "load" });
+      await openSearch(page, "results");
+      const marks = await page.evaluate(() =>
+        [...document.querySelectorAll(".searchresult .search-highlight")]
+          .slice(0, 2)
+          .map(mark => {
+            const own = getComputedStyle(mark);
+            const parent = getComputedStyle(mark.parentElement!);
+            return {
+              background: own.backgroundColor,
+              color: own.color,
+              sameWeight: own.fontWeight === parent.fontWeight,
+            };
+          })
+      );
+      const expected = {
+        background: "rgba(153, 153, 153, 0.35)",
+        color: "rgb(218, 218, 218)",
+        sameWeight: true,
+      };
+      assert.deepEqual(marks, [expected, expected]);
+    });
+  });
+
+  // Why: the placeholder is shown while the preview is empty and hidden
+  // once the script puts anything in it (a loading indicator or a note),
+  // so the script never toggles it itself.
+  it("shows the preview placeholder until the preview has content", async () => {
+    await withPage(1440, async page => {
+      await page.goto(origin + "/", { waitUntil: "load" });
+      await openSearch(page, "results");
+      assert.equal(await page.isVisible(".preview-placeholder"), true);
+      assert.equal(await page.isVisible("#preview-content"), false);
+      await fillPreview(page, "/posts/on-maths-and-engineering/");
+      assert.equal(await page.isVisible(".preview-placeholder"), false);
+      assert.equal(await page.isVisible("#preview-content"), true);
+    });
+  });
+
+  // Why: the preview shows another note's `main.content`, which must look
+  // like that note (callouts, code blocks, compact text) without repeating
+  // the title and tags that the preview's own header already shows, or the
+  // post footer. Live showed the title twice.
+  it("styles the preview like a note, without the note's header and footer", async () => {
+    await withPage(1440, async page => {
+      await page.goto(origin + "/", { waitUntil: "load" });
+      await openSearch(page, "results");
+      await fillPreview(page, "/posts/on-maths-and-engineering/");
+      const preview = await page.evaluate(() => {
+        const body = document.querySelector(".preview-body")!;
+        const style = (selector: string) =>
+          getComputedStyle(body.querySelector(selector)!);
+        return {
+          header: style(":scope > header").display,
+          footer: style(":scope > footer").display,
+          text: style(":scope > p").fontSize,
+          code: style("pre.astro-code").fontFamily.split(",")[0],
+          callout: style(".callout").backgroundColor !== "rgba(0, 0, 0, 0)",
+        };
+      });
+      assert.deepEqual(preview, {
+        header: "none",
+        footer: "none",
+        text: "15.2px",
+        code: '"Commit Mono"',
+        callout: true,
+      });
+    });
+  });
+});
+
+describe("mobile file tree", () => {
+  // Why: on phones and tablets the file tree opens over the page when the
+  // hamburger's `aria-expanded` is "true" (the navigation script flips
+  // it), with an overlay that dims the page. Live positioned the overlay
+  // `absolute`, so it covered only the first screen: opened after
+  // scrolling, the dimming and its tap-to-close were off screen. The
+  // overlay is fixed here, so it covers the viewport wherever the page is.
+  it("opens over the page while the hamburger is expanded", async () => {
+    await withPage(390, async page => {
+      await page.goto(origin + "/posts/on-maths-and-engineering/", {
+        waitUntil: "load",
+      });
+      const shown = async () => ({
+        tree: await page.isVisible(".filetree-wrapper"),
+        overlay: await page.isVisible(".fullpage-overlay"),
+      });
+      const expand = (expanded: boolean) =>
+        page.evaluate(expanded => {
+          window.scrollTo(0, document.body.scrollHeight);
+          document
+            .querySelector(".hamburger-btn")!
+            .setAttribute("aria-expanded", String(expanded));
+        }, expanded);
+
+      assert.deepEqual(await shown(), { tree: false, overlay: false });
+      await expand(true);
+      assert.deepEqual(await shown(), { tree: true, overlay: true });
+      assert.deepEqual(await box(page, ".fullpage-overlay"), [0, 0, 390, 900]);
+      assert.deepEqual(await box(page, ".filetree-wrapper"), [0, 0, 250, 900]);
+      await expand(false);
+      assert.deepEqual(await shown(), { tree: false, overlay: false });
+    });
+  });
+
+  // Why: desktop always shows the file tree, so a hamburger left expanded
+  // when the window widens past lg must not dim the page.
+  it("never shows the overlay on desktop", async () => {
+    await withPage(1440, async page => {
+      await page.goto(origin + "/", { waitUntil: "load" });
+      await page.evaluate(() =>
+        document
+          .querySelector(".hamburger-btn")!
+          .setAttribute("aria-expanded", "true")
+      );
+      assert.equal(await page.isVisible(".fullpage-overlay"), false);
+      assert.equal(await page.isVisible(".filetree-wrapper"), true);
+    });
+  });
+});
+
+describe("accessibility checks (axe-core)", () => {
   // Why: automated checks catch missing names, roles, landmarks, and
   // contrast regressions. Every page is checked at phone and desktop width,
   // because new markup (callout icons, the file tree) appears on all of them.
@@ -385,31 +716,8 @@ describe("accessibility checks (axe-core)", () => {
       await withPage(width, async page => {
         for (const route of [...routes(), "/definitely-not-a-page"]) {
           await page.goto(origin + route, { waitUntil: "load" });
-          await page.addScriptTag({ content: axeSource });
-          const violations = await page.evaluate(async () => {
-            const axe = (
-              window as unknown as {
-                axe: {
-                  run: (context: Document) => Promise<{
-                    violations: { id: string; nodes: { target: string[] }[] }[];
-                  }>;
-                };
-              }
-            ).axe;
-            const result = await axe.run(document);
-            return result.violations.flatMap(violation =>
-              violation.nodes.map(node => ({
-                rule: violation.id,
-                target: node.target.join(" "),
-              }))
-            );
-          });
-          for (const violation of violations) {
-            const known = KNOWN.find(
-              entry =>
-                entry.rule === violation.rule &&
-                entry.target.test(violation.target)
-            );
+          for (const violation of await axeViolations(page)) {
+            const known = isKnown(violation);
             if (known) seen.add(known.rule);
             else
               unexpected.push(
@@ -426,6 +734,39 @@ describe("accessibility checks (axe-core)", () => {
         `${entry.rule} no longer occurs; remove it from KNOWN`
       );
     }
+  });
+
+  // Why: the search dialog and the open mobile file tree are hidden when
+  // the page loads, so the check above never sees them. They add text
+  // (hints, tags, excerpts, highlights) whose contrast and names need the
+  // same checks, with the dialog in the state it is in most of the time.
+  it("finds no new violations with search or the mobile file tree open", async () => {
+    const unexpected: string[] = [];
+    const check = async (page: Page, label: string) => {
+      for (const violation of await axeViolations(page))
+        if (!isKnown(violation))
+          unexpected.push(`${label}: ${violation.rule} at ${violation.target}`);
+    };
+    for (const width of [390, 1440]) {
+      await withPage(width, async page => {
+        await page.goto(origin + "/", { waitUntil: "load" });
+        await openSearch(page, "results");
+        await fillPreview(page, "/posts/on-maths-and-engineering/");
+        await check(page, `${width}px search results`);
+        await openSearch(page, "empty");
+        await check(page, `${width}px search empty`);
+      });
+    }
+    await withPage(390, async page => {
+      await page.goto(origin + "/", { waitUntil: "load" });
+      await page.evaluate(() =>
+        document
+          .querySelector(".hamburger-btn")!
+          .setAttribute("aria-expanded", "true")
+      );
+      await check(page, "390px file tree open");
+    });
+    assert.deepEqual(unexpected, []);
   });
 });
 

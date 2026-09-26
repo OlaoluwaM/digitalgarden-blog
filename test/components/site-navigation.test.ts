@@ -99,11 +99,30 @@ describe("structure", () => {
     expect(heading?.text).toBe("Thunks & Thoughts");
   });
 
-  // Why: a `.fullpage-overlay` must exist for the later mobile-toggle task
-  // to show/hide, even though nothing makes it visible yet.
+  // Why: the overlay dims the page behind the open mobile file tree, and a
+  // tap on it closes the tree. It is decoration for pointer users, so it
+  // stays out of the accessibility tree.
   it("renders the mobile overlay element", async () => {
     const root = await renderNav("/");
-    expect(root.querySelector(".fullpage-overlay")).not.toBeNull();
+    const overlay = root.querySelector(".fullpage-overlay");
+    expect(overlay).not.toBeNull();
+    expect(overlay!.getAttribute("aria-hidden")).toBe("true");
+  });
+
+  // Why: the hamburger's `aria-expanded` is the mobile file tree's only
+  // state: the navigation script flips it, and the stylesheet shows the
+  // tree and the overlay while it is "true", so what screen readers hear
+  // and what is drawn cannot disagree. `aria-controls` names the tree it
+  // opens.
+  it("points the hamburger at the file tree it opens, closed", async () => {
+    const root = await renderNav("/");
+    const hamburger = root.querySelector("button.hamburger-btn")!;
+    expect(hamburger.getAttribute("aria-expanded")).toBe("false");
+    const controls = hamburger.getAttribute("aria-controls");
+    expect(controls).toBeTruthy();
+    expect(
+      root.querySelector(`#${controls}`)?.classList.contains("filetree-wrapper")
+    ).toBe(true);
   });
 
   // Why: mirrors Eleventy's root `<div class="folder" x-data="{isOpen:
@@ -132,6 +151,29 @@ describe("search buttons", () => {
       expect(button.querySelector(".search-icon svg")).not.toBeNull();
       expect(button.querySelector(".search-text")?.text).toBe("Search");
     }
+  });
+
+  // Why: both buttons open the one search dialog. `aria-haspopup` tells
+  // screen readers that a dialog opens, and `aria-controls` names it, so
+  // the search script can find the dialog from either button.
+  it("points both search buttons at the one search dialog", async () => {
+    const root = await renderNav("/");
+    expect(root.querySelectorAll("dialog#globalsearch")).toHaveLength(1);
+    for (const button of root.querySelectorAll("button.search-button")) {
+      expect(button.getAttribute("aria-haspopup")).toBe("dialog");
+      expect(button.getAttribute("aria-controls")).toBe("globalsearch");
+    }
+  });
+
+  // Why: Macs show ⌘ instead of Ctrl. The live script rewrote the whole
+  // hint with innerHTML; a hook on the modifier key lets the script change
+  // only that key's text.
+  it("marks the modifier key so the script can show ⌘ on Macs", async () => {
+    const root = await renderNav("/");
+    const modifiers = root.querySelectorAll(
+      ".search-keys .search-key-modifier"
+    );
+    expect(modifiers.map(key => key.text)).toEqual(["Ctrl", "Ctrl"]);
   });
 });
 

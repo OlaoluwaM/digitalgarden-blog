@@ -251,3 +251,62 @@ entry.
 - **Evidence:** `test/site-build.test.ts` (both components on every note
   page) and `test/layout/site-layout.test.ts` (no request leaves the origin;
   both scripts requested).
+
+## 2026-09-26: Search dialog and mobile file tree
+
+Markup and styles only; the search and navigation scripts are separate
+Client Behavior work. Evidence for every entry: screenshots and a
+computed-style comparison of each dialog state against thunk.blog at
+1440x900 and 390x900, and the tests named per entry.
+
+### Search opens in a modal dialog
+
+- **Change:** the search box is a native `<dialog>` opened as a modal.
+  Focus stays inside it, the page behind is inert, and Escape closes it.
+  Live toggled a `div`, so Tab could leave the box for the page behind it.
+  It looks the same.
+- **Why:** a dialog should keep keyboard and screen reader users inside it
+  until it closes (WCAG 2.4.3).
+- **Evidence:** `test/components/search-dialog.test.ts`; the dialog tests in
+  `test/layout/site-layout.test.ts` (position, backdrop, focus on open).
+
+### Highlighted matches use the body text color
+
+- **Change:** a highlighted match in search results and the preview is
+  drawn in the body text color (#dadada) on the same translucent gray. Live
+  kept the surrounding link or muted gray.
+- **Why:** live's highlighted text had 2.9:1 contrast in titles and 4:1 in
+  excerpts, below WCAG AA's 4.5:1; it is now about 6:1.
+- **Evidence:** the highlight test and the axe check with the dialog open.
+
+### The preview shows the note once
+
+- **Change:** the preview shows the note's text without its header (title
+  and tags) and post footer. Live repeated the title and tags under the
+  preview's own.
+- **Why:** the preview's header already shows them.
+- **Evidence:** the preview styling test.
+
+### The preview hides below 800px
+
+- **Change:** the preview panel hides below the site's `md` breakpoint
+  (800px). Live hid it below 768px.
+- **Why:** the site uses one set of breakpoints.
+- **Evidence:** the search-state tests at 390px and 1440px.
+
+### The mobile file tree's overlay stays on screen
+
+- **Change:** the overlay that dims the page behind the open mobile file
+  tree is fixed to the viewport. Live positioned it `absolute`, so if the
+  file tree was opened after scrolling, the overlay was off screen and
+  tapping the page could not close the tree.
+- **Why:** the overlay must cover what the reader sees.
+- **Evidence:** the mobile file tree test (opened after scrolling to the
+  bottom).
+
+### Smaller changes
+
+- The no-results message uses curly quotes (“query”), as note text does.
+- Keyboard hints use `<kbd>`, and the two navigation landmarks are named
+  "Site" (the mobile navbar) and "Notes" (the file tree), so they stay
+  distinct when both show. Neither changes the look.

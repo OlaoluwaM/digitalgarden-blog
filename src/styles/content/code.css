@@ -5,11 +5,12 @@
  * from the live theme's computed styles), src/site/styles/user/
  * code-blocks.scss, and custom.scss (`code[class*="language-"]`). Shiki
  * writes each block's background and text color as inline styles
- * (the `dark-plus` theme); these rules never set them on the `pre`.
+ * (the `dark-plus` theme); these rules never set them on the `pre`. They
+ * apply in the note column and in the search preview.
  */
 @layer components {
   /* Inline code. Code blocks reset the box below. */
-  .content code {
+  :is(.content, .preview-body) code {
     padding: 0.25rem 0.4rem;
     border: 1px solid var(--color-border);
     border-radius: var(--radius-code);
@@ -27,7 +28,7 @@
   /* Code blocks. The language label and copy button inherit the block's
      font. (Live left the `pre` on the browser's generic monospace, which is
      Courier on some systems; see docs/design-changes.md.) */
-  .content pre.astro-code {
+  :is(.content, .preview-body) pre.astro-code {
     position: relative;
     /* The browser's default block margin, which Preflight removes. */
     margin-block: 1em;
@@ -44,7 +45,7 @@
     tab-size: 4;
   }
 
-  .content pre.astro-code > code {
+  :is(.content, .preview-body) pre.astro-code > code {
     padding: 0;
     border: 0;
     background: none;
@@ -59,13 +60,13 @@
   }
 
   /* Every Shiki block carries a `language-*` class. */
-  .content code[class*="language-"] {
+  :is(.content, .preview-body) code[class*="language-"] {
     font-weight: var(--font-weight-semibold);
   }
 
   /* Line numbers: Shiki's transformer writes `data-line` on each line. The
      number sits in the block's left padding. */
-  .content pre.astro-code .line[data-line]::before {
+  :is(.content, .preview-body) pre.astro-code .line[data-line]::before {
     content: attr(data-line);
     display: inline-block;
     width: 2rem;
@@ -76,7 +77,7 @@
   }
 
   /* Language label, top right. It gives way to the copy button. */
-  .content pre.astro-code[data-language]::before {
+  :is(.content, .preview-body) pre.astro-code[data-language]::before {
     content: attr(data-language);
     position: absolute;
     top: 0.5rem;
@@ -91,7 +92,7 @@
   /* Copy button (src/scripts/copyCode.ts adds it). Hidden until the block is
      hovered or holds focus, so it stays reachable by keyboard: tabbing into
      the focusable `pre` or onto the button shows it. */
-  .content pre.astro-code .copy-code-btn {
+  :is(.content, .preview-body) pre.astro-code .copy-code-btn {
     position: absolute;
     top: 0.4rem;
     right: 0.5rem;
@@ -133,13 +134,16 @@
     }
   }
 
-  .content pre.astro-code:is(:hover, :focus-within) .copy-code-btn,
-  .content pre.astro-code .copy-code-btn:focus-visible {
+  :is(.content, .preview-body)
+    pre.astro-code:is(:hover, :focus-within)
+    .copy-code-btn,
+  :is(.content, .preview-body) pre.astro-code .copy-code-btn:focus-visible {
     opacity: 1;
     pointer-events: auto;
   }
 
-  .content pre.astro-code[data-language]:is(:hover, :focus-within)::before {
+  :is(.content, .preview-body)
+    pre.astro-code[data-language]:is(:hover, :focus-within)::before {
     opacity: 0;
   }
 }

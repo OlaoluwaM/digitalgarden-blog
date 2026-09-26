@@ -1,0 +1,119 @@
+---
+// The search dialog (Eleventy's `searchContainer.njk`), rendered once by
+// NavShell. Its markup is a contract with the search script, which fills
+// the results and preview and sets the state; the static text lives here.
+//
+// - Open with `showModal()` and close with `close()`. The dialog keeps focus
+//   inside, makes the page inert, closes on Escape, and focuses `#term`
+//   (`autofocus`). It covers the viewport, so a click outside the box has
+//   the dialog itself as its target.
+// - `#term` is a combobox: the script keeps `aria-expanded` (results shown)
+//   and `aria-activedescendant` (the selected result's id) current. The
+//   browser's clear button is hidden, as on live.
+// - `#search-layout[data-state]` decides what shows: `idle` (the hint),
+//   `results` (the list and, from md up, the preview), `empty` (the
+//   no-results message, with the query written as text into
+//   `.no-results-query`).
+// - `#search-results` is a listbox. Each result the script appends:
+//     <a class="searchresult" id="search-result-N" role="option"
+//        aria-selected="true|false" tabindex="-1" href="/note/">
+//       <span class="result-title">…</span>
+//       <span class="result-tags"><span class="tag">#tag</span>…</span>
+//       <span class="result-excerpt">…</span>
+//     </a>
+//   Matches inside any text: <mark class="search-highlight">…</mark>.
+// - `.preview-placeholder` shows while `#preview-content` is empty. A preview:
+//     <div class="preview-title">…</div>
+//     <div class="preview-tags"><button type="button" class="tag">#tag</button>…</div>
+//     <div class="preview-body"><!-- a note's main.content --></div>
+//   The body is styled like a note; its header and footer are hidden.
+//
+// Everything the script builds is styled by class in
+// styles/components/search.css, so the script carries no styling.
+import Icon from "./Icon.astro";
+
+// Each key looks like the search button's (NavSearchButton), at the hint's size.
+const keyClass =
+  "rounded-code border border-border bg-surface-raised px-key-x py-1 font-mono text-hint-key font-normal text-code box-decoration-clone [corner-shape:var(--corner-shape-soft)]";
+const hints = [
+  ["Enter", "to select"],
+  ["⇅", "to navigate"],
+  ["ESC", "to close"],
+] as const;
+---
+
+<dialog
+  id="globalsearch"
+  class="search-container size-full max-h-none max-w-none items-start justify-center overflow-y-auto overscroll-contain bg-transparent pt-search-top text-inherit backdrop:bg-overlay open:flex print:hidden"
+  aria-label="Search"
+>
+  <div
+    class="search-box flex w-(--container-search) max-w-9/10 flex-col rounded-dialog bg-surface p-4 shadow-dialog max-md:w-19/20 max-md:max-w-19/20 max-md:p-3"
+  >
+    <div class="search-header shrink-0 border-b border-border pb-3">
+      <input
+        id="term"
+        type="search"
+        class="h-8 w-full rounded-box border border-border bg-surface-sidebar px-4 text-search-input text-text transition-[border-color] duration-200 placeholder:text-faint focus:border-link focus:shadow-field-focus focus:outline-none [&::-webkit-search-cancel-button]:hidden"
+        placeholder="Start typing..."
+        aria-label="Search notes"
+        role="combobox"
+        aria-autocomplete="list"
+        aria-expanded="false"
+        aria-controls="search-results"
+        autocomplete="off"
+        spellcheck="false"
+        autofocus
+      />
+    </div>
+    <div
+      id="search-layout"
+      class="search-layout mt-3 flex min-h-0 flex-1 overflow-hidden"
+      data-state="idle"
+    >
+      <div
+        class="search-results-panel max-h-search-panel shrink-0 overflow-y-auto overscroll-contain"
+      >
+        <p class="search-idle m-0 italic">
+          Enter your search text in the box above
+        </p>
+        <div id="search-results" role="listbox" aria-label="Results"></div>
+        <div class="no-results px-5 py-10 text-center text-muted">
+          <Icon name="zoom-out" class="mx-auto mb-4 block size-12 opacity-30" />
+          <p class="my-paragraph">
+            No results for “<span class="no-results-query"></span>”
+          </p>
+        </div>
+      </div>
+      <div
+        id="search-preview"
+        class="search-preview-panel max-h-search-panel grow overflow-y-auto overscroll-contain pl-4"
+      >
+        <!-- The placeholder shows while the preview is empty; it follows the
+             preview so `peer-empty:` can see it. -->
+        <div
+          id="preview-content"
+          class="preview-content peer p-2 text-preview empty:hidden"
+        >
+        </div>
+        <div
+          class="preview-placeholder hidden h-50 flex-col items-center justify-center p-10 text-center text-muted peer-empty:flex"
+        >
+          <Icon name="file-text" class="mb-4 size-12 opacity-30" />
+          <p class="m-0 text-teaser">Select a result to preview</p>
+        </div>
+      </div>
+    </div>
+    <footer
+      class="search-box-footer mt-3 flex shrink-0 justify-end gap-4 border-t border-border pt-3"
+    >
+      {
+        hints.map(([key, action]) => (
+          <span class="navigation-hint text-hint text-muted">
+            <kbd class={keyClass}>{key}</kbd>&nbsp;{action}
+          </span>
+        ))
+      }
+    </footer>
+  </div>
+</dialog>
