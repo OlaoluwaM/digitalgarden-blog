@@ -236,3 +236,18 @@ entry.
   `scrollable-region-focusable`).
 - **Evidence:** `test/browser/scrollRegions.test.ts`; the axe check no longer
   allows `scrollable-region-focusable`.
+
+## 2026-09-26: Analytics
+
+### Web Analytics from the site's origin, plus Speed Insights
+
+- **Change:** note pages load Vercel Web Analytics and Speed Insights through
+  their official Astro components. The scripts come from `/_vercel/...` on
+  thunk.blog instead of `cdn.vercel-insights.com`, and pages request nothing
+  from other origins. Speed Insights is new: live loaded only Web Analytics.
+  The 404 page has neither, as on live.
+- **Why:** the REWRITE.md Analytics items; same-origin scripts are not
+  blocked as third-party trackers and keep visitors' requests on one host.
+- **Evidence:** `test/site-build.test.ts` (both components on every note
+  page) and `test/layout/site-layout.test.ts` (no request leaves the origin;
+  both scripts requested).

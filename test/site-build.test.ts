@@ -99,6 +99,17 @@ describe("every page's head", () => {
   // polyfill from CDNs. The Astro site bundles or renders what it needs at
   // build time; an external script creeping back in is a regression in both
   // reliability and privacy.
+  // Why: the live site reports page views and Core Web Vitals to Vercel;
+  // dropping either component would silently stop the data. The 404 page
+  // stays standalone like Eleventy's, without them.
+  it("includes Vercel Web Analytics and Speed Insights on note pages", () => {
+    for (const page of site.pages.filter(page => page !== "404.html")) {
+      const document = documents.get(page)!;
+      assert.ok(document.querySelector("vercel-analytics"), page);
+      assert.ok(document.querySelector("vercel-speed-insights"), page);
+    }
+  });
+
   it("loads no third-party scripts", () => {
     for (const page of site.pages) {
       for (const script of documents.get(page)!.querySelectorAll("script")) {

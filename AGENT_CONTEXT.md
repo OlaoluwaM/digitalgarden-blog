@@ -684,6 +684,18 @@ Eleventy's markdown-it options. Olaolu put all resulting items in scope.
   comes from `/sync-callouts`.
 - `.fullpage-overlay` has no styles yet; the mobile-navigation task adds them.
 
+### Analytics (2026-09-26)
+
+- `@vercel/analytics` 2.0.1 and `@vercel/speed-insights` 2.0.0 (pinned)
+  render custom elements at the end of `BaseLayout`'s body; their scripts
+  load from `/_vercel/insights/script.js` and
+  `/_vercel/speed-insights/script.js`, which Vercel serves only when Web
+  Analytics and Speed Insights are enabled for the project. Enabling them is
+  a Vercel project setting (not done; needs Olaolu). Locally those requests
+  404 harmlessly.
+- The images-build fixture symlinks `node_modules`; it sets
+  `vite.resolve.preserveSymlinks` so dependency `.astro` components compile.
+
 ## Verification and deployment
 
 ```sh

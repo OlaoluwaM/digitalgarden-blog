@@ -98,7 +98,14 @@ async function fixture(t: TestContext) {
 export default {
   ...siteConfig,
   cacheDir: "./.astro-cache",
-  vite: { ...siteConfig.vite, cacheDir: "./.vite-cache" },
+  vite: {
+    ...siteConfig.vite,
+    cacheDir: "./.vite-cache",
+    // node_modules is a symlink to the repository's. Resolving through it to
+    // the real path puts dependency .astro components (Vercel's analytics)
+    // outside this project root, where Astro cannot compile them.
+    resolve: { preserveSymlinks: true },
+  },
 };
 `
   );

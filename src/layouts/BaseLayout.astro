@@ -1,10 +1,14 @@
 ---
 import "../styles/global.css";
+import Analytics from "@vercel/analytics/astro";
+import SpeedInsights from "@vercel/speed-insights/astro";
 import { site } from "../lib/site";
 import { canonicalUrl } from "../lib/metadata";
 
-// The document shell every page shares: head metadata, the stylesheet, and
-// the page-wide client scripts.
+// The document shell every page shares: head metadata, the stylesheet,
+// Vercel Web Analytics and Speed Insights, and the page-wide client scripts.
+// The analytics scripts load from `/_vercel/...` on this origin, which
+// Vercel serves when the features are enabled for the project.
 interface Props {
   title: string;
   /** Already filtered through `metaDescription`; omitted when undefined. */
@@ -57,5 +61,8 @@ const canonical = canonicalUrl(Astro.url.pathname);
       initializeCalloutToggles();
       initializeScrollRegions();
     </script>
+    <!-- Custom elements, so they belong in the body, not the head. -->
+    <Analytics />
+    <SpeedInsights />
   </body>
 </html>

@@ -81,8 +81,8 @@ Phase 2: design system.
 
 ## Analytics
 
-- [ ] Add Vercel Web Analytics.
-- [ ] Add Vercel Speed Insights.
+- [x] Add Vercel Web Analytics.
+- [x] Add Vercel Speed Insights.
 
 ## Client Behavior
 

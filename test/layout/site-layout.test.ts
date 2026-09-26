@@ -262,6 +262,34 @@ describe("keyboard access", () => {
   });
 });
 
+describe("network requests", () => {
+  // Why: analytics must come from the site's own origin (Vercel serves
+  // `/_vercel/...` scripts when the features are enabled), not from a
+  // third-party CDN as the live site's older script did, and nothing else
+  // may reach another origin either. Only a browser running the page's
+  // scripts shows what it actually requests.
+  it("requests nothing from other origins and loads analytics same-origin", async () => {
+    await withPage(1440, async page => {
+      const requested: string[] = [];
+      page.on("request", request => requested.push(request.url()));
+      await page.goto(`${origin}/posts/on-maths-and-engineering/`, {
+        waitUntil: "networkidle",
+      });
+      const foreign = requested.filter(url => !url.startsWith(origin));
+      assert.deepEqual(foreign, []);
+      for (const script of [
+        "/_vercel/insights/script.js",
+        "/_vercel/speed-insights/script.js",
+      ]) {
+        assert.ok(
+          requested.includes(origin + script),
+          `${script} not requested; got ${requested.filter(url => url.includes("_vercel")).join(", ")}`
+        );
+      }
+    });
+  });
+});
+
 describe("reduced motion", () => {
   // Why: readers who ask the system for reduced motion should get no
   // animated transitions. Transitions are declared in many places (tags,
@@ -315,7 +343,14 @@ describe("print", () => {
         });
         const shown = await page.evaluate(() =>
           [...document.body.children]
-            .filter(element => getComputedStyle(element).display !== "none")
+            .filter(element => {
+              // Empty elements (the analytics custom elements) print nothing.
+              const box = element.getBoundingClientRect();
+              return (
+                getComputedStyle(element).display !== "none" &&
+                box.width * box.height > 0
+              );
+            })
             .map(element => element.tagName.toLowerCase())
             .filter(tag => tag !== "script")
         );
