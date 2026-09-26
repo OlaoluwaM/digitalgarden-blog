@@ -18,7 +18,13 @@ const EXCERPT_LENGTH = 120;
 // Search once typing pauses this long (live: 200ms).
 const SEARCH_DELAY = 150;
 
-// Fields already wired, so re-running the initializer is safe.
+// Search fields we've already set up, so running the setup twice is
+// harmless. Without this, the index would load twice and every result would
+// show up twice.
+// It's a WeakSet rather than a Set, so an element that leaves the page can
+// be freed from memory. And we don't mark the element with a class, so the
+// page's HTML stays as it was, and a copy of an element never looks set up
+// when it isn't.
 const initialized = new WeakSet<HTMLInputElement>();
 
 export async function fetchSearchDocuments(): Promise<SearchDocument[]> {

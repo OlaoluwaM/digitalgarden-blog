@@ -10,6 +10,10 @@ Astro implementation: [REWRITE.md](REWRITE.md).
 - [ ] Keep the original titles in each note's `title` property. Avoid `?` and `#` in publishable filenames.
 - [ ] Align vault properties with [the content schema](src/content.config.ts): explicit `dg-permalink`; `title`, `description`, `tags`, `published`, and `last_updated` under `dg-note-properties` in publisher output.
 
+## Deferred site features
+
+- [ ] Add a "collapse all folders" button to the file tree once the vault has more than one folder ([mockups](https://claude.ai/artifact/VnPJxBcZ2LEPgo6ZtNjpD8); leaning toward a square button beside the search button).
+
 ## Deferred upstream PRs
 
 - [ ] Astro: upstream the Markdown rendering error fix and regression tests from the [local patch](patches/astro+7.2.9.patch).

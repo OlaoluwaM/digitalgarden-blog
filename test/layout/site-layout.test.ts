@@ -879,6 +879,34 @@ describe("mobile file tree", () => {
     });
   });
 
+  // Why: the hamburger must open the tree on a real page (script, markup,
+  // and stylesheet together), and a tap on the dimmed page beside it must
+  // close it.
+  it("opens from the hamburger and closes from the overlay", async () => {
+    await withPage(390, async page => {
+      await page.goto(origin + "/", { waitUntil: "load" });
+      await page.click(".hamburger-btn");
+      assert.equal(await page.isVisible(".filetree-wrapper"), true);
+      assert.equal(await page.isVisible(".fullpage-overlay"), true);
+      await page.mouse.click(350, 450);
+      assert.equal(await page.isVisible(".filetree-wrapper"), false);
+      assert.equal(await page.isVisible(".fullpage-overlay"), false);
+    });
+  });
+
+  // Why: a folder the reader opened stays open on the next page, as on
+  // live.
+  it("keeps an opened folder open on the next page", async () => {
+    await withPage(1440, async page => {
+      await page.goto(origin + "/", { waitUntil: "load" });
+      const folder = ".filetree-sidebar details.inner-folder >> nth=0";
+      await page.click(`${folder} >> summary`);
+      assert.equal(await page.getAttribute(folder, "open"), "");
+      await page.goto(`${origin}/posts/be-deliberate/`, { waitUntil: "load" });
+      assert.equal(await page.getAttribute(folder, "open"), "");
+    });
+  });
+
   // Why: desktop always shows the file tree, so a hamburger left expanded
   // when the window widens past lg must not dim the page.
   it("never shows the overlay on desktop", async () => {

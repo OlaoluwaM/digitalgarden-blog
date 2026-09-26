@@ -349,3 +349,20 @@ computed-style comparison of each dialog state against thunk.blog at
   page's own and captured its `#` links; phones never see the preview.
 - **Evidence:** `test/browser/searchDialog.test.ts` and the "search dialog
   wiring" tests in `test/layout/site-layout.test.ts`.
+
+## 2026-09-27: Mobile navigation
+
+### The mobile file tree takes focus and closes from the keyboard
+
+- **Change:** opening the file tree from the hamburger moves focus to its
+  first link; Escape closes it and returns focus to the hamburger; widening
+  the window to the desktop layout closes it. Live left focus on the
+  hamburger and had no Escape. Tapping the dimmed page closes it, and
+  folders remember their state across pages under live's storage keys, as
+  on live.
+- **Why:** the tree opens over the page, so keyboard users should start in
+  it and be able to leave it; a tree left open at desktop width would
+  reopen by itself when the window narrowed.
+- **Evidence:** `test/browser/mobileNavigation.test.ts`,
+  `test/browser/folderState.test.ts`, and the "mobile file tree" tests in
+  `test/layout/site-layout.test.ts`.

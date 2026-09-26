@@ -10,6 +10,8 @@
 //     `<details class="folder inner-folder">` / `<summary>`, which opens and
 //     closes without JS (closed by default, matching the live `false`
 //     default before a visitor has toggled it).
+//   - the persisted state's key (`path`) becomes `data-folder-path`, which
+//     scripts/folderState.ts reads.
 //   - the two `<i data-lucide>` chevrons, each shown/hidden by `x-show`,
 //     are both still rendered; `styles/components/navigation.css` swaps
 //     which one is visible based on the native `[open]` attribute instead of
@@ -24,9 +26,19 @@ interface Props {
   /** 0 for a root-level entry; Eleventy's `step` in the ported macro. */
   depth: number;
   activePathname: string;
+  /** The enclosing folder's path; absent at the root. */
+  parentPath?: string;
 }
 
-const { node, depth, activePathname } = Astro.props;
+const { node, depth, activePathname, parentPath } = Astro.props;
+// Live's `menuItem` path: the root folder's name, then "/" and each nested
+// folder's name. Live saved a folder's open state under it.
+const path =
+  node.type === "folder"
+    ? parentPath === undefined
+      ? node.name
+      : `${parentPath}/${node.name}`
+    : parentPath;
 const nested = depth > 0;
 const active = node.type === "file" && node.href === activePathname;
 const chevronClass = "mr-0.5 size-icon opacity-50";
@@ -42,7 +54,7 @@ const wrapperClass = nested
 <div class={wrapperClass}>
   {
     node.type === "folder" ? (
-      <details class="folder inner-folder ml-3 py-0.75">
+      <details class="folder inner-folder ml-3 py-0.75" data-folder-path={path}>
         <summary class="foldername-wrapper align-icon my-1 ml-0.5 inline-flex cursor-pointer list-none items-center justify-evenly text-sm">
           <Icon
             name="chevron-down"
@@ -59,6 +71,7 @@ const wrapperClass = nested
             node={child}
             depth={depth + 1}
             activePathname={activePathname}
+            parentPath={path}
           />
         ))}
       </details>

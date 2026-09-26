@@ -6,7 +6,12 @@
 const SCROLL_REGION_SELECTOR = ".callout-content";
 const FALLBACK_LABEL = "Scrollable content";
 
-// Boxes already observed, so re-running the initializer is safe.
+// Boxes we're already watching, so running the setup twice is harmless.
+// Without this, we'd ask to watch the same box again.
+// It's a WeakSet rather than a Set, so an element that leaves the page can
+// be freed from memory. And we don't mark the element with a class, so the
+// page's HTML stays as it was, and a copy of an element never looks set up
+// when it isn't.
 const observed = new WeakSet<HTMLElement>();
 
 const resizeObserver = new ResizeObserver(entries => {

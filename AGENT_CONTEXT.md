@@ -784,6 +784,25 @@ Eleventy's markdown-it options. Olaolu put all resulting items in scope.
   reintroduced, the race guard, retry, idempotence, excerpt stripping,
   overlap merge, tag search) each fail a test.
 
+### Mobile navigation and folder state (2026-09-27)
+
+- Handed over to Claude (TDD); Olaolu reviews before commit.
+- `src/scripts/mobileNavigation.ts`: the hamburger toggles its own
+  `aria-expanded` (the only state; CSS shows `#filetree` and the overlay
+  below lg). Opening focuses the tree's first link; the overlay closes it;
+  Escape closes it only while focus is on the hamburger or in the tree
+  (Escape in the search dialog is the dialog's) and refocuses the
+  hamburger; `matchMedia("(min-width: 1000px)")` closes it on widening.
+- `src/scripts/folderState.ts`: folders carry `data-folder-path`
+  (FileTreeEntry builds live's `menuItem` path: root name, then
+  `/child`). State is read and written under live's Alpine `$persist` keys
+  (`_x_` + path, JSON booleans), so visitors keep their folders. Saved from
+  a MutationObserver on `open`: the `toggle` event arrives in a later task
+  and was lost when a test (or a quick reader) navigated right after
+  opening a folder. Storage errors are swallowed.
+- Tests: a NavShell component test for the paths, 7 + 5 Chrome tests, two
+  built-site tests. 10 mutations each fail a test.
+
 ## Verification and deployment
 
 ```sh

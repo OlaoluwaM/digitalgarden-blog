@@ -21,8 +21,8 @@
 //     `.navbar`, `max-lg:hidden` on `.filetree-wrapper`).
 //   - below lg, the file tree opens over the page while the hamburger's
 //     `aria-expanded` is "true", with `.fullpage-overlay` dimming the page
-//     (the `nav-open` variant in styles/global.css). The navigation script
-//     flips the attribute; a tap on the overlay should close the tree.
+//     (the `nav-open` variant in styles/global.css). scripts/mobileNavigation.ts
+//     flips the attribute; a tap on the overlay closes the tree.
 //   - the file tree itself is `FileTreeEntry`, recursing over
 //     `buildFileTree`'s output; folders are native `<details>`/`<summary>`
 //     instead of an `x-data` `isOpen` flag.

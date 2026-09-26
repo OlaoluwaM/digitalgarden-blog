@@ -190,6 +190,35 @@ describe("folders", () => {
     }
   });
 
+  // Why: the folder-state script remembers each folder under its path,
+  // built as live's `menuItem` macro built it (the root folder's name, then
+  // "/" and each nested folder's name). Live's Alpine `$persist` stored the
+  // state under `_x_` plus that path, so returning visitors keep theirs.
+  it("gives each folder its path, as live keyed its saved state", async () => {
+    const html = await container.renderToString(NavShell, {
+      props: {
+        tree: [
+          {
+            type: "folder",
+            name: " Posts",
+            children: [
+              {
+                type: "folder",
+                name: "Series",
+                children: [{ type: "file", title: "Part 1", href: "/p1/" }],
+              },
+            ],
+          },
+        ],
+        activePathname: "/",
+      },
+    });
+    const paths = parse(html)
+      .querySelectorAll("details.inner-folder")
+      .map(folder => folder.getAttribute("data-folder-path"));
+    expect(paths).toEqual([" Posts", " Posts/Series"]);
+  });
+
   it("names the folder after its raw dg-path segment, leading space included", async () => {
     const root = await renderNav("/");
     const names = root.querySelectorAll(".foldername").map(el => el.text);
