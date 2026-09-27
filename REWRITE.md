@@ -103,7 +103,7 @@ Phase 2: design system.
 - [ ] Run the tests and a warning-free build.
 - [ ] Complete the vault tasks in [TODO.md](TODO.md), then test a publisher round trip.
 - [ ] Test a Vercel preview.
-- [ ] Switch Vercel to Astro and restore working default build/start scripts.
+- [ ] Switch Vercel to Astro and restore working default build/start scripts; deploys build with `build:astro:prod` (`--force`, so plugin changes re-render every note).
 - [ ] Update the README and publishing instructions.
 - [ ] Document each Markdown plugin and the Eleventy behavior it replaces.
 - [ ] Remove Eleventy and migration-only code.

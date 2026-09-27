@@ -715,6 +715,15 @@ Eleventy's markdown-it options. Olaolu put all resulting items in scope.
   share the `link-underline` utility (`src/styles/utilities.css`, which
   typography.css `@apply`s); astro.config.ts swaps Shiki's block background
   for `var(--color-gray-900)`. Extra `<h1>`s per page are a TODO.
+- Astro's content store (`node_modules/.astro/data-store.json`) clears only
+  when the Astro version, content config, or a JSON digest of the Astro
+  config changes; the digest drops functions, so edits to remark/rehype
+  plugins or Shiki transformers leave unchanged notes with stale HTML
+  (reproduced with the code-block background). Vercel restores
+  `node_modules/**` between builds, so deploys use `build:astro:prod`
+  (`astro build --force`, via `build:astro` so its prebuild runs;
+  `test/build-scripts.test.ts`). Locally, run `npm run dev:astro -- --force`
+  after changing a plugin.
 
 ### Analytics (2026-09-26)
 

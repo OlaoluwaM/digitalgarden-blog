@@ -44,7 +44,8 @@
     "predev:astro": "npm run patch-dependencies && npm run generate:wikilink-index",
     "dev:astro": "astro dev",
     "prebuild:astro": "npm run patch-dependencies && npm run generate:wikilink-index",
-    "build:astro": "astro build"
+    "build:astro": "astro build",
+    "build:astro:prod": "npm run build:astro -- --force"
   },
   "keywords": [],
   "author": "",
