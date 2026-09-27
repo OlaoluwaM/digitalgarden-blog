@@ -468,6 +468,36 @@ const box = (page: Page, selector: string) =>
     return [rect.x, rect.y, rect.width, rect.height].map(Math.round);
   }, selector);
 
+describe("search button", () => {
+  // Why: the Ctrl + K hint is a small box holding two key boxes; live left
+  // about 2px of the hint showing above and below the keys. A shorter hint
+  // cut the keys off at its bottom edge.
+  for (const width of [1440, 900]) {
+    it(`fits the shortcut keys inside their hint at ${width}px`, async () => {
+      await withPage(width, async page => {
+        await page.goto(origin + "/", { waitUntil: "load" });
+        const gaps = await page
+          .locator(".search-keys:visible")
+          .first()
+          .evaluate(hint => {
+            const outer = hint.getBoundingClientRect();
+            return [...hint.querySelectorAll("code")].map(key => {
+              const inner = key.getBoundingClientRect();
+              return {
+                top: inner.top - outer.top,
+                bottom: outer.bottom - inner.bottom,
+              };
+            });
+          });
+        assert.equal(gaps.length, 2);
+        for (const gap of gaps) {
+          assert.ok(gap.top >= 1.5 && gap.bottom >= 1.5, JSON.stringify(gaps));
+        }
+      });
+    });
+  }
+});
+
 describe("search dialog", () => {
   // Why: utility classes that set `display` on a <dialog> beat the
   // browser's rule that hides a closed dialog, so a styling slip shows an
@@ -865,7 +895,7 @@ describe("mobile file tree", () => {
       await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
       await page.click(".hamburger-btn");
       assert.equal(await isOpen(page), true);
-      assert.deepEqual(await box(page, ".filetree-wrapper"), [0, 0, 250, 900]);
+      assert.deepEqual(await box(page, ".filetree-wrapper"), [0, 0, 280, 900]);
       assert.equal(
         await page.evaluate(
           () =>
@@ -906,6 +936,23 @@ describe("mobile file tree", () => {
       );
     });
   }
+
+  // Why: the open tree is as wide as the desktop sidebar can be (280px;
+  // live: 250px), so note titles wrap less, but it always leaves part of
+  // the dimmed page showing to tap, even on the narrowest phones.
+  it("opens wide, but never over the whole width", async () => {
+    for (const [width, expected] of [
+      [390, 280],
+      [320, 272],
+    ] as const) {
+      await withPage(width, async page => {
+        await page.goto(origin + "/", { waitUntil: "load" });
+        await page.click(".hamburger-btn");
+        const [, , treeWidth] = await box(page, ".filetree-wrapper");
+        assert.equal(treeWidth, expected, `${width}px`);
+      });
+    }
+  });
 
   // Why: a folder the reader opened stays open on the next page, as on
   // live.

@@ -381,6 +381,16 @@ computed-style comparison of each dialog state against thunk.blog at
   `test/layout/site-layout.test.ts`, run with JavaScript on and off;
   screenshots of every page and of the open tree match the previous build.
 
+### The mobile file tree is wider
+
+- **Change:** the file tree opened from the hamburger is 280px wide, the
+  desktop sidebar's widest, capped at 85% of the screen (272px on a 320px
+  phone). Live's was 250px.
+- **Why:** long note titles wrapped more than they needed to; the dimmed
+  page beside the tree still shows, to tap closed.
+- **Evidence:** the "opens wide, but never over the whole width" test in
+  `test/layout/site-layout.test.ts`.
+
 ### Search buttons hide without JavaScript
 
 - **Change:** with JavaScript off, the search buttons are hidden. Live showed

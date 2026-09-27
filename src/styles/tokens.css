@@ -149,11 +149,12 @@
   --color-row-hover: rgb(255 255 255 / 0.05);
   --color-key-surface: rgb(255 255 255 / 0.08);
   /* Search key hint (0.7rem) and its <code> keys (Obsidian inline code,
-     0.8em of the hint). Buttons keep line-height: normal. */
+     0.8em of the hint). Live's 1.6 line height leaves room around the
+     keys; `normal` made the hint shorter than they are. */
   --text-key-hint: 0.7rem;
-  --text-key-hint--line-height: normal;
+  --text-key-hint--line-height: 1.6;
   --text-key-code: 0.56rem;
-  --text-key-code--line-height: normal;
+  --text-key-code--line-height: 1.6;
   /* Navbar site name below md. */
   --text-site-name-sm: 1.5rem;
   --text-site-name-sm--line-height: 1;

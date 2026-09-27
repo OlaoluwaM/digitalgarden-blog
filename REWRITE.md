@@ -109,3 +109,7 @@ Phase 2: design system.
 - [ ] Remove Eleventy and migration-only code.
 - [ ] Delete `get-theme` and the `THEME` settings (ADR 0001).
 - [ ] Add `"type": "module"` to `package.json` to remove `MODULE_TYPELESS_PACKAGE_JSON` warnings.
+
+## After Cutover
+
+- [ ] After Olaolu signs off on the site, add visual snapshot tests of the overall UI and key features (pages at phone and desktop widths, the search dialog, the mobile file tree, callouts, code blocks).

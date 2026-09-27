@@ -16,6 +16,12 @@
     @variant max-xl {
       width: var(--container-sidebar-min);
     }
+
+    /* Opened over the page on phones and tablets: as wide as the desktop
+       sidebar can be, but leaving part of the page to tap. */
+    @variant max-lg {
+      width: min(var(--container-sidebar), 85vw);
+    }
   }
 
   /* Folders are native <details>. Safari draws its disclosure triangle with
