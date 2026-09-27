@@ -11,9 +11,10 @@
 //   (`autofocus`). It covers the viewport, so a click outside the box has
 //   the dialog itself as its target.
 // - `#term` is a combobox: the script keeps `aria-expanded` (results shown)
-//   and `aria-activedescendant` (the selected result's id) current. The
-//   browser's clear button is hidden, as on live.
-// - `#search-layout[data-state]` decides what shows: `idle` (the hint),
+//   and `aria-activedescendant` (the selected result's id) current. It is
+//   a text field that asks phones for a search keyboard: a search field
+//   clears itself on Escape instead of letting the dialog close.
+// - `#search-layout[data-state]` decides what shows: `idle` (a message),
 //   `results` (the list and, from md up, the preview), `empty` (the
 //   no-results message, with the query written as text into
 //   `.no-results-query`).
@@ -36,6 +37,12 @@
 import Icon from "./Icon.astro";
 import Key from "./Key.astro";
 
+// The three messages (before a search, no results, no preview yet) share
+// one look. `display` stays off these classes: search.css and the
+// placeholder's `peer-empty:` decide when each shows.
+const messageClass =
+  "flex-col items-center px-5 py-10 text-center text-sm text-gray-100";
+const messageIconClass = "mb-4 size-12 opacity-30";
 const hints = [
   ["Enter", "to select"],
   ["⇅", "to navigate"],
@@ -54,8 +61,10 @@ const hints = [
     <div class="search-header shrink-0 border-b border-gray-700 pb-3">
       <input
         id="term"
-        type="search"
-        class="h-8 w-full rounded-lg border border-gray-700 bg-gray-800 px-4 text-sm text-gray-50 placeholder:text-gray-300 [&::-webkit-search-cancel-button]:hidden"
+        type="text"
+        inputmode="search"
+        enterkeyhint="search"
+        class="h-8 w-full rounded-lg border border-gray-700 bg-gray-800 px-4 text-sm text-gray-50 placeholder:text-gray-300"
         placeholder="Start typing..."
         aria-label="Search notes"
         role="combobox"
@@ -75,15 +84,20 @@ const hints = [
       <div
         class="search-results-panel max-h-[60vh] shrink-0 overflow-y-auto overscroll-contain"
       >
-        <p class="search-idle m-0 italic">
-          Enter your search text in the box above
-        </p>
+        <div class="search-idle">
+          <div class:list={["flex", messageClass]}>
+            <Icon name="search" class={messageIconClass} />
+            <p class="m-0">Type to search the notes</p>
+          </div>
+        </div>
         <div id="search-results" role="listbox" aria-label="Results"></div>
-        <div class="no-results px-5 py-10 text-center text-gray-100">
-          <Icon name="zoom-out" class="mx-auto mb-4 block size-12 opacity-30" />
-          <p class="my-7">
-            No results for “<span class="no-results-query"></span>”
-          </p>
+        <div class="no-results">
+          <div class:list={["flex", messageClass]}>
+            <Icon name="zoom-out" class={messageIconClass} />
+            <p class="m-0">
+              No results for “<span class="no-results-query"></span>”
+            </p>
+          </div>
         </div>
       </div>
       <div
@@ -98,15 +112,19 @@ const hints = [
         >
         </div>
         <div
-          class="preview-placeholder hidden h-50 flex-col items-center justify-center p-10 text-center text-gray-100 peer-empty:flex"
+          class:list={[
+            "preview-placeholder hidden peer-empty:flex",
+            messageClass,
+          ]}
         >
-          <Icon name="file-text" class="mb-4 size-12 opacity-30" />
-          <p class="m-0 text-sm">Select a result to preview</p>
+          <Icon name="file-text" class={messageIconClass} />
+          <p class="m-0">Select a result to preview</p>
         </div>
       </div>
     </div>
+    <!-- Keyboard hints, hidden below md like the search button's. -->
     <footer
-      class="search-box-footer mt-3 flex shrink-0 justify-end gap-4 border-t border-gray-700 pt-3"
+      class="search-box-footer mt-3 flex shrink-0 justify-end gap-4 border-t border-gray-700 pt-3 max-md:hidden"
     >
       {
         hints.map(([key, action]) => (

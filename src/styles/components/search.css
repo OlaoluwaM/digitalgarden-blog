@@ -122,13 +122,17 @@
     box-decoration-break: clone;
   }
 
-  /* The preview's header. */
+  /* The preview's header. The title is set like the note's own, in the
+     serif, a step smaller to fit the panel. */
   .preview-title {
     margin-bottom: --spacing(2);
-    color: var(--color-gray-200);
-    font-size: var(--text-2xl);
-    line-height: var(--text-2xl--line-height);
-    font-weight: var(--font-weight-semibold);
+    color: var(--color-gray-50);
+    font-family: var(--font-serif);
+    font-size: var(--text-3xl);
+    line-height: var(--text-3xl--line-height);
+    letter-spacing: var(--text-3xl--letter-spacing);
+    font-weight: var(--font-weight-normal);
+    text-wrap: pretty;
   }
   .preview-tags {
     display: flex;

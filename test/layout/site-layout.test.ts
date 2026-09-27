@@ -681,6 +681,65 @@ describe("search dialog", () => {
     });
   });
 
+  // Why: search shows a short message before a search, when nothing
+  // matches, and before a result is picked for the preview. They are one
+  // kind of message and share one style; the first was italic,
+  // left-aligned, and brighter than the others.
+  it("shows every search message in one style", async () => {
+    await withPage(1440, async page => {
+      await page.goto(origin + "/", { waitUntil: "load" });
+      const messages: Record<string, unknown> = {};
+      for (const [state, selector] of [
+        ["idle", ".search-idle p"],
+        ["empty", ".no-results p"],
+        ["results", ".preview-placeholder p"],
+      ] as const) {
+        await openSearch(page, state);
+        messages[state] = await page.$eval(selector, message => {
+          const style = getComputedStyle(message);
+          const icon = message.parentElement!.querySelector("svg");
+          return {
+            size: style.fontSize,
+            color: style.color,
+            italic: style.fontStyle === "italic",
+            align: style.textAlign,
+            icon: icon ? getComputedStyle(icon).width : null,
+          };
+        });
+        await page.evaluate(() =>
+          document.querySelector<HTMLDialogElement>("#globalsearch")!.close()
+        );
+      }
+      const expected = {
+        size: "14px",
+        color: "rgb(179, 179, 179)",
+        italic: false,
+        align: "center",
+        icon: "48px",
+      };
+      assert.deepEqual(messages, {
+        idle: expected,
+        empty: expected,
+        results: expected,
+      });
+    });
+  });
+
+  // Why: the footer names keys to press (Enter, arrows, Esc). Phones have
+  // none, so the hints go below md, as the search button's Ctrl + K does.
+  for (const [width, shown] of [
+    [1440, true],
+    [390, false],
+  ] as const) {
+    it(`${shown ? "shows" : "hides"} the keyboard hints at ${width}px`, async () => {
+      await withPage(width, async page => {
+        await page.goto(origin + "/", { waitUntil: "load" });
+        await openSearch(page, "results");
+        assert.equal(await page.isVisible(".search-box-footer"), shown);
+      });
+    });
+  }
+
   // Why: the preview shows another note's `main.content`, which must look
   // like that note (callouts, code blocks, compact text) without repeating
   // the title and tags that the preview's own header already shows, or the
@@ -700,14 +759,19 @@ describe("search dialog", () => {
           text: style(":scope > p").fontSize,
           code: style("pre.astro-code").fontFamily.split(",")[0],
           callout: style(".callout").backgroundColor !== "rgba(0, 0, 0, 0)",
+          title: getComputedStyle(
+            document.querySelector(".preview-title")!
+          ).fontFamily.split(",")[0],
         };
       });
+      // The preview's title is set like the note's own: in the serif.
       assert.deepEqual(preview, {
         header: "none",
         footer: "none",
         text: "16px",
         code: '"Commit Mono"',
         callout: true,
+        title: '"Instrument Serif"',
       });
     });
   });
@@ -831,6 +895,20 @@ describe("search dialog wiring", () => {
     });
   }
 
+  // Why: the footer says Escape closes search. A search field's own
+  // Escape clears the query first, which took a second press to close the
+  // dialog; live closed on the first.
+  it("closes on the first Escape with a query typed", async () => {
+    await withPage(1440, async page => {
+      await page.goto(origin + "/", { waitUntil: "load" });
+      await page.click(".filetree-sidebar .search-button");
+      await page.keyboard.type("haskell");
+      await page.waitForSelector(".searchresult");
+      await page.keyboard.press("Escape");
+      assert.equal(await isOpen(page), false);
+    });
+  });
+
   // Why: `/?q=` links open search with results; the note header's tag
   // links point there.
   it("opens with the results for ?q=", async () => {
@@ -903,6 +981,143 @@ describe("search dialog wiring", () => {
   });
 });
 
+describe("links", () => {
+  // Why: a link inside a sentence is marked by a faint underline as well
+  // as its color (WCAG 1.4.1), which hover makes solid. The post footer's
+  // links had a solid underline and the 404 page's link none.
+  it("underlines links in sentences the same way", async () => {
+    await withPage(1440, async page => {
+      const underline = (selector: string) =>
+        page.$eval(selector, link => {
+          const style = getComputedStyle(link);
+          return {
+            line: style.textDecorationLine,
+            color: style.textDecorationColor,
+            thickness: style.textDecorationThickness,
+            // In em, whatever the link's size.
+            offset:
+              Math.round(
+                (parseFloat(style.textUnderlineOffset) /
+                  parseFloat(style.fontSize)) *
+                  100
+              ) / 100,
+          };
+        });
+      const faint = async (selector: string) => {
+        const { color, ...rest } = await underline(selector);
+        return { ...rest, alpha: (await rgba(page, color)).split(", ")[3] };
+      };
+      await page.goto(`${origin}/posts/implementing-redis-info-in-haskell/`, {
+        waitUntil: "load",
+      });
+      const note = await faint("main p a.internal-link");
+      const footer = await faint(".post-cta a");
+      await page.goto(`${origin}/404`, { waitUntil: "load" });
+      const notFound = await faint("main a");
+      const expected = {
+        line: "underline",
+        thickness: "1px",
+        offset: 0.2,
+        alpha: "0.4)",
+      };
+      assert.deepEqual(
+        { note, footer, notFound },
+        {
+          note: expected,
+          footer: expected,
+          notFound: expected,
+        }
+      );
+    });
+  });
+});
+
+describe("Recent Posts", () => {
+  // Each entry's box, and its description's distance from the title's
+  // line (the link is inline, so its own box sits inside that line).
+  const items = (page: Page) =>
+    page.$$eval(".recent-notes li", items =>
+      items.map(item => {
+        const box = item.getBoundingClientRect();
+        const description = item.querySelector("p");
+        const date = item.querySelector("time")!;
+        const titleLine = parseFloat(getComputedStyle(item).lineHeight);
+        return {
+          top: box.top,
+          bottom: box.bottom,
+          descriptionGap: description
+            ? description.getBoundingClientRect().top - (box.top + titleLine)
+            : null,
+          dateSize: parseFloat(getComputedStyle(date).fontSize),
+          descriptionSize: description
+            ? parseFloat(getComputedStyle(description).fontSize)
+            : null,
+        };
+      })
+    );
+
+  // Why: the date is secondary to the description, so it is smaller; on
+  // the scale both had become 14px.
+  it("sets each date smaller than its description", async () => {
+    await withPage(1440, async page => {
+      await page.goto(origin + "/", { waitUntil: "load" });
+      for (const item of await items(page)) {
+        if (item.descriptionSize === null) continue;
+        assert.ok(item.dateSize < item.descriptionSize, JSON.stringify(item));
+      }
+    });
+  });
+
+  // Why: entries sat 20px apart with the description touching its title,
+  // so the list read as one block. Entries are a paragraph apart (28px, the
+  // notes' rhythm), and the description sits 4px under its title.
+  it("gives each entry room", async () => {
+    await withPage(1440, async page => {
+      await page.goto(origin + "/", { waitUntil: "load" });
+      const list = await items(page);
+      assert.ok(list.length >= 2);
+      for (const [index, item] of list.entries()) {
+        if (item.descriptionGap !== null) {
+          assert.ok(
+            Math.abs(item.descriptionGap - 4) < 1,
+            JSON.stringify(item)
+          );
+        }
+        const next = list[index + 1];
+        if (next)
+          assert.ok(
+            Math.abs(next.top - item.bottom - 28) < 1,
+            `${next.top - item.bottom}px`
+          );
+      }
+    });
+  });
+});
+
+describe("code blocks", () => {
+  // Why: code blocks sit on the raised gray, like inline code, and their
+  // copy button uses the site's one hover fill (white at 5%).
+  it("sit on the raised gray, with the shared fill on the copy button", async () => {
+    await withPage(1440, async page => {
+      await page.goto(
+        `${origin}/posts/how-to-produce-multiple-executables-from-a-stack-project/`,
+        {
+          waitUntil: "load",
+        }
+      );
+      await page.hover("main pre.astro-code");
+      const [block, button] = await page.$eval("main pre.astro-code", pre => [
+        getComputedStyle(pre).backgroundColor,
+        getComputedStyle(pre.querySelector(".copy-code-btn")!).backgroundColor,
+      ]);
+      assert.deepEqual(
+        [await rgba(page, block), await rgba(page, button)],
+        ["rgba(36, 36, 36, 1)", "rgba(255, 255, 255, 0.05)"]
+      );
+    });
+  });
+});
+
 describe("mobile file tree", () => {
   const isOpen = (page: Page) =>
     page.evaluate(() =>
@@ -929,8 +1144,10 @@ describe("mobile file tree", () => {
           page,
           await page.evaluate(
             () =>
-              getComputedStyle(document.querySelector("#filetree")!, "::backdrop")
-                .backgroundColor
+              getComputedStyle(
+                document.querySelector("#filetree")!,
+                "::backdrop"
+              ).backgroundColor
           )
         ),
         "rgba(0, 0, 0, 0.5)"

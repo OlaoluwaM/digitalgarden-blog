@@ -520,3 +520,71 @@ is 2.2px or less unless it says otherwise.
     browser font size.
 - **Why:** one grid; no values that exist once.
 - **Evidence:** `test/design-system.test.ts`; screenshots.
+
+## 2026-09-27: Consistency fixes
+
+Found reviewing the dev site after the move onto Tailwind's scales.
+
+### Escape closes search the first time
+
+- **Change:** the search field is a text field (it still asks phones for
+  a search keyboard). As a search field, it cleared the query on the first
+  Escape, and only the second closed the dialog.
+- **Why:** the footer says Escape closes search, and live closed on the
+  first press.
+- **Evidence:** "closes on the first Escape with a query typed" in
+  `test/layout/site-layout.test.ts`.
+
+### One style for search messages
+
+- **Change:** the messages before a search, with no results, and before a
+  result is previewed share one look: centered, with a 48px icon, in 14px
+  muted gray. The first was italic, left-aligned, and brighter, with no
+  icon, and now reads "Type to search the notes" (was "Enter your search
+  text in the box above"). The no-results message was 16px.
+- **Why:** one kind of message, three styles.
+- **Evidence:** "shows every search message in one style".
+
+### Keyboard hints hide on phones
+
+- **Change:** below 800px the search dialog's footer (Enter, arrows, Esc)
+  is hidden, as the search button's Ctrl + K already was.
+- **Why:** phones have none of those keys.
+- **Evidence:** "shows/hides the keyboard hints" tests.
+
+### The preview's title is set in the serif
+
+- **Change:** the search preview's title is Instrument Serif at 30.7px in
+  the body color (was Instrument Sans semibold, 24.6px, link gray).
+- **Why:** every other note title is set in the serif.
+- **Evidence:** "styles the preview like a note".
+
+### One underline for links in sentences
+
+- **Change:** links in the post footer and the 404 page's "Go back home"
+  get the faint underline links in notes have (the `link-underline`
+  utility). The footer's underline was solid; the 404 link had none.
+- **Why:** a link in a sentence should look the same everywhere, and not
+  rely on color alone.
+- **Evidence:** "underlines links in sentences the same way".
+
+### Recent Posts has more room
+
+- **Change:** entries are 28px apart (were 20px, with 2px padding), each
+  description sits 4px under its title (was touching), and dates are 12px
+  (were 14px, the same as the descriptions).
+- **Why:** the list read as one block, and the date no longer read as
+  secondary.
+- **Evidence:** the "Recent Posts" tests.
+
+### Code blocks sit on the raised gray
+
+- **Change:** code blocks use #242424, like inline code and quotes (was
+  the theme's #1e1e1e, the page's color); the syntax colors are
+  unchanged. The copy button's fill is white at 5% (10% on hover) with
+  muted text; it was 5% of the code's text color.
+- **Why:** code looked different inline and in blocks; the copy button was
+  the one control off the shared hover fill.
+- **Evidence:** "sit on the raised gray, with the shared fill on the copy
+  button"; `test/highlighting.test.ts`; axe (comments, the dimmest syntax
+  color, still pass AA).

@@ -15,6 +15,7 @@ phase 2.
 | `layout.css`    | `components` | The page frame: where the note column sits beside the file tree.              |
 | `content/`      | `components` | Rendered Markdown. Markdown output carries no utility classes.                |
 | `components/`   | `components` | Chrome rules that utilities cannot express (pseudo-elements, calc, `[open]`). |
+| `utilities.css` | `utilities`  | Custom utilities (`@utility`) shared by templates and CSS.                    |
 | `style-guide/`¹ | —            | Dev-only page at `/style-guide/` listing the tokens.                          |
 
 ¹ `src/style-guide/`.
@@ -28,18 +29,18 @@ rules in `@layer components { … }`.
 The tokens follow Tailwind's structure: its theme namespaces, its step names
 in its order, one spacing unit. `test/design-system.test.ts` enforces it.
 
-| Scale      | Steps                                                              | Values                                                     |
-| ---------- | ------------------------------------------------------------------ | ---------------------------------------------------------- |
-| Color      | `gray-50` (text) … `gray-950` (page); `slate-300`, `yellow-400`    | Ours (Obsidian's grays); roles listed in `tokens.css`      |
-| Text       | `xs`, `sm`, `base`, `lg`                                           | Tailwind's, with its paired line heights                   |
-| Text       | `xl` … `5xl` (h5 … h1)                                             | Ours: a Major Third from 3rem, own line heights, tracking  |
-| Leading    | `tight`, `snug`, `normal`, `relaxed` (`none` is built in)          | Tailwind's                                                 |
-| Radius     | `xs` 2px, `sm` 4px, `md` 6px, `lg` 8px, `xl` 12px (`full`)         | Tailwind's                                                 |
-| Spacing    | `--spacing` 0.25rem; whole or half steps                           | Tailwind's                                                 |
-| Container  | `content` 700px, `sidebar`, `sidebar-min`, `site-name`, `6xl`      | Ours (layout), `6xl` Tailwind's                            |
-| Breakpoint | `md` 50rem (800px), `lg` 62.5rem (1000px), `xl` 87.5rem (1400px)   | Ours, in rem                                               |
-| Shadow     | `2xl`                                                              | Tailwind's shape at twice the strength                     |
-| Motion     | default 150ms, `cubic-bezier(0.4, 0, 0.2, 1)`; `ease-overshoot`    | Tailwind's; the hamburger keeps Obsidian's                 |
+| Scale      | Steps                                                            | Values                                                    |
+| ---------- | ---------------------------------------------------------------- | --------------------------------------------------------- |
+| Color      | `gray-50` (text) … `gray-950` (page); `slate-300`, `yellow-400`  | Ours (Obsidian's grays); roles listed in `tokens.css`     |
+| Text       | `xs`, `sm`, `base`, `lg`                                         | Tailwind's, with its paired line heights                  |
+| Text       | `xl` … `5xl` (h5 … h1)                                           | Ours: a Major Third from 3rem, own line heights, tracking |
+| Leading    | `tight`, `snug`, `normal`, `relaxed` (`none` is built in)        | Tailwind's                                                |
+| Radius     | `xs` 2px, `sm` 4px, `md` 6px, `lg` 8px, `xl` 12px (`full`)       | Tailwind's                                                |
+| Spacing    | `--spacing` 0.25rem; whole or half steps                         | Tailwind's                                                |
+| Container  | `content` 700px, `sidebar`, `sidebar-min`, `site-name`, `6xl`    | Ours (layout), `6xl` Tailwind's                           |
+| Breakpoint | `md` 50rem (800px), `lg` 62.5rem (1000px), `xl` 87.5rem (1400px) | Ours, in rem                                              |
+| Shadow     | `2xl`                                                            | Tailwind's shape at twice the strength                    |
+| Motion     | default 150ms, `cubic-bezier(0.4, 0, 0.2, 1)`; `ease-overshoot`  | Tailwind's; the hamburger keeps Obsidian's                |
 
 Note text (1.03rem / 1.5) sits between steps and lives in `layout.css`.
 
@@ -55,7 +56,10 @@ Note text (1.03rem / 1.5) sits between steps and lives in `layout.css`.
 - Arbitrary values (`max-h-[60vh]`) only where no scale or utility fits; each
   is listed, with its reason, in `test/design-system.test.ts`.
 - One style per element: tags, keys (`Key.astro`), inline code, the hover
-  fill (`white/5`), and the focus ring look the same wherever they appear.
+  fill (`white/5`), the focus ring, search messages, and links in
+  sentences (`link-underline`) look the same wherever they appear.
+- A look shared by templates and hand-written CSS is a custom utility in
+  `utilities.css` (`@utility`), which the CSS `@apply`s.
 - Chrome components (header, footer, Recent Posts, navigation, 404) use
   utility classes in their templates. Put a rule in `components/<name>.css`
   only when utilities cannot express it, and say why in a comment.

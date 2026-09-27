@@ -1,0 +1,19 @@
+/*
+ * Custom utilities (Tailwind's `@utility`): patterns that templates use as
+ * classes and the hand-written stylesheets `@apply`, so each look has one
+ * definition.
+ */
+
+/* A link inside a sentence: a faint underline marks it as well as its
+   color (WCAG 1.4.1), and hover makes the underline solid. Note text, the
+   post footer, the 404 page. */
+@utility link-underline {
+  text-decoration-line: underline;
+  text-decoration-color: color-mix(in srgb, currentColor 40%, transparent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+
+  &:hover {
+    text-decoration-color: currentColor;
+  }
+}

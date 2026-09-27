@@ -708,7 +708,13 @@ Eleventy's markdown-it options. Olaolu put all resulting items in scope.
   stale `var()`s, so check renamed utilities with Tailwind's
   `__unstable__loadDesignSystem` (`candidatesToCss` returns null).
 - Every visible change: `docs/design-changes.md` (2026-09-27, Tokens on
-  Tailwind's scales).
+  Tailwind's scales; then Consistency fixes).
+- Consistency fixes (Olaolu approved all recommendations,
+  https://claude.ai/artifact/1bJhVxwWsrefSNJ2ojZvaq): the search field is
+  `type="text"` (a search field ate the first Escape); links in sentences
+  share the `link-underline` utility (`src/styles/utilities.css`, which
+  typography.css `@apply`s); astro.config.ts swaps Shiki's block background
+  for `var(--color-gray-900)`. Extra `<h1>`s per page are a TODO.
 
 ### Analytics (2026-09-26)
 

@@ -24,6 +24,7 @@
 @import "./components/not-found.css";
 @import "./components/navigation.css";
 @import "./components/search.css";
+@import "./utilities.css";
 /*
  * Generate utilities only from the Astro templates and client scripts. The
  * default scans the whole repository, including note text and the Eleventy

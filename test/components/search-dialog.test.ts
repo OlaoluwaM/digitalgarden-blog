@@ -46,7 +46,11 @@ describe("search field", () => {
   // `aria-expanded` and `aria-activedescendant` current.
   it("is a named combobox that controls the results list", () => {
     const input = root.querySelector("input#term");
-    expect(input?.getAttribute("type")).toBe("search");
+    // A text field: a search field clears itself on Escape instead of
+    // letting the dialog close. Phones still show a search keyboard.
+    expect(input?.getAttribute("type")).toBe("text");
+    expect(input?.getAttribute("inputmode")).toBe("search");
+    expect(input?.getAttribute("enterkeyhint")).toBe("search");
     expect(input?.hasAttribute("autofocus")).toBe(true);
     expect(input?.getAttribute("aria-label")).toBe("Search notes");
     expect(input?.getAttribute("placeholder")).toBe("Start typing...");
@@ -66,8 +70,8 @@ describe("results", () => {
   it("starts in the idle state with its hint", () => {
     const layout = root.querySelector(".search-layout#search-layout");
     expect(layout?.getAttribute("data-state")).toBe("idle");
-    expect(layout?.querySelector(".search-idle")?.text).toBe(
-      "Enter your search text in the box above"
+    expect(layout?.querySelector(".search-idle p")?.text).toBe(
+      "Type to search the notes"
     );
   });
 

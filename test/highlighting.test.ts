@@ -25,13 +25,16 @@ async function render(source: string) {
   };
 }
 
-it("uses dark-plus colors for the code block and JavaScript tokens", async () => {
+// Why: the blocks keep dark-plus's syntax colors, but sit on the site's
+// raised gray, like inline code and quotes, instead of the theme's
+// #1e1e1e, which is the page's own color (docs/design-changes.md).
+it("uses dark-plus colors on the site's raised gray", async () => {
   const { document } = await render('```js\nconst greeting = "hello";\n```');
   const block = document.querySelector("pre");
   assert.ok(block);
   assert.match(
     block.getAttribute("style") ?? "",
-    /background-color:\s*#1e1e1e/i
+    /background-color:\s*var\(--color-gray-900\)/
   );
   assert.match(
     block.getAttribute("style") ?? "",

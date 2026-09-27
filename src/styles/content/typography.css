@@ -117,22 +117,17 @@
     /* Links: gray, underlined on hover. Unresolved wikilinks are dimmed. */
     /* Links keep the regular weight (even in table headers and highlights)
        unless they sit in bold text. */
-    /* A faint underline marks links in running text, so they do not rely on
-       color alone (WCAG 1.4.1); hover makes it solid. */
+    /* The faint underline all links in sentences share (utilities.css). */
     a:is(.internal-link, .external-link) {
+      @apply link-underline;
       color: var(--color-gray-200);
       font-weight: var(--font-weight-normal);
-      text-decoration-line: underline;
-      text-decoration-color: color-mix(in srgb, currentColor 40%, transparent);
-      text-decoration-thickness: 1px;
-      text-underline-offset: 0.2em;
       cursor: pointer;
       transition: opacity var(--default-transition-duration)
         var(--default-transition-timing-function);
 
       &:hover {
         color: var(--color-gray-100);
-        text-decoration-color: currentColor;
       }
     }
     :is(b, strong) a:is(.internal-link, .external-link) {

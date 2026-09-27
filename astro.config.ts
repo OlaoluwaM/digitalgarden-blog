@@ -71,6 +71,14 @@ export default defineConfig({
           // (ADR 0003 phase 1).
           pre(node) {
             this.addClassToHast(node, "shiki");
+            // Blocks keep the theme's syntax colors but sit on the site's
+            // raised gray, like inline code, instead of the theme's
+            // #1e1e1e (the page's own color).
+            const style = String(node.properties.style ?? "");
+            node.properties.style = style.replace(
+              /background-color:[^;]*/i,
+              "background-color:var(--color-gray-900)"
+            );
             // Astro's own transformer runs first and labels unlabelled fences
             // "plaintext"; Eleventy labelled them "text".
             if (node.properties.dataLanguage === "plaintext") {

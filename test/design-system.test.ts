@@ -80,8 +80,6 @@ const ARBITRARY_ALLOWED = new Map([
   ["[corner-shape:var(--corner-shape-soft)]", "corner-shape"],
   // No utility exists for `scrollbar-width`.
   ["[scrollbar-width:thin]", "scrollbar-width"],
-  // The browser's clear button in the search field (a vendor pseudo-element).
-  ["[&::-webkit-search-cancel-button]:hidden", "vendor pseudo-element"],
   // The search panels' height follows the viewport (live: 60vh).
   ["max-h-[60vh]", "viewport height"],
   // Key caps are 0.8em of their hint, below any step (D3).

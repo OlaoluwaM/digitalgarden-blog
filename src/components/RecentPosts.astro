@@ -14,12 +14,10 @@ const { posts } = Astro.props;
 {
   posts.length > 0 && (
     <section class="recent-notes mt-8">
-      <h2 class="font-serif font-normal text-4xl mt-17 mb-7">
-        Recent Posts
-      </h2>
-      <ul class="my-7 list-none p-0">
+      <h2 class="font-serif font-normal text-4xl mt-17 mb-7">Recent Posts</h2>
+      <ul class="my-7 grid list-none gap-7 p-0">
         {posts.map(post => (
-          <li class="relative mb-5 py-0.5 last:mb-0">
+          <li>
             <a
               href={post.data.pluginProps.permalink}
               class="internal-link text-gray-200 no-underline hover:text-gray-100 hover:underline"
@@ -27,12 +25,12 @@ const { posts } = Astro.props;
               {post.data.rawNoteProps.title}
             </a>
             {metaDescription(post.data.rawNoteProps.description) && (
-              <p class="m-0 text-sm text-gray-300">
+              <p class="m-0 mt-1 text-sm text-gray-300">
                 {metaDescription(post.data.rawNoteProps.description)}
               </p>
             )}
             <time
-              class="human-date recent-note-date mt-1.5 block text-sm text-gray-300 not-italic"
+              class="human-date recent-note-date mt-1.5 block text-xs text-gray-300 not-italic"
               datetime={post.data.rawNoteProps.published}
             >
               {formatNoteDate(post.data.rawNoteProps.published)}
