@@ -98,9 +98,11 @@ function isKnown(violation: { rule: string; target: string }) {
   );
 }
 
+/** Every page a reader stays on: not the 404 page, and not `/random/`,
+ * which leaves for a note as soon as it loads. */
 function routes() {
   return site.pages
-    .filter(page => page !== "404.html")
+    .filter(page => page !== "404.html" && page !== "random/index.html")
     .map(page => "/" + page.replace(/index\.html$/, ""));
 }
 
@@ -1481,6 +1483,51 @@ describe("not-found handling", () => {
       const response = await page.goto(`${origin}/definitely-not-a-page`);
       assert.equal(response?.status(), 404);
       assert.equal(await page.title(), "Nothing here");
+    });
+  });
+});
+
+describe("random page", () => {
+  async function notes() {
+    const html = await site.read("random/index.html");
+    const json = /<script[^>]*id="random-notes"[^>]*>([\s\S]*?)<\/script>/.exec(
+      html
+    );
+    assert.ok(json, "no #random-notes list");
+    return JSON.parse(json[1]!) as string[];
+  }
+
+  // Why: the page's one job is to land on a note picked at random from its
+  // list. Stubbing Math.random picks the first and last entries, so an
+  // off-by-one in the index shows up.
+  for (const [random, pick] of [
+    [0, "first"],
+    [0.999999, "last"],
+  ] as const) {
+    it(`sends the visitor to the ${pick} note when Math.random() is ${random}`, async () => {
+      const urls = await notes();
+      const expected = pick === "first" ? urls[0]! : urls.at(-1)!;
+      await withPage(1440, async page => {
+        await page.addInitScript(value => {
+          Math.random = () => value;
+        }, random);
+        await page.goto(origin + "/random/");
+        await page.waitForURL(url => url.pathname !== "/random/");
+        assert.equal(new URL(page.url()).pathname, expected);
+      });
+    });
+  }
+
+  // Why: live's redirect added `/~random/` to the history, so Back from the
+  // note returned to it and it redirected again, trapping the reader. The
+  // page replaces itself instead, so Back returns to where they came from.
+  it("leaves no history entry, so Back returns to the previous page", async () => {
+    await withPage(1440, async page => {
+      await page.goto(origin + "/");
+      await page.goto(origin + "/random/");
+      await page.waitForURL(url => url.pathname !== "/random/");
+      await page.goBack();
+      assert.equal(new URL(page.url()).pathname, "/");
     });
   });
 });

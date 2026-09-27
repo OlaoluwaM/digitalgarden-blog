@@ -40,6 +40,10 @@ after(async () => {
   await site?.cleanup();
 });
 
+/** Standalone pages, not notes: no shared layout, note header, or analytics. */
+const STANDALONE = ["404.html", "random/index.html"];
+const isNote = (page: string) => !STANDALONE.includes(page);
+
 function head(page: string) {
   const element = documents.get(page)?.querySelector("head");
   assert.ok(element, `${page} has no <head>`);
@@ -100,10 +104,11 @@ describe("every page's head", () => {
   // build time; an external script creeping back in is a regression in both
   // reliability and privacy.
   // Why: the live site reports page views and Core Web Vitals to Vercel;
-  // dropping either component would silently stop the data. The 404 page
-  // stays standalone like Eleventy's, without them.
+  // dropping either component would silently stop the data. The standalone
+  // pages carry neither: the 404 page as on Eleventy, and `/random/`
+  // leaves for a note before it could report.
   it("includes Vercel Web Analytics and Speed Insights on note pages", () => {
-    for (const page of site.pages.filter(page => page !== "404.html")) {
+    for (const page of site.pages.filter(isNote)) {
       const document = documents.get(page)!;
       assert.ok(document.querySelector("vercel-analytics"), page);
       assert.ok(document.querySelector("vercel-speed-insights"), page);
@@ -186,16 +191,12 @@ describe("the stylesheet bundle (ADR 0003)", () => {
         });
       });
     const collisions = new Set<string>();
-    for (const page of site.pages) {
+    // The standalone pages are hand-written chrome, not rendered Markdown:
+    // they carry utility classes the way header/footer/Recent Posts do.
+    for (const page of site.pages.filter(isNote)) {
       const main = documents.get(page)!.querySelector("main");
       for (const element of main?.querySelectorAll("*") ?? []) {
-        // `main.centered` is the 404 page's own chrome (src/pages/404.astro),
-        // not rendered Markdown: it carries utility classes the same way
-        // header/footer/Recent Posts do.
-        if (
-          element.closest("header, footer, section.recent-notes, main.centered")
-        )
-          continue;
+        if (element.closest("header, footer, section.recent-notes")) continue;
         for (const name of element.classList.values())
           if (utilities.has(name)) collisions.add(`${page}: .${name}`);
       }
@@ -259,7 +260,7 @@ describe("page structure", () => {
   // Why: note content must stay inside `main.content`: layout.css places the
   // note column through that selector, and the code styles are scoped to it.
   it("renders note content inside the content container", () => {
-    for (const page of site.pages.filter(page => page !== "404.html")) {
+    for (const page of site.pages.filter(isNote)) {
       const main = documents.get(page)!.querySelector("body > main");
       assert.ok(main, page);
       assert.deepEqual([...main.classList.values()], ["content"], page);
@@ -278,7 +279,7 @@ describe("page structure", () => {
       documents.get(page)!.querySelector("main > header");
     assert.equal(noteHeader("index.html"), null);
     for (const page of site.pages.filter(
-      page => page !== "404.html" && page !== "index.html"
+      page => isNote(page) && page !== "index.html"
     )) {
       assert.ok(noteHeader(page)?.querySelector("h1"), page);
     }
@@ -288,7 +289,7 @@ describe("page structure", () => {
   // `.markdown-rendered main.content`; without the body class every note
   // renders with browser defaults.
   it("marks every note page's body as rendered Markdown", () => {
-    for (const page of site.pages.filter(page => page !== "404.html")) {
+    for (const page of site.pages.filter(isNote)) {
       const classes = documents.get(page)!.querySelector("body")?.classList;
       assert.ok(classes?.contains("markdown-rendered"), page);
     }

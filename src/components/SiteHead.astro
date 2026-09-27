@@ -1,0 +1,27 @@
+---
+// The head tags every page shares: encoding, viewport, title, icons, the
+// manifest, and feed discovery. A page adds its own tags (metadata,
+// scripts) through the slot, which sits after the title.
+import { site } from "../lib/site.ts";
+
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>{title}</title>
+<slot />
+<link rel="icon" href="/favicon.ico" sizes="any" />
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<link rel="manifest" href="/manifest.webmanifest" />
+<link
+  rel="alternate"
+  type="application/atom+xml"
+  title={site.name}
+  href={new URL("/feed.xml", site.url).href}
+/>

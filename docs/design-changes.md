@@ -635,3 +635,18 @@ Found reviewing the dev site after the move onto Tailwind's scales.
 - **Evidence:** "sets the shortcut hint smaller than the button's label"
   and "fits the shortcut keys inside their hint" in
   `test/layout/site-layout.test.ts`.
+
+## 2026-09-28: `/random/`
+
+- **Change:** the random page moves from `/~random/` to `/random/`, with no
+  redirect from the old URL. It picks from published notes without Home
+  (live included it). It replaces itself in the history
+  (`location.replace`), so Back from the note returns to the page before;
+  live's Back landed on `/~random/`, which redirected again. It loads no
+  analytics (live loaded Vercel's scripts), since it leaves before they
+  could report.
+- **Why:** Olaolu asked for the plain URL (the tilde came from the Digital
+  Garden template) and to leave Home out; a random note should be a note.
+  The Back loop trapped readers.
+- **Evidence:** `test/random-page.test.ts`; the "random page" tests in
+  `test/layout/site-layout.test.ts`.

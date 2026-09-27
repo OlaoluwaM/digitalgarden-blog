@@ -2,24 +2,13 @@
 // T4 (phase 1): standalone 404 page, not using BaseLayout
 import "../styles/global.css";
 import { site } from "../lib/site.ts";
+import SiteHead from "../components/SiteHead.astro";
 ---
 
 <!doctype html>
 <html lang={site.lang}>
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Nothing here</title>
-    <link rel="icon" href="/favicon.ico" sizes="any" />
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <link rel="manifest" href="/manifest.webmanifest" />
-    <link
-      rel="alternate"
-      type="application/atom+xml"
-      title={site.name}
-      href={new URL("/feed.xml", site.url).href}
-    />
+    <SiteHead title="Nothing here" />
   </head>
   <body>
     <main class="content centered">

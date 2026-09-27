@@ -56,7 +56,11 @@ with Eleventy; there is no single filtering or ordering rule for every route.
 - `getPublishedPosts()` currently filters only `dg-publish`. Preserve that
   behavior: `dg-hide` is file-tree metadata, not a global exclusion rule.
 - `src/site/feed.njk` reverses the note collection and excludes `/`.
-  `src/site/_includes/layouts/random.njk` includes the published home note.
+  `src/site/_includes/layouts/random.njk` includes the published home note;
+  the Astro `/random/` (`src/pages/random.astro`, no tilde, old URL not
+  kept) picks from `getPublishedArticles()`, without Home (Olaolu,
+  2026-09-28). The shared head tags live in `src/components/SiteHead.astro`
+  (BaseLayout, 404, random).
   `src/site/search-index.njk` has no `dg-hide` filter.
 - The collection schema validates permalink format; `getPublishedPosts()`
   rejects duplicate effective routes after filtering published posts.

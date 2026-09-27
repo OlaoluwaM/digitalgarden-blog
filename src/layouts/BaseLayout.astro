@@ -4,6 +4,7 @@ import Analytics from "@vercel/analytics/astro";
 import SpeedInsights from "@vercel/speed-insights/astro";
 import { site } from "../lib/site";
 import { canonicalUrl } from "../lib/metadata";
+import SiteHead from "../components/SiteHead.astro";
 
 // The document shell every page shares: head metadata, the stylesheet,
 // Vercel Web Analytics and Speed Insights, and the page-wide client scripts.
@@ -24,28 +25,17 @@ const canonical = canonicalUrl(Astro.url.pathname);
 <!doctype html>
 <html lang={site.lang}>
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{title}</title>
-    {description && <meta name="description" content={description} />}
-    <link rel="canonical" href={canonical} />
-    <meta property="og:type" content={type} />
-    <meta property="og:title" content={title} />
-    {description && <meta property="og:description" content={description} />}
-    <meta property="og:url" content={canonical} />
-    <meta property="og:site_name" content={site.name} />
-    <meta property="og:locale" content={site.lang} />
-    <meta name="twitter:card" content="summary" />
-    <link rel="icon" href="/favicon.ico" sizes="any" />
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <link rel="manifest" href="/manifest.webmanifest" />
-    <link
-      rel="alternate"
-      type="application/atom+xml"
-      title={site.name}
-      href={new URL("/feed.xml", site.url).href}
-    />
+    <SiteHead title={title}>
+      {description && <meta name="description" content={description} />}
+      <link rel="canonical" href={canonical} />
+      <meta property="og:type" content={type} />
+      <meta property="og:title" content={title} />
+      {description && <meta property="og:description" content={description} />}
+      <meta property="og:url" content={canonical} />
+      <meta property="og:site_name" content={site.name} />
+      <meta property="og:locale" content={site.lang} />
+      <meta name="twitter:card" content="summary" />
+    </SiteHead>
   </head>
   <body class="markdown-rendered">
     <slot name="navigation" />

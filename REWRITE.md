@@ -46,7 +46,7 @@
 ## Routes and Data
 
 - [x] Rebuild `/404`.
-- [ ] Rebuild `/~random/`.
+- [x] Rebuild `/~random/` (now `/random/`).
 - [ ] Rebuild `/feed.xml`.
 - [ ] Rebuild `/sitemap.xml`.
 - [x] Rebuild `/searchIndex.json` from published entries.

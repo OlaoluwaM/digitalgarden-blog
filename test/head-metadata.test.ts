@@ -27,7 +27,10 @@ after(async () => {
   await site?.cleanup();
 });
 
-const notePages = () => site.pages.filter(page => page !== "404.html");
+// The standalone pages (404, `/random/`) are not notes and get no
+// canonical link or link-preview tags.
+const notePages = () =>
+  site.pages.filter(page => !["404.html", "random/index.html"].includes(page));
 
 function meta(page: string, key: string) {
   const head = heads.get(page)!;
