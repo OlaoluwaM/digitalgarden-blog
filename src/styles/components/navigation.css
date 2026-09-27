@@ -24,6 +24,14 @@
     }
   }
 
+  /* The note list scrolls under the search button. Its top edge fades, so
+     scrolled rows fade out instead of ending in a hard cut; the padding
+     keeps the first row clear of the fade at rest. */
+  .filetree-sidebar > .folder {
+    padding-top: 8px;
+    mask-image: linear-gradient(to bottom, transparent, #000 8px);
+  }
+
   /* Folders are native <details>. Safari draws its disclosure triangle with
      this pseudo-element even when `list-style` is none; only the Lucide
      chevrons should show. No utility variant exists for it. */

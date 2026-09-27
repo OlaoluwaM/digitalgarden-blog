@@ -391,6 +391,17 @@ computed-style comparison of each dialog state against thunk.blog at
 - **Evidence:** the "opens wide, but never over the whole width" test in
   `test/layout/site-layout.test.ts`.
 
+### The note list keeps clear of the search button
+
+- **Change:** the file tree's note list starts 8px lower, and its top edge
+  fades over those 8px, so rows scrolled up fade out instead of being cut
+  off right under the search button. On phones the search button keeps
+  its 10px bottom margin (live: 2px), so the list starts 16px lower there.
+- **Why:** scrolled, half-hidden titles crowded the search button,
+  especially on phones.
+- **Evidence:** the "leaves room between the search button and the note
+  list" tests in `test/layout/site-layout.test.ts`.
+
 ### Search buttons hide without JavaScript
 
 - **Change:** with JavaScript off, the search buttons are hidden. Live showed

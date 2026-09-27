@@ -954,6 +954,31 @@ describe("mobile file tree", () => {
     }
   });
 
+  // Why: the note list scrolls under the search button. Cut off hard right
+  // below it (2px on phones), half-hidden titles crowded the button. The
+  // list keeps clear of the button at every width, and its top edge fades
+  // so scrolled rows fade out instead of being sliced.
+  for (const width of [390, 1440]) {
+    it(`leaves room between the search button and the note list at ${width}px`, async () => {
+      await withPage(width, async page => {
+        await page.goto(origin + "/", { waitUntil: "load" });
+        if (width < 1000) await page.click(".hamburger-btn");
+        const edge = await page.evaluate(() => {
+          const button = document
+            .querySelector(".filetree-sidebar .search-button")!
+            .getBoundingClientRect();
+          const list = document.querySelector(".filetree-sidebar > .folder")!;
+          return {
+            gap: list.getBoundingClientRect().top - button.bottom,
+            fades: getComputedStyle(list).maskImage.includes("gradient"),
+          };
+        });
+        assert.ok(edge.gap >= 10, `gap ${edge.gap}px`);
+        assert.equal(edge.fades, true);
+      });
+    });
+  }
+
   // Why: a folder the reader opened stays open on the next page, as on
   // live.
   it("keeps an opened folder open on the next page", async () => {
