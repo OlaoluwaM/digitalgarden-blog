@@ -77,14 +77,17 @@
 
   /*
    * Type scale. xs to lg are Tailwind's interface steps with its paired
-   * line heights. xl to 5xl are the heading sizes, a Major Third (1.25) down
-   * from 3rem, with their own line heights and tracking. Note text (1.03rem)
-   * sits between steps and lives with the note column (layout.css).
+   * line heights, except sm, which is live's 0.85rem. xl to 5xl are the
+   * heading sizes, a Major Third (1.25) down from 3rem, with their own line
+   * heights and tracking. Two sizes sit
+   * between steps: note text (1.03rem, layout.css) and the site name (2rem,
+   * NavShell.astro).
    */
   --text-xs: 0.75rem;
   --text-xs--line-height: calc(1 / 0.75);
-  --text-sm: 0.875rem;
-  --text-sm--line-height: calc(1.25 / 0.875);
+  /* Live's small interface text (13.6px), on Tailwind's 20px line. */
+  --text-sm: 0.85rem;
+  --text-sm--line-height: calc(1.25 / 0.85);
   --text-base: 1rem;
   --text-base--line-height: calc(1.5 / 1);
   --text-lg: 1.125rem;
@@ -95,7 +98,7 @@
   /* h4 */
   --text-2xl: 1.536rem;
   --text-2xl--line-height: 1.35;
-  /* h3, the site name */
+  /* h3 */
   --text-3xl: 1.92rem;
   --text-3xl--line-height: 1.3;
   --text-3xl--letter-spacing: -0.01em;
@@ -108,8 +111,7 @@
   --text-5xl--line-height: 1.1;
   --text-5xl--letter-spacing: -0.02em;
 
-  /* Leading: Tailwind's. Lists that should stay airy (the file tree, search
-     results) use `relaxed`; `leading-none` is built in. */
+  /* Leading: Tailwind's; `leading-none` is built in. */
   --leading-tight: 1.25;
   --leading-snug: 1.375;
   --leading-normal: 1.5;

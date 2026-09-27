@@ -691,7 +691,9 @@ Eleventy's markdown-it options. Olaolu put all resulting items in scope.
 - Olaolu's direction: follow Tailwind's structure and scales; keep the
   values that define the site, take Tailwind's where ours were incidental.
   Decisions (all as recommended): Tailwind's paired line heights, with
-  `leading-relaxed` for the file tree; palette-only color names
+  `leading-relaxed` for the file tree (`sm` later became live's 0.85rem,
+  which puts the tree within half a pixel of live's line); the site name
+  kept live's 2rem / 1.1 as a listed exception; palette-only color names
   (`gray-50`…`950`, no `text-muted`); key caps at 0.8em of their hint
   (`Key.astro`, the one listed arbitrary size); one focus ring (2px gray,
   4px offset); snap every off-grid value; enforce with a test.

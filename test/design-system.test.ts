@@ -12,7 +12,8 @@
  * - tokens.css declares only Tailwind's namespaces, with Tailwind's step
  *   names; no token is named after a component.
  * - The interface steps, leading, radii, spacing unit, and default motion are
- *   Tailwind's values (headings, grays, fonts, and widths are ours).
+ *   Tailwind's values, except `sm`, which is live's 0.85rem (headings,
+ *   grays, fonts, and widths are ours too).
  * - Stylesheets write colors, lengths, and durations through tokens,
  *   `--spacing(n)`, and `--alpha()`, never as literals; rendered Markdown
  *   keeps em-based sizes, like Tailwind Typography.
@@ -46,7 +47,11 @@ postcss
 
 /** Tailwind's step names, in its order. */
 const SIZES = ["xs", "sm", "base", "lg", "xl", "2xl", "3xl", "4xl", "5xl"];
-const STEPS = ["50", ...Array.from({ length: 9 }, (_, i) => `${i + 1}00`), "950"];
+const STEPS = [
+  "50",
+  ...Array.from({ length: 9 }, (_, i) => `${i + 1}00`),
+  "950",
+];
 
 /**
  * Every token name tokens.css may declare. Tailwind's namespaces with its
@@ -58,9 +63,7 @@ const NAMESPACES: RegExp[] = [
   new RegExp(`^--color-(white|black|[a-z]+-(${STEPS.join("|")}))$`),
   /^--font-(sans|serif|mono)$/,
   /^--font-weight-(normal|medium|semibold|bold)$/,
-  new RegExp(
-    `^--text-(${SIZES.join("|")})(--(line-height|letter-spacing))?$`
-  ),
+  new RegExp(`^--text-(${SIZES.join("|")})(--(line-height|letter-spacing))?$`),
   /^--leading-(tight|snug|normal|relaxed|loose)$/,
   /^--radius-(xs|sm|md|lg|xl|2xl|3xl|4xl)$/,
   /^--shadow-(2xs|xs|sm|md|lg|xl|2xl)$/,
@@ -84,6 +87,12 @@ const ARBITRARY_ALLOWED = new Map([
   ["max-h-[60vh]", "viewport height"],
   // Key caps are 0.8em of their hint, below any step (D3).
   ["text-[0.8em]", "key caps"],
+  // The search button's shortcut hint, 0.75em of the button's label.
+  ["text-[0.75em]", "shortcut hint"],
+  // The site name, the brand mark: live's 2rem and 1.1 line height,
+  // between the heading steps (3xl is 1.92rem).
+  ["text-[2rem]", "site name"],
+  ["leading-[1.1]", "site name"],
 ]);
 
 /** Literal lengths that stylesheets may keep, by file. */
@@ -117,9 +126,15 @@ function css(path: string): string {
 /** Declarations outside comments, with the file they come from. */
 function declarations(path: string) {
   const found: { prop: string; value: string; line: number }[] = [];
-  postcss.parse(css(path)).walkDecls(decl =>
-    found.push({ prop: decl.prop, value: decl.value, line: decl.source!.start!.line })
-  );
+  postcss
+    .parse(css(path))
+    .walkDecls(decl =>
+      found.push({
+        prop: decl.prop,
+        value: decl.value,
+        line: decl.source!.start!.line,
+      })
+    );
   return found;
 }
 
@@ -160,8 +175,6 @@ describe("tokens", () => {
       "--spacing": "0.25rem",
       "--text-xs": "0.75rem",
       "--text-xs--line-height": "calc(1 / 0.75)",
-      "--text-sm": "0.875rem",
-      "--text-sm--line-height": "calc(1.25 / 0.875)",
       "--text-base": "1rem",
       "--text-base--line-height": "calc(1.5 / 1)",
       "--text-lg": "1.125rem",
@@ -180,8 +193,20 @@ describe("tokens", () => {
       "--default-transition-timing-function": "cubic-bezier(0.4, 0, 0.2, 1)",
     };
     assert.deepEqual(
-      Object.fromEntries(Object.keys(adopted).map(name => [name, tokens.get(name)])),
+      Object.fromEntries(
+        Object.keys(adopted).map(name => [name, tokens.get(name)])
+      ),
       adopted
+    );
+  });
+
+  // Why: small interface text (the file tree, the search button, dates) is
+  // live's 0.85rem, the site's own value on Tailwind's step: 14px read a
+  // size too big in the sidebar. Its line stays 20px, as Tailwind pairs it.
+  it("keeps live's size for the sm step", () => {
+    assert.deepEqual(
+      [tokens.get("--text-sm"), tokens.get("--text-sm--line-height")],
+      ["0.85rem", "calc(1.25 / 0.85)"]
     );
   });
 });
@@ -197,7 +222,9 @@ describe("stylesheets", () => {
           ({ prop, value }) =>
             !prop.startsWith("--callout-color") &&
             !value.includes("var(--callout-color)") &&
-            /#[\da-f]{3,8}\b|\b(rgba?|hsla?|oklch|oklab|lab|lch|hwb)\(/i.test(value)
+            /#[\da-f]{3,8}\b|\b(rgba?|hsla?|oklch|oklab|lab|lch|hwb)\(/i.test(
+              value
+            )
         )
         .map(({ line, value }) => `${where(path, line)} ${value}`)
     );
@@ -213,7 +240,9 @@ describe("stylesheets", () => {
       return declarations(path).flatMap(({ line, value }) =>
         [...value.matchAll(/(?<![\w.-])-?\d*\.?\d+(px|rem)\b/g)]
           .map(match => match[0])
-          .filter(length => !/^-?[12]px$/.test(length) && !allowed.includes(length))
+          .filter(
+            length => !/^-?[12]px$/.test(length) && !allowed.includes(length)
+          )
           .map(length => `${where(path, line)} ${length}`)
       );
     });

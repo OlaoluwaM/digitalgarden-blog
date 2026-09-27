@@ -49,7 +49,9 @@ const { tree, activePathname } = Astro.props;
 // styles/components/navigation.css. The file tree is a popover, and
 // browsers give popovers their own colors, scrolling, and position;
 // `text-inherit` and `overflow-visible` undo the ones no utility here
-// already sets, so the tree looks the same opened or in place.
+// already sets, so the tree looks the same opened or in place. The site
+// name keeps live's 2rem (and, in the sidebar, 1.1 line height): it is the
+// brand mark, between the heading steps (test/design-system.test.ts).
 ---
 
 <nav
@@ -76,7 +78,7 @@ const { tree, activePathname } = Astro.props;
       class="grow text-left text-gray-200 hover:text-gray-100"
     >
       <h1
-        class="site-name-header m-0 font-serif text-3xl leading-none font-normal text-pretty text-inherit max-md:text-2xl"
+        class="site-name-header m-0 font-serif text-[2rem] leading-none font-normal text-pretty text-inherit max-md:text-2xl"
       >
         {site.name}
       </h1>
@@ -100,7 +102,7 @@ const { tree, activePathname } = Astro.props;
       class="text-gray-200 hover:text-gray-100"
     >
       <h1
-        class="mx-auto my-7 w-site-name shrink-0 text-center font-serif text-3xl leading-none font-normal text-pretty text-inherit"
+        class="mx-auto my-7 w-site-name shrink-0 text-center font-serif text-[2rem] leading-[1.1] font-normal text-pretty text-inherit"
       >
         {site.name}
       </h1>

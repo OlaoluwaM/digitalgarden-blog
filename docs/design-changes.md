@@ -588,3 +588,50 @@ Found reviewing the dev site after the move onto Tailwind's scales.
 - **Evidence:** "sit on the raised gray, with the shared fill on the copy
   button"; `test/highlighting.test.ts`; axe (comments, the dimmest syntax
   color, still pass AA).
+
+### Tags in the regular weight
+
+- **Change:** tags are set in the regular weight (was medium), in the note
+  header, search results, and the preview; their color stays #b3b3b3.
+- **Why:** tags should sit quieter under the title. The next gray down
+  (#999) falls to 3.9:1 on a hovered or selected search result, below AA
+  at 12px, so the weight carries the change.
+- **Evidence:** "look the same everywhere, in the regular weight" in
+  `test/layout/site-layout.test.ts`; axe.
+
+### The site name and file tree as on live
+
+- **Change:** the site name is back to live's 2rem with a 1.1 line height
+  in the sidebar and no tracking (the 3xl step made it 30.7px, set solid
+  and tracked in). The file tree matches live's density: see the next
+  entry.
+- **Why:** Olaolu preferred live's larger site name and denser tree. The
+  site name is the brand mark, kept between steps as a listed exception.
+- **Evidence:** the "site name and file tree" tests in
+  `test/layout/site-layout.test.ts`; screenshots against live.
+
+### Small interface text at live's size
+
+- **Change:** the `sm` step is 0.85rem (13.6px, live's size), not
+  Tailwind's 0.875rem, on the same 20px line. The file tree, search
+  button, dates, post footer, Recent Posts descriptions, search field,
+  excerpts, and search messages all use it (0.4px smaller). The file
+  tree's rows sit on a 22.1px line (`leading-relaxed`), within half a
+  pixel of live's 21.76px; at 14px they were 22.75px.
+- **Why:** 14px read a size too big in the sidebar next to live. Live
+  set most of this text between 0.8rem and 0.9rem.
+- **Evidence:** "keeps live's size for the sm step" in
+  `test/design-system.test.ts`; "keeps the file tree at live's size and
+  spacing" in `test/layout/site-layout.test.ts`; screenshots against live.
+
+### A smaller shortcut hint
+
+- **Change:** the search button's Ctrl + K hint is 15% smaller: its text
+  is 0.75em of the button's label (10.2px, was 12px; live 11.2px), with
+  2px by 4px padding (was 4px by 6px), about 70 by 21px (was 80 by 25px).
+  Its keys stay 0.8em of the hint (8.2px). Keys everywhere, the search
+  dialog's hints included, have 2px top and bottom padding (was 4px).
+- **Why:** the hint read nearly as large as the label beside it.
+- **Evidence:** "sets the shortcut hint smaller than the button's label"
+  and "fits the shortcut keys inside their hint" in
+  `test/layout/site-layout.test.ts`.

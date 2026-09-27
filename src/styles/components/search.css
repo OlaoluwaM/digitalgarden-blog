@@ -85,7 +85,7 @@
     margin-bottom: --spacing(1.5);
   }
   /* Tags in results and the preview: the note header's tag (NoteHeader),
-     at the xs step. */
+     at the xs step. Regular weight: they sit under the title. */
   :is(.result-tags, .preview-tags) .tag {
     padding: --spacing(0.5) --spacing(1.5);
     border-radius: var(--radius-lg);
@@ -94,7 +94,6 @@
     color: var(--color-gray-100);
     font-size: var(--text-xs);
     line-height: var(--text-xs--line-height);
-    font-weight: var(--font-weight-medium);
   }
   /* Two lines of context (three on phones, where lines are short). */
   .result-excerpt {

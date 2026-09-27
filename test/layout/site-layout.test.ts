@@ -517,6 +517,31 @@ describe("search button", () => {
       });
     });
   }
+
+  // Why: the shortcut hint is a small aside to the button's label, so it
+  // scales with it: its text is 0.75em of the label, with tight padding,
+  // 15% smaller than the 12px hint it replaced (80 by 25px, now about 70
+  // by 21px).
+  it("sets the shortcut hint smaller than the button's label", async () => {
+    await withPage(1440, async page => {
+      await page.goto(origin + "/", { waitUntil: "load" });
+      const [label, hint, height] = await page.$eval(
+        ".filetree-sidebar .search-button",
+        button => [
+          parseFloat(getComputedStyle(button).fontSize),
+          parseFloat(
+            getComputedStyle(button.querySelector(".search-keys")!).fontSize
+          ),
+          button.querySelector(".search-keys")!.getBoundingClientRect().height,
+        ]
+      );
+      assert.ok(
+        Math.abs(hint / label - 0.75) < 0.01,
+        `${hint}px of ${label}px`
+      );
+      assert.ok(height <= 21, `${height}px tall`);
+    });
+  });
 });
 
 describe("search dialog", () => {
@@ -711,7 +736,7 @@ describe("search dialog", () => {
         );
       }
       const expected = {
-        size: "14px",
+        size: "13.6px",
         color: "rgb(179, 179, 179)",
         italic: false,
         align: "center",
@@ -1027,6 +1052,94 @@ describe("links", () => {
           footer: expected,
           notFound: expected,
         }
+      );
+    });
+  });
+});
+
+describe("site name and file tree", () => {
+  // Why: the site name is the brand mark, kept at live's 2rem with live's
+  // 1.1 line height and no tracking, between the heading steps (3xl is
+  // 30.7px). As the 3xl step it read smaller and tighter than live.
+  it("keeps live's site name size", async () => {
+    const name = (page: Page, selector: string) =>
+      page.$eval(selector, heading => {
+        const style = getComputedStyle(heading);
+        return {
+          size: style.fontSize,
+          lineHeight: style.lineHeight,
+          tracking: style.letterSpacing,
+        };
+      });
+    await withPage(1440, async page => {
+      await page.goto(origin + "/", { waitUntil: "load" });
+      assert.deepEqual(await name(page, ".filetree-sidebar h1"), {
+        size: "32px",
+        lineHeight: "35.2px",
+        tracking: "normal",
+      });
+    });
+    await withPage(900, async page => {
+      await page.goto(origin + "/", { waitUntil: "load" });
+      assert.deepEqual(await name(page, ".navbar h1"), {
+        size: "32px",
+        lineHeight: "32px",
+        tracking: "normal",
+      });
+    });
+  });
+
+  // Why: the file tree is a dense list, and live's looked right: 13.6px
+  // text (the sm step) on a 21.76px line. On the scale that is `sm` with
+  // `leading-relaxed` (22.1px), within half a pixel of live. The search
+  // button above it uses the same size.
+  it("keeps the file tree at live's size and spacing", async () => {
+    await withPage(1440, async page => {
+      await page.goto(`${origin}/posts/be-deliberate/`, { waitUntil: "load" });
+      const [row, button] = await Promise.all([
+        page.$eval(".filetree-sidebar .notelink", row => {
+          const style = getComputedStyle(row);
+          return {
+            size: style.fontSize,
+            line: parseFloat(style.lineHeight),
+          };
+        }),
+        page.$eval(
+          ".filetree-sidebar .search-button",
+          button => getComputedStyle(button).fontSize
+        ),
+      ]);
+      assert.equal(row.size, "13.6px");
+      assert.equal(button, "13.6px");
+      assert.ok(Math.abs(row.line - 21.76) <= 0.5, `${row.line}px`);
+    });
+  });
+});
+
+describe("tags", () => {
+  // Why: tags are secondary to the title and text they sit under. They
+  // stay in the muted gray that passes AA on every card (#999 fails on a
+  // hovered search result), so they are quieted by weight instead, and
+  // look the same in the note header, search results, and the preview.
+  it("look the same everywhere, in the regular weight", async () => {
+    await withPage(1440, async page => {
+      const look = (selector: string) =>
+        page.$eval(selector, tag => {
+          const style = getComputedStyle(tag);
+          return { weight: style.fontWeight, color: style.color };
+        });
+      await page.goto(`${origin}/posts/implementing-redis-info-in-haskell/`, {
+        waitUntil: "load",
+      });
+      const header = await look("header a.tag");
+      await openSearch(page, "results");
+      await fillPreview(page, "/posts/on-maths-and-engineering/");
+      const result = await look(".result-tags .tag");
+      const preview = await look(".preview-tags .tag");
+      const expected = { weight: "400", color: "rgb(179, 179, 179)" };
+      assert.deepEqual(
+        { header, result, preview },
+        { header: expected, result: expected, preview: expected }
       );
     });
   });
