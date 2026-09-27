@@ -1,169 +1,401 @@
 ---
 // Dev-only style guide (ADR 0003 phase 2), served at /style-guide/ by
-// `npm run dev:astro` and never built. It lists every token straight from
-// tokens.css, so it cannot drift from the file, then shows the chrome
-// components and a Markdown sample with every element the notes can use.
-import postcss from "postcss";
+// `npm run dev:astro` and never built. It documents the design system: how
+// the site looks and why. Every value is read from tokens.css
+// (./tokens.ts), so the page cannot drift from it; the words around the
+// values are written here.
 import tokensSource from "../styles/tokens.css?raw";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import SiteNavigation from "../components/SiteNavigation.astro";
-import NoteHeader from "../components/NoteHeader.astro";
+import Key from "../components/Key.astro";
+import Tag from "../components/Tag.astro";
 import RecentPosts from "../components/RecentPosts.astro";
 import PostFooter from "../components/PostFooter.astro";
-import type { Post } from "../content/posts.ts";
+import {
+  getPublishedArticles,
+  getPublishedPosts,
+  getRecentArticles,
+} from "../content/posts";
+import { contrastRatio, parseTokens, steps, tokenNotes } from "./tokens";
 import { Content as Sample } from "./sample.md";
 
-const tokens: { name: string; value: string }[] = [];
-postcss.parse(tokensSource).walkDecls(decl => {
-  if (!decl.prop.endsWith("*")) {
-    tokens.push({ name: decl.prop, value: decl.value.replace(/\s+/g, " ") });
-  }
-});
-const group = (prefix: string) =>
-  tokens.filter(
-    token => token.name.startsWith(prefix) && !token.name.includes("--", 2)
-  );
-const colors = group("--color-");
-const fonts = group("--font-").filter(token => !token.name.includes("weight"));
-const sizes = group("--text-");
-const leading = group("--leading-");
-const radii = group("--radius-");
-const other = tokens.filter(
-  token =>
-    !["--color-", "--font-", "--text-", "--leading-", "--radius-"].some(
-      prefix => token.name.startsWith(prefix)
-    ) || token.name.startsWith("--font-weight")
-);
-// xl and up are the heading sizes, set in the serif.
-const heading = (name: string) => /^--text-\d?xl$/.test(name);
-const swatchClass = "flex flex-col gap-1 text-xs";
-const chipClass = "block h-12 rounded-lg inset-ring inset-ring-gray-700";
-const valueClass = "text-gray-300 wrap-anywhere";
-// Browsers indent list items for their bullet; the grid has none.
-const gridClass =
-  "grid list-none grid-cols-2 gap-4 p-0 *:ms-0 md:grid-cols-4";
+const tokens = parseTokens(tokensSource);
+const posts = await getPublishedPosts();
+const recent = getRecentArticles(posts, 2);
+const tags = [
+  ...new Set(
+    getPublishedArticles(posts).flatMap(post => post.data.rawNoteProps.tags)
+  ),
+].slice(0, 3);
 
-function fakePost(
-  title: string,
-  description: string,
-  published: string,
-  tags: string[] = []
-): Post {
-  return {
-    data: {
-      pluginProps: { permalink: "/style-guide/" },
-      rawNoteProps: {
-        title,
-        description,
-        tags,
-        published,
-        last_updated: published,
-      },
-    },
-  } as unknown as Post;
+const stepName = (name: string, prefix: string) => name.slice(prefix.length);
+const px = (rem: string) => `${Number((parseFloat(rem) * 16).toFixed(1))}px`;
+/** A unitless line height, from `1.3` or Tailwind's `calc(1.25 / 0.85)`. */
+function ratio(value: string): number {
+  const fraction = /^calc\(([\d.]+) \/ ([\d.]+)\)$/.exec(value);
+  return fraction ? Number(fraction[1]) / Number(fraction[2]) : Number(value);
 }
-const headerPost = fakePost("Note header", "", "2026-09-26T12:00", [
-  "style-guide",
-  "tokens",
-]);
-const recent = [
-  fakePost("A recent post", "Its description.", "2026-09-20T09:00"),
-  fakePost("A post without a description", "", "2026-09-01T09:00"),
+
+// Each text color, and the surface its contrast is measured on.
+const textOn: Record<string, string> = {
+  "--color-gray-50": "--color-gray-950",
+  "--color-gray-100": "--color-gray-950",
+  "--color-gray-200": "--color-gray-950",
+  "--color-gray-300": "--color-gray-950",
+  "--color-slate-300": "--color-gray-900",
+};
+function contrast(name: string): string | undefined {
+  const surface = textOn[name];
+  if (!surface) return undefined;
+  const value = contrastRatio(tokens.get(name)!, tokens.get(surface)!);
+  return `${value.toFixed(1)}:1 on ${stepName(surface, "--color-")}`;
+}
+
+const tints = [
+  { chip: "bg-white/5", name: "white/5", use: "The hover fill." },
+  { chip: "bg-white/8", name: "white/8", use: "The shortcut hint." },
+  { chip: "bg-gray-200/10", name: "gray-200/10", use: "Tags." },
+  { chip: "bg-yellow-400/40", name: "yellow-400/40", use: "Highlights." },
+  { chip: "bg-black/50", name: "black/50", use: "Backdrops." },
 ];
+const fonts = [
+  { name: "--font-sans", class: "font-sans", face: "Instrument Sans" },
+  { name: "--font-serif", class: "font-serif", face: "Instrument Serif" },
+  { name: "--font-mono", class: "font-mono", face: "Commit Mono" },
+];
+const spacing = [
+  { step: 1, bar: "w-1" },
+  { step: 2, bar: "w-2" },
+  { step: 3, bar: "w-3" },
+  { step: 4, bar: "w-4" },
+  { step: 6, bar: "w-6" },
+  { step: 8, bar: "w-8" },
+  { step: 12, bar: "w-12" },
+  { step: 16, bar: "w-16" },
+];
+const layout = [
+  ...steps(tokens, "--container-"),
+  ...steps(tokens, "--breakpoint-"),
+  [
+    "--default-transition-duration",
+    tokens.get("--default-transition-duration")!,
+  ],
+  [
+    "--default-transition-timing-function",
+    tokens.get("--default-transition-timing-function")!,
+  ],
+  ...steps(tokens, "--ease-"),
+  ...steps(tokens, "--corner-shape-"),
+];
+
+const link = "internal-link";
+const gridClass = "grid list-none grid-cols-2 gap-4 p-0 *:ms-0 md:grid-cols-3";
+const swatchClass = "flex flex-col gap-1 text-sm";
+const chipClass = "block h-12 rounded-lg inset-ring inset-ring-gray-700";
+const faintClass = "text-gray-300";
+const listClass = "list-none p-0 *:ms-0";
 ---
 
-<BaseLayout title="Style guide" type="website">
+<BaseLayout
+  title="Style guide"
+  description="How thunk.blog looks, and why: its colors, type, spacing, and components, read straight from the site's stylesheet."
+  type="article"
+>
   <SiteNavigation slot="navigation" />
-  <h1>Style guide</h1>
+  <header>
+    <h1 class="font-serif font-normal text-5xl mt-7 mb-11">Style guide</h1>
+  </header>
+
   <p>
-    Tokens from <code>src/styles/tokens.css</code>. Each one is a CSS custom
-    property and, in Tailwind, a utility.
+    How this site looks, and why. Every value on this page is read from
+    <code>src/styles/tokens.css</code>, so the page always matches the site.
   </p>
 
-  <h2>Colors</h2>
+  <ul>
+    <li><a class={link} href="#principles">Principles</a></li>
+    <li><a class={link} href="#color">Color</a></li>
+    <li><a class={link} href="#type">Type</a></li>
+    <li><a class={link} href="#space-and-shape">Space and shape</a></li>
+    <li><a class={link} href="#components">Components</a></li>
+    <li><a class={link} href="#markdown">Markdown</a></li>
+    <li><a class={link} href="#changing-the-design">Changing the design</a></li>
+  </ul>
+
+  <h2 id="principles">Principles</h2>
+  <ul>
+    <li>
+      <strong>Obsidian's look, Tailwind's structure.</strong> The site began as an
+      Obsidian vault, and it keeps that look: Obsidian's dark grays and its heading
+      sizes. Underneath, the values are organized the way{" "}
+      <a class="external-link" target="_blank" href="https://tailwindcss.com/"
+        >Tailwind</a
+      > organizes them, and where a value is incidental (small text, line heights,
+      corners, spacing, easing), it's Tailwind's own.
+    </li>
+    <li>
+      <strong>Stay on the scales.</strong> Every color, size, and gap is a step on
+      a scale. When no step fits, the nearest one wins. The few exceptions are named
+      on this page, and a test fails on any new one.
+    </li>
+    <li>
+      <strong>One look per thing.</strong> A tag, a key, a link in a sentence, a hover,
+      or a focus ring looks the same wherever it appears.
+    </li>
+    <li>
+      <strong>Readable first.</strong> Every text color passes WCAG AA (4.5:1) on
+      the surfaces it sits on.
+    </li>
+    <li>
+      <strong>Works without JavaScript.</strong> The file tree, callouts, and tags
+      use what the browser already does (popovers, <code>&lt;details&gt;</code>,
+      links). Scripts add to them; search is the one feature that needs one.
+    </li>
+  </ul>
+
+  <h2 id="color">Color</h2>
+  <p>
+    Grays do almost all the work: 50 is the lightest, 950 is the page. Each step
+    has one job. Text colors show their contrast on the page.
+  </p>
   <ul class={gridClass}>
     {
-      colors.map(token => (
+      steps(tokens, "--color-").map(([name, value]) => (
         <li class={swatchClass}>
-          <span class={chipClass} style={`background: var(${token.name})`} />
-          <code>{token.name}</code>
-          <span class={valueClass}>{token.value}</span>
-          <span style={`color: var(${token.name})`}>Aa text</span>
+          <span class={chipClass} style={`background: var(${name})`} />
+          <code class="self-start">{stepName(name, "--color-")}</code>
+          <span class={faintClass}>{value}</span>
+          {contrast(name) && <span class={faintClass}>{contrast(name)}</span>}
+          <span>{tokenNotes[name]}</span>
         </li>
       ))
     }
   </ul>
 
-  <h2>Fonts</h2>
-  {
-    fonts.map(token => (
-      <p style={`font-family: var(${token.name})`}>
-        <code>{token.name}</code> The quick brown fox jumps over the lazy dog
-        0123456789
-      </p>
-    ))
-  }
-
-  <h2>Type scale</h2>
-  {
-    sizes.map(token => (
-      <p
-        class:list={["my-2", heading(token.name) ? "font-serif font-normal" : "font-sans"]}
-        style={`font-size: var(${token.name}); line-height: var(${token.name}--line-height, normal); letter-spacing: var(${token.name}--letter-spacing, normal)`}
-      >
-        {token.name.replace("--text-", "")} · {token.value}
-      </p>
-    ))
-  }
-
-  <h2>Leading</h2>
-  {
-    leading.map(token => (
-      <p class="my-4" style={`line-height: var(${token.name})`}>
-        <code>{token.name}</code> · {token.value}. Two lines of interface text
-        show how far apart the lines of a paragraph sit at this leading.
-      </p>
-    ))
-  }
-
-  <h2>Radii</h2>
+  <h3>Tints</h3>
+  <p>
+    Hovers, fills, and backdrops aren't colors of their own. They're a color at
+    an opacity, so they work on any surface.
+  </p>
   <ul class={gridClass}>
     {
-      radii.map(token => (
+      tints.map(tint => (
+        <li class={swatchClass}>
+          <span class:list={[chipClass, tint.chip]} />
+          <code class="self-start">{tint.name}</code>
+          <span>{tint.use}</span>
+        </li>
+      ))
+    }
+  </ul>
+
+  <h2 id="type">Type</h2>
+  <h3>Fonts</h3>
+  <p>Three families, all served from this site rather than a font service.</p>
+  {
+    fonts.map(font => (
+      <div class="my-5">
+        <p class:list={["m-0 text-2xl", font.class]}>
+          {font.face}: the quick brown fox jumps over the lazy dog, 0123456789
+        </p>
+        <p class="m-0 text-sm text-gray-100">
+          <code>{stepName(font.name, "--font-")}</code> {tokenNotes[font.name]}
+        </p>
+      </div>
+    ))
+  }
+  <p>Four weights, used sparingly:</p>
+  <ul class={listClass}>
+    {
+      steps(tokens, "--font-weight-").map(([name, value]) => (
+        <li>
+          <span style={`font-weight: var(${name})`}>
+            {stepName(name, "--font-weight-")} ({value})
+          </span>{" "}
+          <span class="text-sm text-gray-100">{tokenNotes[name]}</span>
+        </li>
+      ))
+    }
+  </ul>
+
+  <h3>Sizes</h3>
+  <p>
+    <code>xs</code> to <code>lg</code> are for the interface. <code>xl</code> to
+    <code>5xl</code> are headings in the serif, each 1.25 times the one below, down
+    from 3rem. <code>sm</code> keeps the old site's 0.85rem rather than Tailwind's
+    0.875rem.
+  </p>
+  {
+    steps(tokens, "--text-").map(([name, value]) => {
+      const lineHeight = tokens.get(`${name}--line-height`)!;
+      const tracking = tokens.get(`${name}--letter-spacing`);
+      const heading = parseFloat(value) > parseFloat(tokens.get("--text-lg")!);
+      return (
+        <div class="my-6">
+          <p
+            class:list={[
+              "m-0",
+              heading ? "font-serif font-normal" : "font-sans",
+            ]}
+            style={`font-size: var(${name}); line-height: var(${name}--line-height); letter-spacing: var(${name}--letter-spacing, normal)`}
+          >
+            {heading
+              ? "Thunks & Thoughts"
+              : "The quick brown fox jumps over the lazy dog"}
+          </p>
+          <p class="m-0 text-sm text-gray-100">
+            <code>{stepName(name, "--text-")}</code>{" "}
+            <span class={faintClass}>
+              {value} · {px(value)} on a{" "}
+              {Number((parseFloat(value) * 16 * ratio(lineHeight)).toFixed(1))}
+              px line{tracking && ` · ${tracking} tracking`}
+            </span>{" "}
+            · {tokenNotes[name]}
+          </p>
+        </div>
+      );
+    })
+  }
+  <p>
+    Two sizes sit between steps on purpose. Note text is 1.03rem, the size the
+    old site read at; this paragraph is set in it. The site name, at the top of
+    the file tree, is 2rem.
+  </p>
+
+  <h3>Line height</h3>
+  {
+    steps(tokens, "--leading-").map(([name, value]) => (
+      <div class="my-6">
+        <p class="m-0 w-2/3" style={`line-height: var(${name})`}>
+          A few lines of text, long enough to wrap, to show how far apart the
+          lines of a paragraph sit at this line height.
+        </p>
+        <p class="m-0 text-sm text-gray-100">
+          <code>{stepName(name, "--leading-")}</code>{" "}
+          <span class={faintClass}>{value}</span> · {tokenNotes[name]}
+        </p>
+      </div>
+    ))
+  }
+
+  <h2 id="space-and-shape">Space and shape</h2>
+  <h3>Spacing</h3>
+  <p>
+    One unit, {tokens.get("--spacing")} (4px). {tokenNotes["--spacing"]}
+  </p>
+  <ul class={listClass}>
+    {
+      spacing.map(({ step, bar }) => (
+        <li class="flex items-center gap-4 text-sm">
+          <span class="w-8 text-gray-300 tabular-nums">{step}</span>
+          <span class:list={["block h-3 rounded-xs bg-gray-200", bar]} />
+          <span class="text-gray-300">{step * 4}px</span>
+        </li>
+      ))
+    }
+  </ul>
+
+  <h3>Corners</h3>
+  <ul class={gridClass}>
+    {
+      steps(tokens, "--radius-").map(([name, value]) => (
         <li class={swatchClass}>
           <span
-            class={`${chipClass} bg-gray-800`}
-            style={`border-radius: var(${token.name})`}
+            class:list={[chipClass, "bg-gray-800"]}
+            style={`border-radius: var(${name})`}
           />
-          <code>{token.name}</code>
-          <span class={valueClass}>{token.value}</span>
+          <code class="self-start">{stepName(name, "--radius-")}</code>
+          <span class={faintClass}>
+            {value} · {px(value)}
+          </span>
+          <span>{tokenNotes[name]}</span>
         </li>
       ))
     }
   </ul>
 
-  <h2>Other tokens</h2>
-  <table>
-    <tbody>
-      {
-        other.map(token => (
-          <tr>
-            <td>
-              <code>{token.name}</code>
-            </td>
-            <td>{token.value}</td>
-          </tr>
-        ))
-      }
-    </tbody>
-  </table>
+  <h3>Shadow</h3>
+  <div class="my-6 rounded-xl bg-gray-950 p-5 shadow-2xl">
+    <code>2xl</code>
+    {tokenNotes["--shadow-2xl"]}
+  </div>
 
-  <h2>Components</h2>
-  <NoteHeader post={headerPost} />
-  <RecentPosts posts={recent} />
+  <h3>Widths, breakpoints, and motion</h3>
+  <ul class={listClass}>
+    {
+      layout.map(([name, value]) => (
+        <li class="my-2">
+          <code>{name}</code> <span class={faintClass}>{value}</span>
+          <br />
+          {tokenNotes[name]}
+        </li>
+      ))
+    }
+  </ul>
+
+  <h2 id="components">Components</h2>
+  <h3>Links</h3>
+  <p>
+    A link in a sentence is gray with a faint underline that darkens on hover,
+    like <a class={link} href="/">this one to Home</a> or{" "}
+    <a class="external-link" target="_blank" href="https://docs.astro.build/"
+      >this one to Astro's docs</a
+    >.
+  </p>
+
+  <h3>Keys</h3>
+  <p>
+    Press <Key>Ctrl</Key> + <Key>K</Key> to search. A key looks like inline code at
+    0.8 times the text around it, which is smaller than any step: it has to fit in
+    the search button's hint.
+  </p>
+
+  <h3>Tags</h3>
+  <p>
+    Each note's tags sit under its title. A tag is a link to a search for it, so
+    it works without JavaScript.
+  </p>
+  <div class="flex flex-wrap gap-2">{tags.map(tag => <Tag tag={tag} />)}</div>
+
+  <h3>Focus and hover</h3>
+  <p>
+    Press Tab: whatever has keyboard focus gets one ring, 2px of gray-200, 4px
+    out. Clicks show none. Anything you can point at in the file tree or search
+    fills with white/5 on hover.
+  </p>
+
+  <h3>Post footer</h3>
+  <p>Every post ends with this:</p>
   <PostFooter />
 
-  <h2>Markdown sample</h2>
-  <Sample />
-</BaseLayout>
+  <RecentPosts posts={recent} />
+  <p>Home ends with this list of its latest posts (here, the two newest).</p>
 
+  <h2 id="markdown">Markdown</h2>
+  <p>
+    Everything a note can contain, rendered the way notes are: headings, lists,
+    tables, math, code, and callouts.
+  </p>
+  <Sample />
+
+  <h2 id="changing-the-design">Changing the design</h2>
+  <p>For whoever changes the design next (probably me):</p>
+  <ul>
+    <li>
+      Use a token (<code>bg-gray-800</code>, <code>text-sm</code>, <code
+        >p-4</code
+      >), never a raw value. <code>test/design-system.test.ts</code> fails on raw
+      colors and lengths, and on one-off values that aren't on its short list.
+    </li>
+    <li>
+      Log every visible change from the old site in <code
+        >docs/design-changes.md</code
+      >.
+    </li>
+    <li>
+      The conventions, and which file holds what, are in <code
+        >src/styles/README.md</code
+      >. A new token needs its sentence in <code>src/style-guide/tokens.ts</code
+      >.
+    </li>
+  </ul>
+</BaseLayout>

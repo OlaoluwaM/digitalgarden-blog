@@ -2,6 +2,7 @@
 // T2 (phase 1): note title, tags, and timestamps.
 import type { Post } from "../content/posts.ts";
 import Icon from "./Icon.astro";
+import Tag from "./Tag.astro";
 import { formatNoteDate } from "../lib/dates.ts";
 
 interface Props {
@@ -10,10 +11,6 @@ interface Props {
 
 const { post } = Astro.props;
 const { title, tags, published, last_updated } = post.data.rawNoteProps;
-
-function tagHref(tag: string): string {
-  return `/?q=${encodeURIComponent(`#${tag}`)}`;
-}
 ---
 
 <header>
@@ -22,16 +19,7 @@ function tagHref(tag: string): string {
   </h1>
   <div class="header-meta">
     <div class="header-tags flex flex-wrap gap-2">
-      {
-        tags.map((tag: string) => (
-          <a
-            class="tag inline-flex h-8 items-center justify-center whitespace-nowrap rounded-lg bg-gray-200/10 px-2 py-1 text-sm leading-none text-gray-100 no-underline inset-ring inset-ring-gray-700 transition-colors hover:bg-gray-200/15 hover:text-gray-50 motion-reduce:transition-none"
-            href={tagHref(tag)}
-          >
-            #{tag}
-          </a>
-        ))
-      }
+      {tags.map((tag: string) => <Tag tag={tag} />)}
     </div>
     <div class="timestamps mt-5 flex gap-2.5 text-sm text-gray-100 tabular-nums">
       <div

@@ -1,0 +1,17 @@
+---
+// A note's tag: a link to a search for it (`/?q=%23tag`), which works
+// without JavaScript. Search results and the search preview draw the same
+// look from `.tag` in components/search.css, since a script builds them.
+interface Props {
+  tag: string;
+}
+
+const { tag } = Astro.props;
+---
+
+<a
+  class="tag inline-flex h-8 items-center justify-center whitespace-nowrap rounded-lg bg-gray-200/10 px-2 py-1 text-sm leading-none text-gray-100 no-underline inset-ring inset-ring-gray-700 transition-colors hover:bg-gray-200/15 hover:text-gray-50 motion-reduce:transition-none"
+  href={`/?q=${encodeURIComponent(`#${tag}`)}`}
+>
+  #{tag}
+</a>

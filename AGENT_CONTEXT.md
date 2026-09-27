@@ -675,7 +675,12 @@ Eleventy's markdown-it options. Olaolu put all resulting items in scope.
 - Preflight side effects handled: inline MathJax SVGs (`display: inline`),
   `ol` numbering, `pre` and 404 paragraph margins.
 - Style guide: `src/style-guide/StyleGuide.astro`, injected at
-  `/style-guide/` by `astro dev` only.
+  `/style-guide/` by `astro dev` only (Olaolu chose dev-only over public on
+  2026-09-27). It documents the design system: principles, each token's
+  value and purpose, contrast, components, and a Markdown sample. The
+  sentence per token lives in `src/style-guide/tokens.ts`, and
+  `test/style-guide.test.ts` requires one for every token. The tag markup
+  moved to `src/components/Tag.astro` so the page can show it.
 - Process: four worktree agents (navigation; header/footer/Recent Posts/404;
   typography; code and callouts), then an adversarial review (10 findings,
   all fixed: print, tests, axe allowlist, reduced motion, copy button hover,

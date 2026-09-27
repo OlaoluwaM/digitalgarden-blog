@@ -16,7 +16,7 @@ phase 2.
 | `content/`      | `components` | Rendered Markdown. Markdown output carries no utility classes.                |
 | `components/`   | `components` | Chrome rules that utilities cannot express (pseudo-elements, calc, `[open]`). |
 | `utilities.css` | `utilities`  | Custom utilities (`@utility`) shared by templates and CSS.                    |
-| `style-guide/`¹ | —            | Dev-only page at `/style-guide/` listing the tokens.                          |
+| `style-guide/`¹ | —            | Dev-only page at `/style-guide/` documenting the tokens and components.       |
 
 ¹ `src/style-guide/`.
 
@@ -86,4 +86,6 @@ the site name, the brand mark (live's 2rem / 1.1, `text-[2rem]` in
 ## Changing the design
 
 Every visible difference from the live Eleventy site must be intended and
-recorded in [docs/design-changes.md](../../docs/design-changes.md).
+recorded in [docs/design-changes.md](../../docs/design-changes.md). A new
+token needs its sentence in `src/style-guide/tokens.ts`, which the style
+guide shows beside it.

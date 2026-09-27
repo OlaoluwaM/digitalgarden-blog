@@ -13,6 +13,7 @@ Astro implementation: [REWRITE.md](REWRITE.md).
 ## Deferred site features
 
 - [ ] Add a "collapse all folders" button to the file tree once the vault has more than one folder ([mockups](https://claude.ai/artifact/VnPJxBcZ2LEPgo6ZtNjpD8); leaning toward a square button beside the search button).
+- [ ] Label task-list checkboxes (`- [x]`) in the Markdown pipeline, e.g. wrap each item's text in a `<label>`; axe flags them in the dev style guide's Markdown sample. No note has a task list yet.
 - [ ] Keep one `<h1>` per page: the navbar and sidebar site names are `<h1>`s too (inherited from live), so heading navigation meets the site name twice before the note title.
 
 ## Deferred upstream PRs
