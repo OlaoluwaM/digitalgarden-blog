@@ -26,7 +26,8 @@ const keyClass =
 <button
   type="button"
   class:list={[
-    "search-button align-icon",
+    // Search needs JavaScript; without it the button would do nothing.
+    "search-button align-icon noscript:hidden",
     "my-2.5 flex h-search-button cursor-pointer appearance-none items-center justify-evenly gap-2 rounded-box border border-border bg-surface px-2.5 py-0 text-left font-sans text-sm/[normal] font-normal whitespace-nowrap text-inherit transition-none select-none hover:border-muted",
     navbar
       ? "mx-0 grow-[0.035] max-md:min-w-9"

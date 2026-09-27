@@ -92,7 +92,7 @@ Phase 2: design system.
 - [x] Wire the search dialog: open and close, results, keyboard selection, preview, and tag search.
 - [x] Style the open mobile file tree and its `.fullpage-overlay` (shown while the hamburger's `aria-expanded` is `true`).
 - [x] Port mobile navigation and file-tree folder state to TypeScript (no Alpine).
-- [ ] Keep usable fallbacks where JavaScript is not essential.
+- [x] Keep usable fallbacks where JavaScript is not essential.
 
 ## Cutover
 

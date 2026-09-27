@@ -787,12 +787,17 @@ Eleventy's markdown-it options. Olaolu put all resulting items in scope.
 ### Mobile navigation and folder state (2026-09-27)
 
 - Handed over to Claude (TDD); Olaolu reviews before commit.
-- `src/scripts/mobileNavigation.ts`: the hamburger toggles its own
-  `aria-expanded` (the only state; CSS shows `#filetree` and the overlay
-  below lg). Opening focuses the tree's first link; the overlay closes it;
-  Escape closes it only while focus is on the hamburger or in the tree
-  (Escape in the search dialog is the dialog's) and refocuses the
-  hamburger; `matchMedia("(min-width: 1000px)")` closes it on widening.
+- `src/scripts/mobileNavigation.ts` (revised for the no-JavaScript
+  fallback, 2026-09-27): `#filetree` is `popover="auto"` and the hamburger
+  has `popovertarget="filetree"`, so the browser opens and closes the tree
+  (tap outside, Escape, focus back to the hamburger), dims with
+  `::backdrop` (`.fullpage-overlay` and the `nav-open` variant are gone),
+  and exposes the hamburger's expanded state; it works without
+  JavaScript. The script only focuses the tree's first link on `toggle`
+  (open) and hides the popover when widening to lg. From lg up the same
+  element shows in place (`flex` beats the UA's closed-popover
+  `display: none`); `text-inherit`/`overflow-visible` undo other UA
+  popover styles.
 - `src/scripts/folderState.ts`: folders carry `data-folder-path`
   (FileTreeEntry builds live's `menuItem` path: root name, then
   `/child`). State is read and written under live's Alpine `$persist` keys
@@ -802,6 +807,40 @@ Eleventy's markdown-it options. Olaolu put all resulting items in scope.
   opening a folder. Storage errors are swallowed.
 - Tests: a NavShell component test for the paths, 7 + 5 Chrome tests, two
   built-site tests. 10 mutations each fail a test.
+
+### Fallbacks without JavaScript (2026-09-27)
+
+- Handed over to Claude (TDD). The mobile tree is a popover (above);
+  `NavSearchButton` has `noscript:hidden` (Tailwind's `@media (scripting:
+none)` variant); `content/callouts.css` shows collapsed callouts' content
+  and hides their fold control under `scripting: none`. Folders
+  (`<details>`), links, and tag links (`/?q=#tag`) already worked. Not
+  covered: overflowing callouts get their keyboard tab stop from a script.
+- Tests: layout tests run the drawer with JavaScript on and off, check the
+  search buttons both ways, and a collapsed callout rendered with the
+  site's stylesheet (no note has one). Screenshots of all 30 page views and
+  the open drawer match the previous build. 7 of 8 mutations fail a test;
+  `text-inherit` is a guard with no visible effect today.
+
+### Test builds run in parallel safely (2026-09-27)
+
+- `test/support/site-build.ts` gives every `buildSite()` its own Astro and
+  Vite cache folders through a generated config that wraps
+  `astro.config.ts` (`--config` is joined onto the project root, so it is
+  passed relative). With the shared `node_modules/.astro`, one test file's
+  `--force` build cleared the content store while another's was using it:
+  ENOENT on `data-store.json.tmp` or "No post with a top-level tag
+  including 'gardenEntry'", and that file's tests were cancelled. A failed
+  build now removes its work folder.
+- `test/site-build-concurrency.test.ts` starts four builds 700ms apart; it
+  failed 3 of 3 runs before the fix and passes after. Builds started at the
+  same instant did not reproduce it.
+- Considered and declined: one shared build from a Node global test setup
+  (`--test-global-setup`). Only three unit files and the layout tests
+  build; builds take seconds; sharing would couple the files and the
+  single-file `test:*` scripts to a setup file. Revisit if more files need
+  the built site or builds get slow (reasoning also in
+  `test/support/site-build.ts`).
 
 ## Verification and deployment
 

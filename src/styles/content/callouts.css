@@ -185,4 +185,18 @@
   .callout.is-collapsed > .callout-title > .callout-fold svg {
     transform: rotate(-90deg);
   }
+
+  /* Without JavaScript nothing can expand a collapsed callout, so its
+     content shows, and the fold control that could not work goes. */
+  @media (scripting: none) {
+    .callout.is-collapsed > .callout-content {
+      display: block;
+    }
+    .callout-fold {
+      display: none;
+    }
+    .callout.is-collapsible > .callout-title {
+      cursor: auto;
+    }
+  }
 }

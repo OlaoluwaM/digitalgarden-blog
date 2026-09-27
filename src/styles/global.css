@@ -35,10 +35,3 @@
 @source "../layouts";
 @source "../pages";
 @source "../scripts";
-
-/*
- * The mobile file tree is open while the hamburger says so. Its
- * `aria-expanded` is the only state, so what screen readers announce and
- * what is drawn cannot disagree. Use with `max-lg:` (NavShell).
- */
-@custom-variant nav-open (:root:has(.hamburger-btn[aria-expanded="true"]) &);

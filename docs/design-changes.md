@@ -366,3 +366,33 @@ computed-style comparison of each dialog state against thunk.blog at
 - **Evidence:** `test/browser/mobileNavigation.test.ts`,
   `test/browser/folderState.test.ts`, and the "mobile file tree" tests in
   `test/layout/site-layout.test.ts`.
+
+## 2026-09-27: Without JavaScript
+
+### The mobile file tree opens without JavaScript
+
+- **Change:** below 1000px the file tree is a popover the hamburger opens,
+  so it opens, closes on a tap outside or Escape, and dims the page even
+  with JavaScript off. Live's needed Alpine, so without JavaScript phones
+  and tablets could not reach the tree at all. With JavaScript it looks and
+  behaves as before.
+- **Why:** navigation is not a feature that needs a script.
+- **Evidence:** the "mobile file tree" tests in
+  `test/layout/site-layout.test.ts`, run with JavaScript on and off;
+  screenshots of every page and of the open tree match the previous build.
+
+### Search buttons hide without JavaScript
+
+- **Change:** with JavaScript off, the search buttons are hidden. Live showed
+  them, and they did nothing.
+- **Why:** search needs JavaScript.
+- **Evidence:** the "without JavaScript" tests.
+
+### Collapsed callouts show expanded without JavaScript
+
+- **Change:** with JavaScript off, a callout written collapsed
+  (`[!note]-`) shows its content, without the fold control. No published
+  note uses one yet.
+- **Why:** only the callout script can expand it, so its text would be
+  unreachable.
+- **Evidence:** the "without JavaScript" tests.

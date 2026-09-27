@@ -846,53 +846,66 @@ describe("search dialog wiring", () => {
 });
 
 describe("mobile file tree", () => {
-  // Why: on phones and tablets the file tree opens over the page when the
-  // hamburger's `aria-expanded` is "true" (the navigation script flips
-  // it), with an overlay that dims the page. Live positioned the overlay
-  // `absolute`, so it covered only the first screen: opened after
-  // scrolling, the dimming and its tap-to-close were off screen. The
-  // overlay is fixed here, so it covers the viewport wherever the page is.
-  it("opens over the page while the hamburger is expanded", async () => {
+  const isOpen = (page: Page) =>
+    page.evaluate(() =>
+      document.querySelector("#filetree")!.matches(":popover-open")
+    );
+
+  // Why: on phones and tablets the file tree is a popover over the page,
+  // with the page dimmed behind it (the popover's backdrop). Live dimmed
+  // with an `absolute` overlay that covered only the first screen, so
+  // opened after scrolling, the dimming and its tap-to-close were off
+  // screen. The backdrop always covers the viewport.
+  it("opens over the page wherever it is scrolled", async () => {
     await withPage(390, async page => {
       await page.goto(origin + "/posts/on-maths-and-engineering/", {
         waitUntil: "load",
       });
-      const shown = async () => ({
-        tree: await page.isVisible(".filetree-wrapper"),
-        overlay: await page.isVisible(".fullpage-overlay"),
-      });
-      const expand = (expanded: boolean) =>
-        page.evaluate(expanded => {
-          window.scrollTo(0, document.body.scrollHeight);
-          document
-            .querySelector(".hamburger-btn")!
-            .setAttribute("aria-expanded", String(expanded));
-        }, expanded);
-
-      assert.deepEqual(await shown(), { tree: false, overlay: false });
-      await expand(true);
-      assert.deepEqual(await shown(), { tree: true, overlay: true });
-      assert.deepEqual(await box(page, ".fullpage-overlay"), [0, 0, 390, 900]);
-      assert.deepEqual(await box(page, ".filetree-wrapper"), [0, 0, 250, 900]);
-      await expand(false);
-      assert.deepEqual(await shown(), { tree: false, overlay: false });
-    });
-  });
-
-  // Why: the hamburger must open the tree on a real page (script, markup,
-  // and stylesheet together), and a tap on the dimmed page beside it must
-  // close it.
-  it("opens from the hamburger and closes from the overlay", async () => {
-    await withPage(390, async page => {
-      await page.goto(origin + "/", { waitUntil: "load" });
-      await page.click(".hamburger-btn");
-      assert.equal(await page.isVisible(".filetree-wrapper"), true);
-      assert.equal(await page.isVisible(".fullpage-overlay"), true);
-      await page.mouse.click(350, 450);
       assert.equal(await page.isVisible(".filetree-wrapper"), false);
-      assert.equal(await page.isVisible(".fullpage-overlay"), false);
+      await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+      await page.click(".hamburger-btn");
+      assert.equal(await isOpen(page), true);
+      assert.deepEqual(await box(page, ".filetree-wrapper"), [0, 0, 250, 900]);
+      assert.equal(
+        await page.evaluate(
+          () =>
+            getComputedStyle(document.querySelector("#filetree")!, "::backdrop")
+              .backgroundColor
+        ),
+        "rgba(0, 0, 0, 0.5)"
+      );
     });
   });
+
+  // Why: the navigation must work without JavaScript, which live's Alpine
+  // version did not: the hamburger opens the tree, and a tap on the dimmed
+  // page or Escape closes it. The tree's links and folders then work as
+  // they do on desktop.
+  for (const javaScriptEnabled of [true, false]) {
+    it(`opens from the hamburger and closes from a tap outside or Escape (JavaScript ${javaScriptEnabled ? "on" : "off"})`, async () => {
+      await withPage(
+        390,
+        async page => {
+          await page.goto(origin + "/", { waitUntil: "load" });
+          await page.click(".hamburger-btn");
+          assert.equal(await page.isVisible(".filetree-wrapper"), true);
+          await page.mouse.click(350, 450);
+          assert.equal(await page.isVisible(".filetree-wrapper"), false);
+
+          await page.click(".hamburger-btn");
+          assert.equal(await page.isVisible(".filetree-wrapper"), true);
+          await page.keyboard.press("Escape");
+          assert.equal(await page.isVisible(".filetree-wrapper"), false);
+
+          await page.click(".hamburger-btn");
+          await page.click(".filetree-sidebar details.inner-folder >> summary");
+          await page.click('.filetree-sidebar a[href="/posts/be-deliberate/"]');
+          await page.waitForURL(`${origin}/posts/be-deliberate/`);
+        },
+        { javaScriptEnabled }
+      );
+    });
+  }
 
   // Why: a folder the reader opened stays open on the next page, as on
   // live.
@@ -907,19 +920,62 @@ describe("mobile file tree", () => {
     });
   });
 
-  // Why: desktop always shows the file tree, so a hamburger left expanded
-  // when the window widens past lg must not dim the page.
-  it("never shows the overlay on desktop", async () => {
+  // Why: desktop shows the file tree in place: it is the same element as
+  // the phone popover, so it must show without being opened and without
+  // dimming the page.
+  it("shows the tree in place on desktop", async () => {
     await withPage(1440, async page => {
       await page.goto(origin + "/", { waitUntil: "load" });
-      await page.evaluate(() =>
-        document
-          .querySelector(".hamburger-btn")!
-          .setAttribute("aria-expanded", "true")
-      );
-      assert.equal(await page.isVisible(".fullpage-overlay"), false);
       assert.equal(await page.isVisible(".filetree-wrapper"), true);
+      assert.equal(await isOpen(page), false);
+      assert.deepEqual(await box(page, ".filetree-wrapper"), [0, 0, 290, 900]);
     });
+  });
+});
+
+describe("without JavaScript", () => {
+  // Why: search needs JavaScript, so without it the search buttons would
+  // do nothing. They are hidden instead; with JavaScript they show.
+  for (const width of [390, 1440]) {
+    it(`hides the search buttons at ${width}px`, async () => {
+      for (const javaScriptEnabled of [true, false]) {
+        await withPage(
+          width,
+          async page => {
+            await page.goto(origin + "/", { waitUntil: "load" });
+            assert.equal(
+              await page.locator(".search-button:visible").count(),
+              javaScriptEnabled ? 1 : 0,
+              `JavaScript ${javaScriptEnabled ? "on" : "off"}`
+            );
+          },
+          { javaScriptEnabled }
+        );
+      }
+    });
+  }
+
+  // Why: a callout written collapsed (`[!note]-`) opens only through the
+  // callout script, so without JavaScript its text would stay hidden for
+  // good. It shows expanded instead, without the fold chevron that could
+  // not work. No published note is collapsed yet, so the test builds one
+  // with the site's stylesheet.
+  it("shows collapsed callouts expanded", async () => {
+    const html = await site.read("index.html");
+    const stylesheet = html.match(/<link rel="stylesheet" href="([^"]+)"/)![1];
+    await withPage(
+      1440,
+      async page => {
+        await page.goto(origin + "/", { waitUntil: "load" });
+        await page.setContent(
+          `<!doctype html><html><head><link rel="stylesheet" href="${origin}${stylesheet}"></head><body class="markdown-rendered"><main class="content"><div class="callout is-collapsible is-collapsed" data-callout="note"><div class="callout-title"><div class="callout-title-inner">Note</div><div class="callout-fold"><svg width="16" height="16"></svg></div></div><div class="callout-content"><p>Hidden text</p></div></div></main></body></html>`,
+          { waitUntil: "load" }
+        );
+        assert.equal(await page.isVisible(".callout-content p"), true);
+        assert.equal(await page.isVisible(".callout-fold"), false);
+      },
+      { javaScriptEnabled: false }
+    );
   });
 });
 
@@ -977,11 +1033,7 @@ describe("accessibility checks (axe-core)", () => {
     }
     await withPage(390, async page => {
       await page.goto(origin + "/", { waitUntil: "load" });
-      await page.evaluate(() =>
-        document
-          .querySelector(".hamburger-btn")!
-          .setAttribute("aria-expanded", "true")
-      );
+      await page.click(".hamburger-btn");
       await check(page, "390px file tree open");
     });
     assert.deepEqual(unexpected, []);

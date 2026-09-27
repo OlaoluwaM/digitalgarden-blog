@@ -99,30 +99,21 @@ describe("structure", () => {
     expect(heading?.text).toBe("Thunks & Thoughts");
   });
 
-  // Why: the overlay dims the page behind the open mobile file tree, and a
-  // tap on it closes the tree. It is decoration for pointer users, so it
-  // stays out of the accessibility tree.
-  it("renders the mobile overlay element", async () => {
-    const root = await renderNav("/");
-    const overlay = root.querySelector(".fullpage-overlay");
-    expect(overlay).not.toBeNull();
-    expect(overlay!.getAttribute("aria-hidden")).toBe("true");
-  });
-
-  // Why: the hamburger's `aria-expanded` is the mobile file tree's only
-  // state: the navigation script flips it, and the stylesheet shows the
-  // tree and the overlay while it is "true", so what screen readers hear
-  // and what is drawn cannot disagree. `aria-controls` names the tree it
-  // opens.
-  it("points the hamburger at the file tree it opens, closed", async () => {
+  // Why: below lg the file tree is a popover the hamburger opens through
+  // `popovertarget`, so it opens and closes without JavaScript (live needed
+  // Alpine). The browser then handles Escape, a tap outside, the dimmed
+  // backdrop, and the hamburger's expanded state for screen readers, so
+  // the markup carries no `aria-expanded` of its own to fall out of step.
+  it("makes the file tree a popover the hamburger opens", async () => {
     const root = await renderNav("/");
     const hamburger = root.querySelector("button.hamburger-btn")!;
-    expect(hamburger.getAttribute("aria-expanded")).toBe("false");
-    const controls = hamburger.getAttribute("aria-controls");
-    expect(controls).toBeTruthy();
-    expect(
-      root.querySelector(`#${controls}`)?.classList.contains("filetree-wrapper")
-    ).toBe(true);
+    const target = hamburger.getAttribute("popovertarget");
+    expect(target).toBeTruthy();
+    expect(hamburger.hasAttribute("aria-expanded")).toBe(false);
+    const tree = root.querySelector(`#${target}`);
+    expect(tree?.classList.contains("filetree-wrapper")).toBe(true);
+    expect(tree?.getAttribute("popover")).toBe("auto");
+    expect(root.querySelector(".fullpage-overlay")).toBeNull();
   });
 
   // Why: mirrors Eleventy's root `<div class="folder" x-data="{isOpen:

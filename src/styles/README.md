@@ -35,9 +35,11 @@ rules in `@layer components { … }`.
   and rendered Markdown depend on them. Add utilities beside them.
 - Markup that a script builds (search results, the search preview) is styled
   by class in `components/<name>.css`, so the script carries no styling.
-- Scripts set state, and CSS reads it: `aria-expanded` on the hamburger (the
-  `nav-open` variant in `global.css`), `aria-selected` on a search result,
-  `data-state` on the search layout. A component rule that shows or hides an
+- State lives in markup the browser or a script sets, and CSS reads it: the
+  mobile file tree's popover state (`open:`), `aria-selected` on a search
+  result, `data-state` on the search layout. Behavior that needs no
+  script uses the platform (popovers, `<details>`, `<dialog>`), so it works
+  without JavaScript; `noscript:` hides controls that need it. A component rule that shows or hides an
   element loses to a utility on the same property, so such elements carry
   no `display` utilities.
 - Breakpoints: `md` 800px, `lg` 1000px (desktop navigation), `xl` 1400px. In

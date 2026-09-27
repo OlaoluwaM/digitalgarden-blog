@@ -19,10 +19,12 @@
 //     `x-show.important` wrappers that swapped the navbar and the sidebar at
 //     1000px, are gone. The same swap is a media query now (`lg:hidden` on
 //     `.navbar`, `max-lg:hidden` on `.filetree-wrapper`).
-//   - below lg, the file tree opens over the page while the hamburger's
-//     `aria-expanded` is "true", with `.fullpage-overlay` dimming the page
-//     (the `nav-open` variant in styles/global.css). scripts/mobileNavigation.ts
-//     flips the attribute; a tap on the overlay closes the tree.
+//   - below lg, the file tree is a popover the hamburger opens with
+//     `popovertarget`, so it works without JavaScript: the browser opens and
+//     closes it (a tap outside, Escape), dims the page with its backdrop
+//     (live's `.fullpage-overlay`), and gives the hamburger its expanded
+//     state. scripts/mobileNavigation.ts adds focus and closing on widening.
+//     From lg up the same element shows in place, never opened.
 //   - the file tree itself is `FileTreeEntry`, recursing over
 //     `buildFileTree`'s output; folders are native `<details>`/`<summary>`
 //     instead of an `x-data` `isOpen` flag.
@@ -44,7 +46,10 @@ const { tree, activePathname } = Astro.props;
 // 1.5x horizontally to read better on phones (user/custom.scss), and the
 // button keeps the transition Obsidian gave every button, so its focus ring
 // eases in as it did live. The sidebar's width arithmetic lives in
-// styles/components/navigation.css.
+// styles/components/navigation.css. The file tree is a popover, and
+// browsers give popovers their own colors, scrolling, and position;
+// `text-inherit` and `overflow-visible` undo the ones no utility here
+// already sets, so the tree looks the same opened or in place.
 ---
 
 <nav
@@ -58,8 +63,7 @@ const { tree, activePathname } = Astro.props;
       type="button"
       class="hamburger-btn flex h-8 cursor-pointer appearance-none items-center justify-center rounded-full border-none bg-transparent p-0 text-inherit transition-all duration-320 ease-overshoot select-none motion-reduce:transition-none"
       aria-label="Toggle navigation"
-      aria-expanded="false"
-      aria-controls="filetree"
+      popovertarget="filetree"
     >
       <Icon
         name="menu"
@@ -82,14 +86,9 @@ const { tree, activePathname } = Astro.props;
 </nav>
 
 <div
-  class="fullpage-overlay fixed inset-0 z-5 hidden bg-overlay max-lg:nav-open:block print:hidden"
-  aria-hidden="true"
->
-</div>
-
-<div
   id="filetree"
-  class="filetree-wrapper fixed top-0 left-0 z-10 flex h-full min-w-(--container-sidebar-min) justify-end bg-surface-sidebar max-xl:justify-start max-lg:hidden max-lg:nav-open:flex print:hidden"
+  popover="auto"
+  class="filetree-wrapper fixed top-0 left-0 z-10 flex h-full min-w-(--container-sidebar-min) justify-end overflow-visible bg-surface-sidebar text-inherit backdrop:bg-overlay max-xl:justify-start max-lg:hidden max-lg:open:flex print:hidden"
 >
   <nav
     aria-label="Notes"
