@@ -5,9 +5,23 @@
  * built assets with `rename`, which fails across filesystems (a `/tmp` tmpfs).
  * Builds use `--force` so rendered Markdown reflects current plugin code
  * instead of Astro's content cache.
+ *
+ * Each build gets its own Astro and Vite cache folders, through a small
+ * config file that wraps the site's. Test files build in parallel
+ * processes, and with the shared `node_modules/.astro`, one build's
+ * `--force` cleared the content store while another was still using it
+ * (test/site-build-concurrency.test.ts).
+ *
+ * Why each test file builds for itself instead of sharing one build from a
+ * global setup (`node --test --test-global-setup`): only three unit test
+ * files and the layout tests need the site, and a build takes a few
+ * seconds, so sharing would save little. It would tie every file to a
+ * setup file and make the single-file scripts (`npm run test:site-build`)
+ * need the flag or a fallback. Revisit if more files need the built site
+ * or builds get slow.
  */
 import { spawn } from "node:child_process";
-import { mkdtemp, readdir, readFile, rm } from "node:fs/promises";
+import { mkdtemp, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import { join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -24,14 +38,22 @@ export interface SiteBuild {
 export async function buildSite(): Promise<SiteBuild> {
   const workDir = await mkdtemp(join(repository, ".astro", "site-build-"));
   const outDir = join(workDir, "out");
-  const log = await runAstroBuild(outDir);
-  const pages = (await listFiles(outDir))
-    .filter(path => path.endsWith(".html"))
-    .map(path => relative(outDir, path))
-    .sort();
-
-  if (pages.length === 0) {
-    throw new Error(`The site build produced no pages:\n${log}`);
+  let pages: string[];
+  // A failed build removes its folder too.
+  try {
+    const config = join(workDir, "astro.config.ts");
+    await writeFile(config, cacheConfig(workDir));
+    const log = await runAstroBuild(outDir, config);
+    pages = (await listFiles(outDir))
+      .filter(path => path.endsWith(".html"))
+      .map(path => relative(outDir, path))
+      .sort();
+    if (pages.length === 0) {
+      throw new Error(`The site build produced no pages:\n${log}`);
+    }
+  } catch (error) {
+    await rm(workDir, { recursive: true, force: true });
+    throw error;
   }
 
   return {
@@ -42,7 +64,21 @@ export async function buildSite(): Promise<SiteBuild> {
   };
 }
 
-function runAstroBuild(outDir: string): Promise<string> {
+/** The site's config with Astro and Vite caches inside `workDir`. */
+function cacheConfig(workDir: string) {
+  const site = JSON.stringify(join(repository, "astro.config.ts"));
+  const astroCache = JSON.stringify(join(workDir, "astro-cache"));
+  const viteCache = JSON.stringify(join(workDir, "vite-cache"));
+  return `import site from ${site};
+export default {
+  ...site,
+  cacheDir: ${astroCache},
+  vite: { ...site.vite, cacheDir: ${viteCache} },
+};
+`;
+}
+
+function runAstroBuild(outDir: string, config: string): Promise<string> {
   return new Promise((resolve, reject) => {
     const child = spawn(
       process.execPath,
@@ -52,6 +88,9 @@ function runAstroBuild(outDir: string): Promise<string> {
         "--force",
         "--outDir",
         outDir,
+        // Astro joins this onto the project root.
+        "--config",
+        relative(repository, config),
       ],
       { cwd: repository, stdio: ["ignore", "pipe", "pipe"] }
     );
