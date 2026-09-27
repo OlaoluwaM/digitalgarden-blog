@@ -166,6 +166,20 @@ describe("search buttons", () => {
     );
     expect(modifiers.map(key => key.text)).toEqual(["Ctrl", "Ctrl"]);
   });
+
+  // Why: the shortcut names keys to press, which is what <kbd> means;
+  // live used <code>, which reads as program text. The dialog's hints
+  // already use <kbd>, and both draw them with the one Key component.
+  it("marks the shortcut's keys as keyboard input", async () => {
+    const root = await renderNav("/");
+    for (const hint of root.querySelectorAll(".search-keys")) {
+      expect(hint.querySelectorAll("kbd").map(key => key.text)).toEqual([
+        "Ctrl",
+        "K",
+      ]);
+      expect(hint.querySelectorAll("code")).toHaveLength(0);
+    }
+  });
 });
 
 describe("folders", () => {

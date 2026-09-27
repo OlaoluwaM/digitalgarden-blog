@@ -26,13 +26,22 @@ const group = (prefix: string) =>
 const colors = group("--color-");
 const fonts = group("--font-").filter(token => !token.name.includes("weight"));
 const sizes = group("--text-");
+const leading = group("--leading-");
 const radii = group("--radius-");
 const other = tokens.filter(
   token =>
-    !["--color-", "--font-", "--text-", "--radius-"].some(prefix =>
-      token.name.startsWith(prefix)
+    !["--color-", "--font-", "--text-", "--leading-", "--radius-"].some(
+      prefix => token.name.startsWith(prefix)
     ) || token.name.startsWith("--font-weight")
 );
+// xl and up are the heading sizes, set in the serif.
+const heading = (name: string) => /^--text-\d?xl$/.test(name);
+const swatchClass = "flex flex-col gap-1 text-xs";
+const chipClass = "block h-12 rounded-lg inset-ring inset-ring-gray-700";
+const valueClass = "text-gray-300 wrap-anywhere";
+// Browsers indent list items for their bullet; the grid has none.
+const gridClass =
+  "grid list-none grid-cols-2 gap-4 p-0 *:ms-0 md:grid-cols-4";
 
 function fakePost(
   title: string,
@@ -72,13 +81,13 @@ const recent = [
   </p>
 
   <h2>Colors</h2>
-  <ul class="sg-grid">
+  <ul class={gridClass}>
     {
       colors.map(token => (
-        <li class="sg-swatch">
-          <span class="sg-chip" style={`background: var(${token.name})`} />
+        <li class={swatchClass}>
+          <span class={chipClass} style={`background: var(${token.name})`} />
           <code>{token.name}</code>
-          <span class="sg-value">{token.value}</span>
+          <span class={valueClass}>{token.value}</span>
           <span style={`color: var(${token.name})`}>Aa text</span>
         </li>
       ))
@@ -99,24 +108,35 @@ const recent = [
   {
     sizes.map(token => (
       <p
-        style={`font-size: var(${token.name}); line-height: var(${token.name}--line-height, normal); letter-spacing: var(${token.name}--letter-spacing, normal); margin: 0.5rem 0; font-family: ${token.name.startsWith("--text-h") || token.name === "--text-site-name" ? "var(--font-serif); font-weight: 400" : "var(--font-sans)"}`}
+        class:list={["my-2", heading(token.name) ? "font-serif font-normal" : "font-sans"]}
+        style={`font-size: var(${token.name}); line-height: var(${token.name}--line-height, normal); letter-spacing: var(${token.name}--letter-spacing, normal)`}
       >
         {token.name.replace("--text-", "")} · {token.value}
       </p>
     ))
   }
 
+  <h2>Leading</h2>
+  {
+    leading.map(token => (
+      <p class="my-4" style={`line-height: var(${token.name})`}>
+        <code>{token.name}</code> · {token.value}. Two lines of interface text
+        show how far apart the lines of a paragraph sit at this leading.
+      </p>
+    ))
+  }
+
   <h2>Radii</h2>
-  <ul class="sg-grid">
+  <ul class={gridClass}>
     {
       radii.map(token => (
-        <li class="sg-swatch">
+        <li class={swatchClass}>
           <span
-            class="sg-chip"
-            style={`border-radius: var(${token.name}); background: var(--color-surface-sidebar); border: 1px solid var(--color-border)`}
+            class={`${chipClass} bg-gray-800`}
+            style={`border-radius: var(${token.name})`}
           />
           <code>{token.name}</code>
-          <span class="sg-value">{token.value}</span>
+          <span class={valueClass}>{token.value}</span>
         </li>
       ))
     }
@@ -147,32 +167,3 @@ const recent = [
   <Sample />
 </BaseLayout>
 
-<style>
-  @layer components {
-    .sg-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
-      gap: 1rem;
-      padding: 0;
-      list-style: none;
-    }
-    .sg-swatch {
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
-      font-size: var(--text-xs);
-      /* Browsers indent list items for their bullet. */
-      margin-inline-start: 0;
-    }
-    .sg-chip {
-      display: block;
-      height: 3rem;
-      border-radius: var(--radius-box);
-      box-shadow: var(--shadow-input);
-    }
-    .sg-value {
-      color: var(--color-faint);
-      overflow-wrap: anywhere;
-    }
-  }
-</style>

@@ -6,7 +6,7 @@
 // `showFilesMobile` flag.
 
 // The desktop layout, where the tree always shows (--breakpoint-lg).
-const DESKTOP = "(min-width: 1000px)";
+const DESKTOP = "(min-width: 62.5rem)";
 
 // Trees we've already set up, so running the setup twice is harmless.
 // Without this, each opening would be handled twice.

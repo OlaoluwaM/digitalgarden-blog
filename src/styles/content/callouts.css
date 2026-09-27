@@ -92,15 +92,15 @@
      content. */
   .callout {
     margin: 1em 0;
-    padding: 1rem;
+    padding: --spacing(4);
     overflow: hidden;
     border: 1px solid rgba(var(--callout-color), 0.25);
-    border-radius: var(--radius-box);
+    border-radius: var(--radius-lg);
     corner-shape: var(--corner-shape-soft);
     background-color: rgba(var(--callout-color), 0.1);
     font-family: var(--font-sans);
-    font-size: var(--text-callout);
-    line-height: var(--text-callout--line-height);
+    font-size: var(--text-base);
+    line-height: var(--text-base--line-height);
     overflow-wrap: break-word;
   }
 
@@ -109,10 +109,10 @@
   .callout-title {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: --spacing(2);
     color: rgb(var(--callout-color));
-    font-size: var(--text-callout-title);
-    line-height: var(--text-callout-title--line-height);
+    font-size: var(--text-base);
+    line-height: var(--leading-tight);
   }
 
   .callout.is-collapsible > .callout-title {
@@ -142,7 +142,7 @@
 
     & svg {
       scale: 0.9;
-      transition: transform 100ms ease-in-out;
+      transition: transform 100ms var(--default-transition-timing-function);
 
       @media (prefers-reduced-motion: reduce) {
         transition: none;
@@ -154,27 +154,25 @@
      with the title text. `overflow-y: hidden` prevents stray vertical
      scrollbars on text-heavy callouts. */
   .callout-content {
-    margin-left: calc(1em + 0.5rem);
+    margin-left: calc(1em + --spacing(2));
     overflow-x: auto;
     overflow-y: hidden;
   }
 
   .callout > .callout-content > :first-child {
-    margin-top: 0.5rem;
+    margin-top: --spacing(2);
   }
 
   .callout > .callout-content > :last-child {
     margin-bottom: 0;
   }
 
-  /* Nested callouts sit a little further from the text above them. One that
-     opens its parent's body gets more room than the first line of text. */
-  .callout-content .callout {
-    margin-top: 1.25rem;
-  }
-
+  /* Nested callouts sit a little further from the text above them, also
+     when one opens its parent's body (where the rule above would give it
+     the first line's smaller gap). */
+  .callout-content .callout,
   .callout > .callout-content > .callout:first-child {
-    margin-top: 1.2rem;
+    margin-top: --spacing(5);
   }
 
   /* Collapsed: hide the body and point the chevron right. */

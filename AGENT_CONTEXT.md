@@ -666,6 +666,8 @@ Eleventy's markdown-it options. Olaolu put all resulting items in scope.
   (`source(none)`): the default scan turned note words into `.table`,
   `.hidden`, `.collapse` utilities.
 - `tokens.css` (`@theme static`) clears Tailwind's default namespaces.
+  Since 2026-09-27 it follows Tailwind's structure (see "Tokens on
+  Tailwind's scales" below).
 - Removed dead Obsidian hooks: body `theme-dark`, `markdown-preview-view`,
   `markdown-preview-section`; main `cm-s-obsidian`, `print`. Kept
   `markdown-rendered` (content stylesheet scope) and other class names
@@ -683,6 +685,30 @@ Eleventy's markdown-it options. Olaolu put all resulting items in scope.
   entry left is the vault's `aside` callout color (#7f849c, 3.98:1), which
   comes from `/sync-callouts`.
 - `.fullpage-overlay` is styled by the search and mobile file tree work below.
+
+### Tokens on Tailwind's scales (2026-09-27)
+
+- Olaolu's direction: follow Tailwind's structure and scales; keep the
+  values that define the site, take Tailwind's where ours were incidental.
+  Decisions (all as recommended): Tailwind's paired line heights, with
+  `leading-relaxed` for the file tree; palette-only color names
+  (`gray-50`…`950`, no `text-muted`); key caps at 0.8em of their hint
+  (`Key.astro`, the one listed arbitrary size); one focus ring (2px gray,
+  4px offset); snap every off-grid value; enforce with a test.
+- `test/design-system.test.ts` reads the source: token names in
+  Tailwind's namespaces and step names, adopted steps equal to Tailwind's,
+  no color/length literals in CSS (except 1px/2px borders and the note
+  text's 1.03rem), half-step spacing, Tailwind durations, no `var()` of a
+  missing token, and no arbitrary values in templates beyond its list.
+- The 700px column stays `--container-content`: `max-w-prose` is a
+  Tailwind built-in (65ch).
+- Opacity modifiers compute to `oklab(...)`; layout tests compare colors
+  through the `rgba()` helper in `test/layout/site-layout.test.ts`.
+- Tailwind drops an unknown class silently, and the test only catches
+  stale `var()`s, so check renamed utilities with Tailwind's
+  `__unstable__loadDesignSystem` (`candidatesToCss` returns null).
+- Every visible change: `docs/design-changes.md` (2026-09-27, Tokens on
+  Tailwind's scales).
 
 ### Analytics (2026-09-26)
 

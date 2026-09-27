@@ -41,11 +41,11 @@ const path =
     : parentPath;
 const nested = depth > 0;
 const active = node.type === "file" && node.href === activePathname;
-const chevronClass = "mr-0.5 size-icon opacity-50";
+const chevronClass = "mr-0.5 size-3 opacity-50";
 // Eleventy: `class="{{'filelist' if step>0}}"` — no class at all at the
 // root, where step is 0. Nested rows draw the depth line.
 const wrapperClass = nested
-  ? "filelist ml-2 border-l border-l-muted/40"
+  ? "filelist ml-2 border-l border-l-gray-100/40"
   : undefined;
 // Note links use `hover:underline!` because their inline
 // `text-decoration:none` would otherwise win over a utility.
@@ -54,8 +54,8 @@ const wrapperClass = nested
 <div class={wrapperClass}>
   {
     node.type === "folder" ? (
-      <details class="folder inner-folder ml-3 py-0.75" data-folder-path={path}>
-        <summary class="foldername-wrapper align-icon my-1 ml-0.5 inline-flex cursor-pointer list-none items-center justify-evenly text-sm">
+      <details class="folder inner-folder ml-3 py-1" data-folder-path={path}>
+        <summary class="foldername-wrapper align-icon my-1 ml-0.5 inline-flex cursor-pointer list-none items-center justify-evenly text-sm/relaxed">
           <Icon
             name="chevron-down"
             class={`folder-chevron-open ${chevronClass}`}
@@ -80,14 +80,14 @@ const wrapperClass = nested
         class:list={[
           "notelink",
           active && "active-note",
-          "relative flex items-center py-1 pr-2 pl-3 text-sm hover:bg-row-hover",
+          "relative flex items-center py-1 pr-2 pl-3 text-sm/relaxed hover:bg-white/5",
           // Nested notes carry a 2px left rule (colored when active) over
           // the folder's depth line; root notes have none and are indented
           // past the folder chevrons.
           nested
             ? [
                 "-ml-px border-l-2",
-                active ? "border-l-link" : "border-l-transparent",
+                active ? "border-l-gray-200" : "border-l-transparent",
               ]
             : "ml-5.5 border-l-0",
         ]}
@@ -97,7 +97,7 @@ const wrapperClass = nested
           style="text-decoration:none"
           class:list={[
             "filename hover:underline!",
-            active ? "text-text" : "text-link hover:text-link-hover",
+            active ? "text-gray-50" : "text-gray-200 hover:text-gray-100",
           ]}
           href={node.href}
         >

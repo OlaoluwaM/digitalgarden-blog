@@ -45,19 +45,24 @@ function contrast(foreground: string, background: string): number {
 describe("design tokens", () => {
   // Why: WCAG AA needs 4.5:1 for body-size text. The live site's #666 muted
   // text failed at 2.9:1 and was raised deliberately (docs/design-changes.md).
-  // Each pair is a text color on a surface it is actually used on, so a
-  // later token tweak cannot quietly bring the failure back.
+  // Each pair is a text gray on a surface it is actually used on (the roles
+  // are listed in tokens.css), so a later token tweak cannot quietly bring
+  // the failure back.
   const pairs = [
-    ["--color-text", "--color-surface"],
-    ["--color-text", "--color-surface-sidebar"],
-    ["--color-text", "--color-surface-raised"],
-    ["--color-muted", "--color-surface"],
-    ["--color-muted", "--color-surface-sidebar"],
-    ["--color-faint", "--color-surface"],
-    ["--color-faint", "--color-surface-sidebar"],
-    ["--color-link", "--color-surface"],
-    ["--color-link-hover", "--color-surface"],
-    ["--color-code", "--color-surface-raised"],
+    // Text on the page, the sidebar, and raised surfaces.
+    ["--color-gray-50", "--color-gray-950"],
+    ["--color-gray-50", "--color-gray-800"],
+    ["--color-gray-50", "--color-gray-900"],
+    // Muted text, and link hover.
+    ["--color-gray-100", "--color-gray-950"],
+    ["--color-gray-100", "--color-gray-800"],
+    // Faint text.
+    ["--color-gray-300", "--color-gray-950"],
+    ["--color-gray-300", "--color-gray-800"],
+    // Links.
+    ["--color-gray-200", "--color-gray-950"],
+    // Inline code.
+    ["--color-slate-300", "--color-gray-900"],
   ] as const;
   for (const [text, surface] of pairs) {
     it(`${text} on ${surface} meets WCAG AA (4.5:1)`, () => {
@@ -68,15 +73,19 @@ describe("design tokens", () => {
 
   // Why: the tokens are meant to be the whole vocabulary. If Tailwind's
   // default palette, fonts, or type scale leaked back in, utilities such as
-  // `text-blue-500` or `text-lg` would work and bypass the design system.
+  // `text-blue-500` or `rounded-2xl` would work and bypass the design system.
   it("clears Tailwind's default namespaces", () => {
     for (const namespace of [
       "--color-*",
       "--font-*",
       "--text-*",
+      "--leading-*",
+      "--tracking-*",
       "--radius-*",
-      "--breakpoint-*",
       "--shadow-*",
+      "--container-*",
+      "--breakpoint-*",
+      "--ease-*",
     ]) {
       assert.equal(tokens.get(namespace), "initial", namespace);
     }

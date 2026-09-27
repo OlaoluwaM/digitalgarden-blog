@@ -54,29 +54,29 @@ const { tree, activePathname } = Astro.props;
 
 <nav
   aria-label="Site"
-  class="navbar fixed inset-x-0 top-0 z-3 flex w-full items-center justify-between bg-surface-sidebar px-8 py-navbar-y lg:hidden print:hidden"
+  class="navbar fixed inset-x-0 top-0 z-3 flex w-full items-center justify-between bg-gray-800 px-8 py-1.5 lg:hidden print:hidden"
 >
   <div
-    class="navbar-inner flex grow cursor-pointer items-center gap-navbar-gap max-md:gap-2"
+    class="navbar-inner flex grow cursor-pointer items-center gap-8 max-md:gap-2"
   >
     <button
       type="button"
-      class="hamburger-btn flex h-8 cursor-pointer appearance-none items-center justify-center rounded-full border-none bg-transparent p-0 text-inherit transition-all duration-320 ease-overshoot select-none motion-reduce:transition-none"
+      class="hamburger-btn flex h-8 cursor-pointer appearance-none items-center justify-center rounded-full border-none bg-transparent p-0 text-inherit transition-all duration-300 ease-overshoot select-none motion-reduce:transition-none"
       aria-label="Toggle navigation"
       popovertarget="filetree"
     >
       <Icon
         name="menu"
-        class="pointer-events-none h-4 w-hamburger-icon *:origin-center *:[transform:scaleX(1.5)]"
+        class="pointer-events-none h-4 w-6 *:origin-center *:scale-x-150"
       />
     </button>
     <a
       href="/"
       style="text-decoration:none"
-      class="grow text-left text-link hover:text-link-hover"
+      class="grow text-left text-gray-200 hover:text-gray-100"
     >
       <h1
-        class="site-name-header m-0 font-serif text-site-name leading-none font-normal text-pretty text-inherit max-md:text-site-name-sm"
+        class="site-name-header m-0 font-serif text-3xl leading-none font-normal text-pretty text-inherit max-md:text-2xl"
       >
         {site.name}
       </h1>
@@ -88,19 +88,19 @@ const { tree, activePathname } = Astro.props;
 <div
   id="filetree"
   popover="auto"
-  class="filetree-wrapper fixed top-0 left-0 z-10 flex h-full min-w-(--container-sidebar-min) justify-end overflow-visible bg-surface-sidebar text-inherit backdrop:bg-overlay max-xl:justify-start max-lg:hidden max-lg:open:flex print:hidden"
+  class="filetree-wrapper fixed top-0 left-0 z-10 flex h-full min-w-sidebar-min justify-end overflow-visible bg-gray-800 text-inherit backdrop:bg-black/50 max-xl:justify-start max-lg:hidden max-lg:open:flex print:hidden"
 >
   <nav
     aria-label="Notes"
-    class="filetree-sidebar m-0 flex h-full w-auto max-w-(--container-sidebar) min-w-(--container-sidebar-min) grow flex-col overflow-hidden px-5 py-2.5 text-muted"
+    class="filetree-sidebar m-0 flex h-full w-auto max-w-sidebar min-w-sidebar-min grow flex-col overflow-hidden px-5 py-2.5 text-gray-100"
   >
     <a
       href="/"
       style="text-decoration:none"
-      class="text-link hover:text-link-hover"
+      class="text-gray-200 hover:text-gray-100"
     >
       <h1
-        class="mx-auto my-7 w-site-name shrink-0 text-center font-serif text-site-name font-normal text-pretty text-inherit"
+        class="mx-auto my-7 w-site-name shrink-0 text-center font-serif text-3xl leading-none font-normal text-pretty text-inherit"
       >
         {site.name}
       </h1>

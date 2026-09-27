@@ -1,0 +1,18 @@
+---
+// A keyboard key in a shortcut hint: the search button's Ctrl + K and the
+// search dialog's footer. It looks like inline code in a note, at 0.8em of
+// the hint around it (Obsidian's --code-size), which is smaller than any
+// step on the type scale.
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<kbd
+  class:list={[
+    "rounded-md border border-gray-700 bg-gray-900 px-1.5 py-1 font-mono text-[0.8em] leading-relaxed font-normal text-slate-300 box-decoration-clone [corner-shape:var(--corner-shape-soft)]",
+    className,
+  ]}><slot /></kbd
+>

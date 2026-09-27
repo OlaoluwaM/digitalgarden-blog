@@ -11,6 +11,7 @@
 // inherited, so it is the sidebar's muted gray there and the body text color
 // in the navbar, as on the live site.
 import Icon from "./Icon.astro";
+import Key from "./Key.astro";
 
 interface Props {
   placement: "navbar" | "sidebar";
@@ -18,9 +19,6 @@ interface Props {
 
 const { placement } = Astro.props;
 const navbar = placement === "navbar";
-// Each key looks like inline code in a note.
-const keyClass =
-  "rounded-code border border-border bg-surface-raised px-key-x py-1 font-mono text-key-code font-normal text-code box-decoration-clone [corner-shape:var(--corner-shape-soft)]";
 ---
 
 <button
@@ -28,9 +26,9 @@ const keyClass =
   class:list={[
     // Search needs JavaScript; without it the button would do nothing.
     "search-button align-icon noscript:hidden",
-    "my-2.5 flex h-search-button cursor-pointer appearance-none items-center justify-evenly gap-2 rounded-box border border-border bg-surface px-2.5 py-0 text-left font-sans text-sm/[normal] font-normal whitespace-nowrap text-inherit transition-none select-none hover:border-muted",
+    "my-2.5 flex h-9 cursor-pointer appearance-none items-center justify-evenly gap-2 rounded-lg border border-gray-700 bg-gray-950 px-2.5 py-0 text-left font-sans text-sm font-normal whitespace-nowrap text-inherit transition-none select-none hover:border-gray-100",
     navbar
-      ? "mx-0 grow-[0.035] max-md:min-w-9"
+      ? "mx-0 max-md:min-w-9 md:w-46"
       : "mx-0 w-full shrink-0 max-xl:mr-2.5 max-md:mx-0.5",
   ]}
   aria-label="Search"
@@ -38,7 +36,7 @@ const keyClass =
   aria-controls="globalsearch"
 >
   <span class="search-icon flex items-center">
-    <Icon name="search" class="pointer-events-none size-icon opacity-70" />
+    <Icon name="search" class="pointer-events-none size-3 opacity-70" />
   </span>
   <span
     class:list={[
@@ -47,8 +45,7 @@ const keyClass =
     ]}>Search</span
   >
   <span
-    class="search-keys rounded-key bg-key-surface px-1.5 py-0.75 text-key-hint text-faint max-lg:py-key-y-narrow max-md:hidden"
-    ><code class:list={["search-key-modifier", keyClass]}>Ctrl</code
-    >&nbsp;+&nbsp;<code class={keyClass}>K</code></span
+    class="search-keys rounded-sm bg-white/8 px-1.5 py-1 text-xs text-gray-300 max-md:hidden"
+    ><Key class="search-key-modifier">Ctrl</Key>&nbsp;+&nbsp;<Key>K</Key></span
   >
 </button>

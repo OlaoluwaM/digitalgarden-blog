@@ -25,14 +25,14 @@
     position: relative;
     margin: 0;
     /* The page gutter on every width (Obsidian's --file-margins). */
-    padding: 2rem;
+    padding: --spacing(8);
     /* Propagates to the viewport: no sideways page scroll. */
     overflow-x: hidden;
-    background-color: var(--color-surface);
-    color: var(--color-text);
+    background-color: var(--color-gray-950);
+    color: var(--color-gray-50);
     font-family: var(--font-sans);
-    font-size: var(--text-ui);
-    line-height: var(--text-ui--line-height);
+    font-size: var(--text-base);
+    line-height: var(--text-base--line-height);
     font-kerning: normal;
     text-rendering: optimizeLegibility;
     color-scheme: dark;
@@ -44,7 +44,7 @@
   }
 
   ::selection {
-    background-color: var(--color-selection);
+    background-color: --alpha(var(--color-gray-200) / 30%);
   }
 
   /* Keyboard focus only; mouse clicks show no ring. */
@@ -52,8 +52,8 @@
     outline: none;
   }
   :focus-visible {
-    outline: 2px solid var(--color-link);
-    outline-offset: 0.3rem;
+    outline: 2px solid var(--color-gray-200);
+    outline-offset: --spacing(1);
   }
 
   img {

@@ -35,3 +35,5 @@
 @source "../layouts";
 @source "../pages";
 @source "../scripts";
+/* The dev-only style guide's template, not its Markdown sample. */
+@source "../style-guide/*.astro";

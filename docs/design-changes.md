@@ -417,3 +417,106 @@ computed-style comparison of each dialog state against thunk.blog at
 - **Why:** only the callout script can expand it, so its text would be
   unreachable.
 - **Evidence:** the "without JavaScript" tests.
+
+## 2026-09-27: Tokens on Tailwind's scales
+
+The tokens moved onto Tailwind's structure: its namespaces, its step names,
+one spacing unit. Values that define the site stayed (grays, fonts, heading
+sizes, note text, layout widths, breakpoints); incidental ones became
+Tailwind's. One-off values snapped to the nearest step. Every change below
+is 2.2px or less unless it says otherwise.
+
+### Interface text
+
+- **Change:**
+  - Interface text takes Tailwind's steps and their line heights: `xs`
+    0.75rem, `sm` 0.875rem, `base` 1rem, `lg` 1.125rem. The page's default
+    line height is 1.5 (was 1.6); note text keeps 1.03rem / 1.5.
+  - File tree rows and the search button: 0.85rem → 0.875rem. Tree rows
+    use 1.625 line height (was 1.6), and folder rows 4px padding (was 3px).
+  - Dates (note header, Recent Posts), Recent Posts descriptions, and the
+    post footer: 0.8rem, 0.8em, and 0.9rem → 0.875rem.
+  - h6: 1.07rem → 1.125rem. The site name: 2rem → 1.92rem (the h3 step,
+    with its −0.01em tracking); in the sidebar its two lines sit closer
+    (line height 1.1 → 1), 6px shorter. On phones: 1.5rem → 1.536rem.
+  - Line heights on Tailwind's leading: code blocks 1.6 → 1.625, tables and
+    callout titles 1.3 → 1.25.
+- **Why:** 35 font sizes and 9 line heights, most used once, become 9
+  steps; the interface reads as one system.
+- **Evidence:** `test/design-system.test.ts`; screenshots of every page at
+  1440px and 390px, and of each search and navigation state, against the
+  previous build.
+
+### Search
+
+- **Change:**
+  - The dialog is 1152px wide (the `6xl` step; was 1100px).
+  - Field text 0.9rem → 0.875rem; hints 0.8rem → 0.75rem; result titles
+    1.1rem → 1.125rem; excerpts 0.85rem → 0.875rem; the "select a result"
+    placeholder 0.9rem → 0.875rem.
+  - The preview's text is 1rem (was 0.95rem), its title 1.536rem (was
+    1.4rem), and its note headings 1.229rem for h1 and h2 (were 1.3rem and
+    1.2rem) and 1.125rem for h3 (was 1.1rem).
+  - Inline code in the preview looks as it does in notes (was smaller,
+    with less padding, on the sidebar gray).
+  - Hovered and selected results lighten by the same white/5 as file tree
+    rows. They used #242424, which is darker than the card.
+- **Why:** one set of steps across the site; the preview shows a note, so
+  its code should look like the note's; the hover was barely visible.
+- **Evidence:** the "search dialog" tests in
+  `test/layout/site-layout.test.ts`; state screenshots.
+
+### One tag style
+
+- **Change:** tags in the note header, search results, and the preview
+  share one look: 8px corners, a 10% gray fill, a 1px inset border,
+  medium weight, #b3b3b3 text (was #999 in the header). Header tags are
+  14px (were 0.875em, 14.4px); result and preview tags 12px (were 11.2px
+  and 12px, with 3px and 4px corners and different fills). Clickable tags
+  brighten on hover.
+- **Why:** three tag designs for one idea. #999 on a result card's fill
+  fell below 4.5:1 at 12px.
+- **Evidence:** axe in `test/layout/site-layout.test.ts` (search results
+  included); state screenshots.
+
+### One key style
+
+- **Change:** the search button's Ctrl + K and the dialog's hints draw keys
+  with one component, as `<kbd>` (the button used `<code>`), at 0.8em of
+  their hint: 9.6px (were 8.96px in the button, 10.24px in the dialog).
+  The button's hint is 0.75rem (was 0.7rem), with 4px padding (was 3px,
+  and 3.5px below 1000px).
+- **Why:** keys to press are keyboard input; the two hints looked slightly
+  different.
+- **Evidence:** "marks the shortcut's keys as keyboard input" in
+  `test/components/site-navigation.test.ts`; "fits the shortcut keys
+  inside their hint" in `test/layout/site-layout.test.ts`.
+
+### One focus ring
+
+- **Change:** every focused control shows the same 2px gray outline, 4px
+  away (was 4.8px). The search field shows it instead of its lighter
+  border and 2px glow; the code copy button drops its extra 3px shadow.
+- **Why:** three focus treatments for one purpose.
+- **Evidence:** "shows a focus ring on every control reached with Tab" in
+  `test/layout/site-layout.test.ts`.
+
+### Spacing, radii, and motion snapped to the scales
+
+- **Change:**
+  - Navbar: padding 6.4px → 6px, the gap after the hamburger 32.8px →
+    32px, the hamburger icon 23.2px → 24px wide, its animation 320ms →
+    300ms. The navbar's search button is 184px wide between 800px and
+    1000px (was 182–189px) and 36px tall everywhere (was 36.8px).
+  - Note column top padding 90px → 88px (76px on phones, was 75px);
+    Recent Posts heading margin 67.2px → 68px; nested callouts that open
+    their parent 19.2px → 20px; note header date icons 3px → 4px apart;
+    smaller one-off gaps and paddings to the nearest 2px.
+  - Radii on Tailwind's steps: header tags 7.2px → 8px.
+  - Transitions use Tailwind's easing, `cubic-bezier(0.4, 0, 0.2, 1)` (was
+    `ease`); links fade in 150ms (was 160ms).
+  - Breakpoints are in rem (50rem, 62.5rem, 87.5rem): the same 800, 1000,
+    and 1400px at the default font size, and they follow the reader's
+    browser font size.
+- **Why:** one grid; no values that exist once.
+- **Evidence:** `test/design-system.test.ts`; screenshots.

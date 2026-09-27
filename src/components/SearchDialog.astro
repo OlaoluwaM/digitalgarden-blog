@@ -34,10 +34,8 @@
 // Everything the script builds is styled by class in
 // styles/components/search.css, so the script carries no styling.
 import Icon from "./Icon.astro";
+import Key from "./Key.astro";
 
-// Each key looks like the search button's (NavSearchButton), at the hint's size.
-const keyClass =
-  "rounded-code border border-border bg-surface-raised px-key-x py-1 font-mono text-hint-key font-normal text-code box-decoration-clone [corner-shape:var(--corner-shape-soft)]";
 const hints = [
   ["Enter", "to select"],
   ["⇅", "to navigate"],
@@ -47,17 +45,17 @@ const hints = [
 
 <dialog
   id="globalsearch"
-  class="search-container size-full max-h-none max-w-none items-start justify-center overflow-y-auto overscroll-contain bg-transparent pt-search-top text-inherit backdrop:bg-overlay open:flex print:hidden"
+  class="search-container size-full max-h-none max-w-none items-start justify-center overflow-y-auto overscroll-contain bg-transparent pt-20 text-inherit backdrop:bg-black/50 open:flex print:hidden"
   aria-label="Search"
 >
   <div
-    class="search-box flex w-(--container-search) max-w-9/10 flex-col rounded-dialog bg-surface p-4 shadow-dialog max-md:w-19/20 max-md:max-w-19/20 max-md:p-3"
+    class="search-box flex w-6xl max-w-9/10 flex-col rounded-xl bg-gray-950 p-4 shadow-2xl max-md:w-19/20 max-md:max-w-19/20 max-md:p-3"
   >
-    <div class="search-header shrink-0 border-b border-border pb-3">
+    <div class="search-header shrink-0 border-b border-gray-700 pb-3">
       <input
         id="term"
         type="search"
-        class="h-8 w-full rounded-box border border-border bg-surface-sidebar px-4 text-search-input text-text transition-[border-color] duration-200 placeholder:text-faint focus:border-link focus:shadow-field-focus focus:outline-none [&::-webkit-search-cancel-button]:hidden"
+        class="h-8 w-full rounded-lg border border-gray-700 bg-gray-800 px-4 text-sm text-gray-50 placeholder:text-gray-300 [&::-webkit-search-cancel-button]:hidden"
         placeholder="Start typing..."
         aria-label="Search notes"
         role="combobox"
@@ -75,45 +73,45 @@ const hints = [
       data-state="idle"
     >
       <div
-        class="search-results-panel max-h-search-panel shrink-0 overflow-y-auto overscroll-contain"
+        class="search-results-panel max-h-[60vh] shrink-0 overflow-y-auto overscroll-contain"
       >
         <p class="search-idle m-0 italic">
           Enter your search text in the box above
         </p>
         <div id="search-results" role="listbox" aria-label="Results"></div>
-        <div class="no-results px-5 py-10 text-center text-muted">
+        <div class="no-results px-5 py-10 text-center text-gray-100">
           <Icon name="zoom-out" class="mx-auto mb-4 block size-12 opacity-30" />
-          <p class="my-paragraph">
+          <p class="my-7">
             No results for “<span class="no-results-query"></span>”
           </p>
         </div>
       </div>
       <div
         id="search-preview"
-        class="search-preview-panel max-h-search-panel grow overflow-y-auto overscroll-contain pl-4"
+        class="search-preview-panel max-h-[60vh] grow overflow-y-auto overscroll-contain pl-4"
       >
         <!-- The placeholder shows while the preview is empty; it follows the
              preview so `peer-empty:` can see it. -->
         <div
           id="preview-content"
-          class="preview-content peer p-2 text-preview empty:hidden"
+          class="preview-content peer p-2 text-base empty:hidden"
         >
         </div>
         <div
-          class="preview-placeholder hidden h-50 flex-col items-center justify-center p-10 text-center text-muted peer-empty:flex"
+          class="preview-placeholder hidden h-50 flex-col items-center justify-center p-10 text-center text-gray-100 peer-empty:flex"
         >
           <Icon name="file-text" class="mb-4 size-12 opacity-30" />
-          <p class="m-0 text-teaser">Select a result to preview</p>
+          <p class="m-0 text-sm">Select a result to preview</p>
         </div>
       </div>
     </div>
     <footer
-      class="search-box-footer mt-3 flex shrink-0 justify-end gap-4 border-t border-border pt-3"
+      class="search-box-footer mt-3 flex shrink-0 justify-end gap-4 border-t border-gray-700 pt-3"
     >
       {
         hints.map(([key, action]) => (
-          <span class="navigation-hint text-hint text-muted">
-            <kbd class={keyClass}>{key}</kbd>&nbsp;{action}
+          <span class="navigation-hint text-xs text-gray-100">
+            <Key>{key}</Key>&nbsp;{action}
           </span>
         ))
       }

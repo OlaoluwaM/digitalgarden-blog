@@ -17,7 +17,7 @@ function tagHref(tag: string): string {
 ---
 
 <header>
-  <h1 class="font-serif font-normal text-h1 mt-7 mb-11">
+  <h1 class="font-serif font-normal text-5xl mt-7 mb-11">
     {title}
   </h1>
   <div class="header-meta">
@@ -25,7 +25,7 @@ function tagHref(tag: string): string {
       {
         tags.map((tag: string) => (
           <a
-            class="tag inline-flex h-8 items-center justify-center whitespace-nowrap rounded-tag border-0 border-solid border-link/20 bg-link/10 px-2 py-1 text-tag font-medium text-link no-underline shadow-input transition-colors hover:border-link/30 hover:bg-link/15 hover:text-link-hover motion-reduce:transition-none"
+            class="tag inline-flex h-8 items-center justify-center whitespace-nowrap rounded-lg bg-gray-200/10 px-2 py-1 text-sm leading-none font-medium text-gray-100 no-underline inset-ring inset-ring-gray-700 transition-colors hover:bg-gray-200/15 hover:text-gray-50 motion-reduce:transition-none"
             href={tagHref(tag)}
           >
             #{tag}
@@ -33,11 +33,11 @@ function tagHref(tag: string): string {
         ))
       }
     </div>
-    <div class="timestamps mt-5 flex gap-2.5 text-meta text-muted tabular-nums">
+    <div class="timestamps mt-5 flex gap-2.5 text-sm text-gray-100 tabular-nums">
       <div
         title="Created at"
         aria-label="Created at"
-        class="flex items-center gap-[3px]"
+        class="flex items-center gap-1"
       >
         <Icon name="calendar-plus" class="size-4" />{" "}
         <time class="human-date" datetime={published}>
@@ -47,7 +47,7 @@ function tagHref(tag: string): string {
       <div
         title="Updated at"
         aria-label="Updated at"
-        class="flex items-center gap-[3px]"
+        class="flex items-center gap-1"
       >
         <Icon name="calendar-clock" class="size-4" />{" "}
         <time class="human-date" datetime={last_updated}>

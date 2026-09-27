@@ -468,6 +468,27 @@ const box = (page: Page, selector: string) =>
     return [rect.x, rect.y, rect.width, rect.height].map(Math.round);
   }, selector);
 
+/**
+ * A computed color as `rgba(r, g, b, a)`. Colors with an opacity modifier
+ * (`bg-black/50`) compute to `oklab(...)`; mixing into sRGB gives every
+ * color the same notation, so tests compare values, not how the browser
+ * writes them.
+ */
+const rgba = (page: Page, color: string) =>
+  page.evaluate(color => {
+    const probe = document.createElement("span");
+    probe.style.color = `color-mix(in srgb, ${color} 100%, transparent)`;
+    document.body.append(probe);
+    const computed = getComputedStyle(probe).color;
+    probe.remove();
+    const [r, g, b, a = 1] = computed
+      .replace(/^color\(srgb |\)$/g, "")
+      .split(/[\s/]+/)
+      .map(Number);
+    const channel = (value: number) => Math.round(value * 255);
+    return `rgba(${channel(r!)}, ${channel(g!)}, ${channel(b!)}, ${Math.round(a * 100) / 100})`;
+  }, color);
+
 describe("search button", () => {
   // Why: the Ctrl + K hint is a small box holding two key boxes; live left
   // about 2px of the hint showing above and below the keys. A shorter hint
@@ -481,7 +502,7 @@ describe("search button", () => {
           .first()
           .evaluate(hint => {
             const outer = hint.getBoundingClientRect();
-            return [...hint.querySelectorAll("code")].map(key => {
+            return [...hint.querySelectorAll("kbd")].map(key => {
               const inner = key.getBoundingClientRect();
               return {
                 top: inner.top - outer.top,
@@ -502,10 +523,10 @@ describe("search dialog", () => {
   // Why: utility classes that set `display` on a <dialog> beat the
   // browser's rule that hides a closed dialog, so a styling slip shows an
   // empty search box on every page. Open, it must sit where live put it:
-  // 80px from the top, 1100px wide on desktop and 95% on phones, over a
-  // dimmed page.
+  // 80px from the top, over a dimmed page, 95% wide on phones. On desktop
+  // it is 1152px wide (the 6xl step; live: 1100px).
   for (const [width, expected] of [
-    [1440, { x: 170, width: 1100 }],
+    [1440, { x: 144, width: 1152 }],
     [390, { x: 10, width: 371 }],
   ] as const) {
     it(`stays hidden until opened, then sits over the page at ${width}px`, async () => {
@@ -518,12 +539,15 @@ describe("search dialog", () => {
         const [x, y, boxWidth] = await box(page, ".search-box");
         assert.deepEqual({ x, y, width: boxWidth }, { ...expected, y: 80 });
         assert.equal(
-          await page.evaluate(
-            () =>
-              getComputedStyle(
-                document.querySelector("#globalsearch")!,
-                "::backdrop"
-              ).backgroundColor
+          await rgba(
+            page,
+            await page.evaluate(
+              () =>
+                getComputedStyle(
+                  document.querySelector("#globalsearch")!,
+                  "::backdrop"
+                ).backgroundColor
+            )
           ),
           "rgba(0, 0, 0, 0.5)"
         );
@@ -629,9 +653,13 @@ describe("search dialog", () => {
             };
           })
       );
+      for (const mark of marks) {
+        mark.background = await rgba(page, mark.background);
+        mark.color = await rgba(page, mark.color);
+      }
       const expected = {
         background: "rgba(153, 153, 153, 0.35)",
-        color: "rgb(218, 218, 218)",
+        color: "rgba(218, 218, 218, 1)",
         sameWeight: true,
       };
       assert.deepEqual(marks, [expected, expected]);
@@ -677,7 +705,7 @@ describe("search dialog", () => {
       assert.deepEqual(preview, {
         header: "none",
         footer: "none",
-        text: "15.2px",
+        text: "16px",
         code: '"Commit Mono"',
         callout: true,
       });
@@ -897,10 +925,13 @@ describe("mobile file tree", () => {
       assert.equal(await isOpen(page), true);
       assert.deepEqual(await box(page, ".filetree-wrapper"), [0, 0, 280, 900]);
       assert.equal(
-        await page.evaluate(
-          () =>
-            getComputedStyle(document.querySelector("#filetree")!, "::backdrop")
-              .backgroundColor
+        await rgba(
+          page,
+          await page.evaluate(
+            () =>
+              getComputedStyle(document.querySelector("#filetree")!, "::backdrop")
+                .backgroundColor
+          )
         ),
         "rgba(0, 0, 0, 0.5)"
       );
