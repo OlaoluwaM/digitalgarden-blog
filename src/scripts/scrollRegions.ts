@@ -1,10 +1,10 @@
-// Content boxes that scroll sideways (callout bodies holding wide math, and
-// the wrappers around wide tables) need a tab stop, or keyboard users cannot
+// Content boxes that scroll sideways (callout bodies holding wide math, the
+// wrappers around wide tables, and wide diagrams) need a tab stop, or keyboard users cannot
 // scroll them (WCAG 2.1.1). Only boxes
 // that actually overflow get one, and overflow depends on the viewport, so a
 // ResizeObserver re-checks each box whenever its size changes, including
 // when a callout collapses and hides it.
-const SCROLL_REGION_SELECTOR = ".callout-content, .table-wrapper";
+const SCROLL_REGION_SELECTOR = ".callout-content, .table-wrapper, .diagram";
 const FALLBACK_LABEL = "Scrollable content";
 const TABLE_LABEL = "Table, scrollable";
 
@@ -50,6 +50,17 @@ function updateRegion(region: HTMLElement) {
 function labelFor(region: HTMLElement) {
   // A table scrolls in its own wrapper, even inside a callout.
   if (region.classList.contains("table-wrapper")) return TABLE_LABEL;
+  // A diagram is named after itself: its SVG's name, or the title that
+  // names it.
+  if (region.classList.contains("diagram")) {
+    const svg = region.querySelector("svg");
+    const titleId = svg?.getAttribute("aria-labelledby");
+    const name =
+      (titleId && document.getElementById(titleId)?.textContent.trim()) ||
+      svg?.getAttribute("aria-label") ||
+      FALLBACK_LABEL;
+    return `${name}, scrollable`;
+  }
   const title = region
     .closest(".callout")
     ?.querySelector(":scope > .callout-title .callout-title-inner")

@@ -1083,3 +1083,18 @@ approval before committing and starting the next.
   checkbox and the children before any nested `ul`/`ol` in a `<label>`.
   Tests: processor cases (tight, nested, loose, ordered, disabled state)
   and a fixture-site layout test (names, read-only, axe).
+- Item 8 (diagrams, ADR 0006): `mkmdastDiagramsPlugin` (after the callout
+  plugin) → `renderWithKroki` (src/lib/kroki.ts: POST `/{type}/svg`,
+  options in the query string, cache keyed by URL+type+options+source in
+  `KROKI_CACHE_DIR` or node_modules/.cache/kroki, errors quote Kroki's text
+  without its stack) → `prepareDiagramSvg` (src/lib/diagram-svg.ts:
+  strips scripts/on*/javascript:, prefixes ids and their references,
+  role=img + name, drops PlantUML's fixed size). Figures carry
+  `--diagram-width`; CSS shrinks to ≥70% then scrolls; scrollRegions covers
+  `.diagram`. Scrolling diagrams get an edge-fade mask moved by a
+  scroll-driven animation (`@property --fade-start/--fade-end`, keyframes
+  `diagram-edge-fade`), off on `:focus-visible`. Write its animation as
+  longhands: Lightning CSS folds `animation` + `animation-timeline` into a
+  shorthand browsers reject. The content @scope stops at `.diagram` (Mermaid labels are
+  HTML `<p>`). Tests use test/support/fake-kroki.ts with real Kroki SVGs in
+  test/fixtures/kroki; nothing in `npm test` calls kroki.io.

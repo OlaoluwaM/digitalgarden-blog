@@ -865,3 +865,28 @@ https://claude.ai/artifact/AezzrntfR1ZLK4WXrF4x9n.
 - **Evidence:** `test/task-list-labels.test.ts` and
   `test/layout/task-lists.test.ts` (names, read-only boxes, and axe on a
   fixture site); all three layout tests fail without the plugin.
+
+## 2026-09-28: Mermaid and PlantUML diagrams
+
+- **Change:** ` ```mermaid ` and ` ```plantuml ` fences render as SVG
+  diagrams at build time through Kroki
+  ([ADR 0006](adrs/0006-render-mermaid-and-plantuml-at-build-time-through-kroki.md)),
+  in Mermaid's dark theme (edge labels on the site's gray-800) and
+  PlantUML's `cyborg` theme. A diagram shrinks to fit the note column but
+  not below 70% of its drawn width; past that it scrolls sideways, with a
+  tab stop and the name "… diagram, scrollable" while it does, and fades
+  out at the edge with more to scroll to (a scroll-driven animation:
+  Chrome, Edge, and Safari 26; Firefox shows no fade). The fade steps
+  aside while the diagram has keyboard focus, so its focus ring shows.
+  The tables' edge shadow was tried first; a diagram's filled shapes hide
+  it (https://claude.ai/artifact/HnTwo3Pu7UkEs5NuPut2X8). Live
+  rendered Mermaid in the browser with Mermaid's script and PlantUML as an
+  image from plantuml.com; the Astro site had dropped both. No published
+  note has a diagram yet.
+- **Why:** Olaolu wants diagrams in notes, without client JavaScript or
+  third-party requests from readers' browsers.
+- **Evidence:** `test/kroki.test.ts`, `test/diagram-svg.test.ts`,
+  `test/diagrams.test.ts`, the diagram case in
+  `test/browser/scrollRegions.test.ts`, and `test/layout/diagrams.test.ts`
+  (a fixture site against a local fake Kroki: sizing and scrolling, style
+  isolation, distinct ids, axe, and a failed build on a rejected diagram).

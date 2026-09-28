@@ -28,6 +28,13 @@ npm run lint      # ESLint (typescript-eslint strict, eslint-plugin-astro)
 npm run format    # Prettier: format code and config (not Markdown)
 ```
 
+Mermaid and PlantUML fences render through [Kroki](https://kroki.io) during
+the build ([ADR 0006](docs/adrs/0006-render-mermaid-and-plantuml-at-build-time-through-kroki.md)),
+so a note with a new or changed diagram needs Kroki to be reachable; a
+diagram Kroki can't render fails the build. `KROKI_URL` points at another
+Kroki (default `https://kroki.io`), and `KROKI_CACHE_DIR` moves the cache
+of rendered diagrams (default `node_modules/.cache/kroki`).
+
 `dev` and `build` first apply the dependency patches in `patches/` and
 regenerate the wikilink index (`src/generated/wikilink-index.ts`). `build`
 re-renders every note (`--force`), because Astro's content cache does not

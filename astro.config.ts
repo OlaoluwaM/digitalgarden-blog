@@ -14,6 +14,7 @@ import { hastTaskListLabelsPlugin } from "./src/plugins/hast/taskListLabels.ts";
 import { mkmdastDigitalGardenImagesPlugin } from "./src/plugins/mdast/images.ts";
 import { mdastMathRenderPlugin } from "./src/plugins/mdast/math.ts";
 import { mdastHighlightsPlugin } from "./src/plugins/mdast/highlights.ts";
+import { mkmdastDiagramsPlugin } from "./src/plugins/mdast/diagrams.ts";
 
 const mdastWikilinksPlugin = mkmdastWikilinksPlugin(wikilinkIndex);
 const mdastAdmonitionCalloutPlugin =
@@ -68,6 +69,8 @@ export default defineConfig({
         mdastAdmonitionCalloutPlugin,
         mdastMathRenderPlugin,
         mdastDigitalGardenImagesPlugin,
+        // After the callout plugin, so diagrams inside callouts render.
+        mkmdastDiagramsPlugin(),
         // Last: it rewrites paragraph text the plugins above read.
         mdastHighlightsPlugin,
       ],

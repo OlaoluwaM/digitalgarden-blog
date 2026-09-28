@@ -136,3 +136,19 @@ it("makes an overflowing table wrapper focusable and names it as a table", () =>
     root.remove();
   }
 });
+
+// Why: a diagram wider than the column scrolls in its figure, like a wide
+// table, and needs the same tab stop. It is named after the diagram, from
+// the SVG's own name.
+it("makes an overflowing diagram focusable and names it after the diagram", () => {
+  root = document.createElement("main");
+  root.innerHTML = `<figure class="diagram" style="width: 200px; overflow-x: auto"><svg role="img" aria-label="Mermaid diagram" width="500" height="10"></svg></figure><figure class="diagram" style="width: 200px; overflow-x: auto"><title id="t">Publishing flow</title><svg role="img" aria-labelledby="t" width="500" height="10"></svg></figure>`;
+  document.body.append(root);
+  initializeScrollRegions();
+  const [plain, titled] = root.querySelectorAll(".diagram");
+  expect(plain!.getAttribute("tabindex")).toBe("0");
+  expect(plain!.getAttribute("aria-label")).toBe("Mermaid diagram, scrollable");
+  expect(titled!.getAttribute("aria-label")).toBe(
+    "Publishing flow, scrollable"
+  );
+});
