@@ -81,11 +81,11 @@ function parseCalloutIconsFromAllSources(): Map<string, string> {
 describe("callout icon map", () => {
   // Why: the map is hand-authored in TypeScript but must mirror the CSS
   // that actually decides each callout's icon in the browser (Obsidian
-  // defaults + `/sync-callouts`-generated custom
+  // defaults + `npm run sync-callouts`-generated custom
   // types). Parsing those sources independently and diffing against the
   // exported map is the only thing that catches drift after someone edits
   // one side and forgets the other -- in particular, re-running
-  // `/sync-callouts` must not be able to silently desync icons.
+  // `npm run sync-callouts` must not be able to silently desync icons.
   it("matches every --callout-icon declaration in the CSS/Sass sources, except the listed overrides", () => {
     const fromCss = parseCalloutIconsFromAllSources();
     const defaultFromCss = fromCss.get(DEFAULT_KEY);

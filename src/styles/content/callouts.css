@@ -62,13 +62,10 @@
     --callout-color: 158, 158, 158;
   }
 
-  /*
-   * Custom types from the Obsidian vault. Copied from
-   * src/site/styles/user/callouts.scss, which `/sync-callouts` writes. That
-   * file is deleted at cutover with the Eleventy styles, so the skill must
-   * write these
-   * rules (and the icon map in src/plugins/hast/callout-icons.ts) instead.
-   */
+  /* Custom types from the Obsidian vault, with their icons in
+     src/plugins/hast/callout-icons.ts. `npm run sync-callouts` writes the
+     rules between the markers; do not edit them by hand. */
+  /* sync-callouts:start */
   .callout[data-callout="ai-text"] {
     --callout-color: 116, 227, 161;
   }
@@ -87,6 +84,7 @@
   .callout[data-callout="exercise"] {
     --callout-color: 183, 148, 246;
   }
+  /* sync-callouts:end */
 
   /* The box. Nested callouts get the same box inside their parent's
      content. */

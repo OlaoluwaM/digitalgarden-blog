@@ -12,7 +12,7 @@ import type { Element } from "hast";
 // ["svg-icon"] } })` call) and throws on an unknown name, but the live
 // callout markup carries no `svg-icon` class, and an unresolved Obsidian
 // icon name (such as Obsidian's `quote-glyph`, which Lucide lacks, copied
-// into the icon map by a future `/sync-callouts`) must degrade gracefully
+// into the icon map by a future `npm run sync-callouts`) must degrade gracefully
 // rather than fail the build --
 // `replaceElement` itself only `console.warn`s and leaves the placeholder
 // element in the DOM, and that placeholder's tag/attribute in the live

@@ -43,6 +43,8 @@
     "test:images-build": "node --test --test-isolation=none test/images-build.test.ts",
     "test:wikilink-index": "node --test --test-isolation=none test/wikilink-index.test.ts",
     "generate:wikilink-index": "node scripts/generate-wikilink-index.ts",
+    "sync-callouts": "node scripts/sync-callouts.ts",
+    "test:sync-callouts": "node --test --test-isolation=none test/sync-callouts.test.ts",
     "predev:astro": "npm run patch-dependencies && npm run generate:wikilink-index",
     "dev:astro": "astro dev",
     "prebuild:astro": "npm run patch-dependencies && npm run generate:wikilink-index",

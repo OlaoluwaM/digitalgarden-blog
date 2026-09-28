@@ -50,7 +50,7 @@
 - [x] Rebuild `/feed.xml` (RSS, ADR 0004).
 - [x] Rebuild the sitemap (`/sitemap-index.xml` and `/robots.txt`, ADR 0005).
 - [x] Rebuild `/searchIndex.json` from published entries.
-- [ ] Make `/sync-callouts` generate the callout icon map in `src/plugins/hast/callout-icons.ts`, and decide where its `--callout-color` output lives once phase 2 removes the legacy Sass.
+- [x] Replace the `/sync-callouts` skill with `npm run sync-callouts`, which writes the callout colors and icon map.
 
 ## Markup and CSS
 
@@ -108,6 +108,7 @@ Phase 2: design system.
 - [ ] Document each Markdown plugin and the Eleventy behavior it replaces.
 - [ ] Remove Eleventy and migration-only code.
 - [ ] Delete `get-theme` and the `THEME` settings (ADR 0001).
+- [ ] Stop `sync-callouts` writing `callouts.scss`; compare `test/callout-icons.test.ts` against `callouts.css` instead of the Eleventy Sass.
 - [ ] Add `"type": "module"` to `package.json` to remove `MODULE_TYPELESS_PACKAGE_JSON` warnings.
 
 ## After Cutover

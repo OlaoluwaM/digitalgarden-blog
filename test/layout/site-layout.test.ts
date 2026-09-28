@@ -82,7 +82,7 @@ after(async () => {
 // the list shrinks when one is fixed), and any other violation fails.
 // - color-contrast: the vault's `aside` callout title color (#7f849c,
 //   3.98:1 on its tinted background). It comes from the Obsidian vault
-//   through /sync-callouts, so the fix belongs there.
+//   through `npm run sync-callouts`, so the fix belongs there.
 const KNOWN = [
   {
     rule: "color-contrast",

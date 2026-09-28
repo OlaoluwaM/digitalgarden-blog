@@ -36,9 +36,14 @@ Vault publishing remains paused pending the tasks in [TODO.md](TODO.md).
   Markdown and resolves nested wikilinks. It is registered in Astro; tests
   assert plain blockquotes containing `[!note]`, not finished callout markup
   or collapse behavior.
-- Astro does not yet load the shared layout, styles, or client behavior.
-  `.claude/skills/sync-callouts/SKILL.md` still targets the Eleventy Sass and
-  `calloutScript.njk`; those remain the reference during the visual port.
+- `npm run sync-callouts` (`scripts/sync-callouts.ts`, rules in
+  `scripts/callout-sync.ts`; it replaced the `/sync-callouts` skill) copies the
+  vault's custom callout types: colors between markers in
+  `src/styles/content/callouts.css`, icons between markers in
+  `src/plugins/hast/callout-icons.ts`, and Eleventy's `callouts.scss` until
+  cutover. It reads the Admonition plugin and the enabled snippets only, and
+  writes nothing if a type needs an `--icon` or `--color` override; the
+  run ends by listing those types and the option that fixes each.
 
 ## Posts helpers and remaining content work
 
@@ -701,7 +706,7 @@ Eleventy's markdown-it options. Olaolu put all resulting items in scope.
 - Links in note text have a faint underline, and overflowing callout bodies
   get a tab stop (`src/scripts/scrollRegions.ts`). The only axe allowlist
   entry left is the vault's `aside` callout color (#7f849c, 3.98:1), which
-  comes from `/sync-callouts`.
+  comes from `npm run sync-callouts`.
 - `.fullpage-overlay` is styled by the search and mobile file tree work below.
 
 ### Tokens on Tailwind's scales (2026-09-27)
