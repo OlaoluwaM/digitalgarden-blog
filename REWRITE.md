@@ -4,7 +4,7 @@
 
 In this order.
 
-1. [ ] Upgrade Astro to 7.3.4+ ([#18070](https://github.com/withastro/astro/issues/18070) fixed); shrink the patch to the `glob.js` fix ([#18054](https://github.com/withastro/astro/issues/18054)).
+1. [x] Upgrade Astro to 7.3.4+ ([#18070](https://github.com/withastro/astro/issues/18070) fixed); shrink the patch to the `glob.js` fix ([#18054](https://github.com/withastro/astro/issues/18054)).
 2. [ ] Add linting: choose between Biome and ESLint (with Astro and TypeScript support), then add a `lint` script and run it in `npm test`.
 3. [ ] Apply the long-form typography refinements ([notes](docs/typography-refinements.md)).
 4. [ ] Add a table of contents for notes with at least three headings ([designs](https://claude.ai/artifact/GrmM5QYkynByeushqTNvy4)): a right rail at 1400px and wider (A), an inline Contents box from 800px to 1399px (B, collapsed by default), and a Contents button with a bottom sheet below 800px (D).

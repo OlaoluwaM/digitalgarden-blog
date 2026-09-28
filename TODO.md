@@ -17,8 +17,7 @@ Astro implementation: [REWRITE.md](REWRITE.md).
 
 ## Deferred upstream PRs
 
-- [ ] Astro: upstream the Markdown rendering error fix and regression tests from the [local patch](patches/astro+7.2.9.patch).
-- [ ] Astro: upstream the image-attribute decoding fix and regression tests from the same patch.
+- [ ] Astro: upstream the Markdown rendering error fix and regression tests from the [local patch](patches/astro+7.3.5.patch) ([#18054](https://github.com/withastro/astro/issues/18054)).
 - [ ] Digital Garden plugin: add an option to sync content through a pull request instead of committing directly to `main`.
 
 ## After pull-request publishing

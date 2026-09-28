@@ -21,7 +21,7 @@ Vault publishing remains paused pending the tasks in [TODO.md](TODO.md).
 
 ## Current implementation
 
-- Astro `7.2.9`, strict TypeScript, static output; 14 generated pages.
+- Astro `7.3.5` (upgraded 2026-09-28), strict TypeScript, static output; 14 generated pages.
 - `src/content.config.ts` loads `src/site/notes` and transforms frontmatter
   into `pluginProps` (publisher fields) and `rawNoteProps` (vault fields).
 - `src/pages/index.astro` selects the `gardenEntry`; `[...slug].astro` filters
@@ -1007,3 +1007,13 @@ Keep these outside the migration checklist:
 Olaolu handed Claude the items in REWRITE.md's "Remaining Work" section, in
 the listed order. After each item: stop, show the result, and wait for his
 approval before committing and starting the next.
+- Item 1 (Astro upgrade): Astro 7.3.5 and `@astrojs/markdown-satteri`
+  0.4.2 (matches Astro's own dependency). 7.3.x ships the image-attribute
+  decoding fix, so `patches/astro+7.3.5.patch` keeps only the `glob.js`
+  rendering-error hunk (#18054), which still applies unchanged. Astro 7.3
+  annotates elements with `data-astro-source-*` under Vite's dev server;
+  `vitest.astro.config.mts` turns the dev toolbar off so component tests see
+  build markup. Evidence: `npm test` (476 unit, 53 component, 59 layout,
+  75 browser, typecheck clean), `test:images-build` 7/7, build 16 pages,
+  and a forced build of the pre-upgrade commit is byte-identical (`diff -rq`
+  over all of `dist`).
