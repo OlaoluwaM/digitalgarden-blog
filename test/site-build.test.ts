@@ -80,19 +80,27 @@ describe("every page's head", () => {
 
   // Why: these links are what the live site ships. Losing one silently breaks
   // favicons, home-screen icons, or feed discovery.
-  it("links the favicons, manifest, and Atom feed like the live site", () => {
+  // The feed link's type must match the feed (RSS since ADR 0004), or feed
+  // readers and browser extensions may skip or mislabel it.
+  it("links the favicons, manifest, and RSS feed", () => {
     for (const page of site.pages) {
       const links = head(page)
         .querySelectorAll("link")
-        .map(
-          link => `${link.getAttribute("rel")} ${link.getAttribute("href")}`
+        .map(link =>
+          [
+            link.getAttribute("rel"),
+            link.getAttribute("type"),
+            link.getAttribute("href"),
+          ]
+            .filter(Boolean)
+            .join(" ")
         );
       for (const expected of [
         "icon /favicon.ico",
-        "icon /favicon.svg",
+        "icon image/svg+xml /favicon.svg",
         "apple-touch-icon /apple-touch-icon.png",
         "manifest /manifest.webmanifest",
-        "alternate https://thunk.blog/feed.xml",
+        "alternate application/rss+xml https://thunk.blog/feed.xml",
       ]) {
         assert.ok(links.includes(expected), `${page} is missing ${expected}`);
       }

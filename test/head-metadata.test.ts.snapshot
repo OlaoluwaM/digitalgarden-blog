@@ -14,7 +14,7 @@ exports[`head snapshots > matches the reviewed head for index.html 1`] = `
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="manifest" href="/manifest.webmanifest">
-<link rel="alternate" type="application/atom+xml" title="Thunks &amp; Thoughts" href="https://thunk.blog/feed.xml">
+<link rel="alternate" type="application/rss+xml" title="Thunks &amp; Thoughts" href="https://thunk.blog/feed.xml">
 <link rel="stylesheet" href="/_astro/<asset>.css">
 </head>
 `;
@@ -37,7 +37,7 @@ exports[`head snapshots > matches the reviewed head for posts/be-deliberate/inde
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="manifest" href="/manifest.webmanifest">
-<link rel="alternate" type="application/atom+xml" title="Thunks &amp; Thoughts" href="https://thunk.blog/feed.xml">
+<link rel="alternate" type="application/rss+xml" title="Thunks &amp; Thoughts" href="https://thunk.blog/feed.xml">
 <link rel="stylesheet" href="/_astro/<asset>.css">
 </head>
 `;
@@ -60,7 +60,7 @@ exports[`head snapshots > matches the reviewed head for posts/on-maths-and-engin
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="manifest" href="/manifest.webmanifest">
-<link rel="alternate" type="application/atom+xml" title="Thunks &amp; Thoughts" href="https://thunk.blog/feed.xml">
+<link rel="alternate" type="application/rss+xml" title="Thunks &amp; Thoughts" href="https://thunk.blog/feed.xml">
 <link rel="stylesheet" href="/_astro/<asset>.css">
 </head>
 `;
