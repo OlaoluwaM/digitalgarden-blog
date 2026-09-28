@@ -239,12 +239,14 @@ entry.
 
 ## 2026-09-26: Analytics
 
-### Web Analytics from the site's origin, plus Speed Insights
+### Web Analytics and Speed Insights from the site's origin
 
 - **Change:** note pages load Vercel Web Analytics and Speed Insights through
   their official Astro components. The scripts come from `/_vercel/...` on
   thunk.blog instead of `cdn.vercel-insights.com`, and pages request nothing
-  from other origins. Speed Insights is new: live loaded only Web Analytics.
+  from other origins. Live loaded both: Web Analytics from the CDN and
+  Speed Insights from `/_vercel/` (since 2026-03-20).
+  (Corrected 2026-09-28: this entry first said Speed Insights was new.)
   The 404 page has neither, as on live.
 - **Why:** the REWRITE.md Analytics items; same-origin scripts are not
   blocked as third-party trackers and keep visitors' requests on one host.
@@ -673,3 +675,66 @@ Found reviewing the dev site after the move onto Tailwind's scales.
 - **Why:** Olaolu chose Astro's standard sitemap over a hand-rolled
   `/sitemap.xml` (ADR 0005).
 - **Evidence:** `test/sitemap.test.ts`.
+
+## 2026-09-28: Recorded late
+
+Changes from live found by the Eleventy inventory that had no entry here.
+Each was intended or follows from an entry above; evidence is a comparison
+of the Eleventy build (`dist/`) with the Astro build (`dist-astro/`).
+
+### Titles come from the title property
+
+- **Change:** pages, the file tree, and search use each note's `title`
+  property. Two titles differ from live: "Endianness, WOOT!" is now
+  "Endianness, WOOT!?" and "Numbers Numerals Oh Boy" is now "Numbers?
+  Numerals? Oh Boy". Live used the filename, which cannot hold `?`.
+- **Why:** the property keeps the real title (TODO.md vault renames).
+- **Evidence:** the two posts' `<h1>` in both builds.
+
+### A bare unresolved wikilink becomes a link
+
+- **Change:** `[[Polynomials]]` in "On maths and engineering" links to
+  `/404` as an unresolved link. Live printed it as plain text, because its
+  link filter only handled `[[target|alias]]`.
+- **Why:** every wikilink is treated the same way.
+- **Evidence:** `test/wikilinks.test.ts`; the maths post in both builds.
+
+### Images are one optimized img
+
+- **Change:** a note image is one lazy `<img>` with a WebP `srcset`, width,
+  and height. Live used `<picture>` with WebP and JPEG sources and the
+  original file as a fallback.
+- **Why:** Astro's image pipeline (REWRITE.md "Markdown and Assets"); every
+  current browser shows WebP. Affects the Redis post.
+- **Evidence:** `test/images-build.test.ts`; the Redis post in both builds.
+
+### No graph data
+
+- **Change:** `/graph.json` is gone.
+- **Why:** only the local graph read it, and the graph is off on live.
+- **Evidence:** the route inventory; `src/pages/` has no graph route.
+
+### No loading spinner in search
+
+- **Change:** search results and the preview show no spinner while the
+  index or a note loads.
+- **Why:** not ported with the search dialog. The index is small and loads
+  on first use, so the wait is short.
+- **Evidence:** `src/scripts/search.ts`, `src/scripts/searchPreview.ts`.
+
+### No hash-target outline or heading copy
+
+- **Change:** the element named in the URL's `#fragment` gets no dashed
+  outline, and double-clicking an element with an id no longer copies its
+  link (live's `references.njk`).
+- **Why:** posts have no heading ids, so it only ever applied to Home's
+  "Welcome".
+- **Evidence:** no equivalent in `src/scripts/`.
+
+### Headings are not focusable
+
+- **Change:** headings with ids have no `tabindex="-1"` (live's
+  markdown-it-anchor added it, so a skip to the heading moved focus).
+- **Why:** Astro's heading ids come from github-slugger without it; only
+  Home's "Welcome" has an id.
+- **Evidence:** `dist/index.html` and `dist-astro/index.html`.

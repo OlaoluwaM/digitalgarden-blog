@@ -36,6 +36,10 @@ Vault publishing remains paused pending the tasks in [TODO.md](TODO.md).
   Markdown and resolves nested wikilinks. It is registered in Astro; tests
   assert plain blockquotes containing `[!note]`, not finished callout markup
   or collapse behavior.
+- `==highlights==` render as `<mark>` through `src/plugins/mdast/highlights.ts`
+  (added 2026-09-28; Sätteri has no highlight syntax). It runs last among
+  the mdast plugins and pairs markers within one paragraph, heading, or
+  table cell, like markdown-it-mark.
 - `npm run sync-callouts` (`scripts/sync-callouts.ts`, rules in
   `scripts/callout-sync.ts`; it replaced the `/sync-callouts` skill) copies the
   vault's custom callout types: colors between markers in
@@ -947,10 +951,11 @@ at cutover. Live Vercel settings were not inspected or changed.
 
 Keep these outside the migration checklist:
 
-- Table of contents, backlinks, local graph, and link previews.
+- Table of contents (wanted; design first), backlinks, local graph, and
+  link previews.
 - Wikilink-index hot reload if pre-dev generation becomes insufficient.
 - Distill the vendored theme into owned styles after cutover (ADR 0001).
-- Vercel Speed Insights; revisit the publishing boundary. (Math moved into
-  Markdown scope on 2026-09-25.)
+- Revisit the publishing boundary. (Math moved into Markdown scope on
+  2026-09-25; Speed Insights is done.)
 - Upstream Sätteri issues in [TODO.md](TODO.md), then removal of superseded
   local workarounds.
