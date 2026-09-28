@@ -738,3 +738,55 @@ of the Eleventy build (`dist/`) with the Astro build (`dist-astro/`).
 - **Why:** Astro's heading ids come from github-slugger without it; only
   Home's "Welcome" has an id.
 - **Evidence:** `dist/index.html` and `dist-astro/index.html`.
+
+## 2026-09-28: Long-form typography
+
+Measurements, sources, and what was left out:
+[typography-refinements.md](typography-refinements.md). Preview:
+https://claude.ai/artifact/AezzrntfR1ZLK4WXrF4x9n.
+
+### Note text is larger, with more leading, from 800px up
+
+- **Change:** note text is 18px (`--text-lg`) on a 1.625 line
+  (`--leading-relaxed`) from `md` (800px) up; live set 16.48px on 1.5
+  everywhere. Phones keep live's size and leading.
+- **Why:** at 700px, 16.48px text ran about 92 characters a line, past the
+  45–90 range for comfortable reading; 18px brings it to about 82, and
+  longer lines need more leading. Phone lines are about 42 characters.
+- **Evidence:** "sets note text larger with more leading from 800px up" and
+  "keeps note lines at or under 90 characters" in
+  `test/layout/site-layout.test.ts`.
+
+### The note column stops at 700px between 1000px and 1399px
+
+- **Change:** from `lg` to `xl` the note column is at most 700px
+  (`--container-content`), still 270px from the left. Live let it fill the
+  window beside the file tree: 766px at 1100px, 946px at 1280px.
+- **Why:** the wide column made the longest lines on the site, about 120
+  characters at 1280px.
+- **Evidence:** "keeps note lines at or under 90 characters" at 1100, 1280,
+  and 1440px.
+
+### Callouts take the note text's leading
+
+- **Change:** callout text keeps its 16px size but uses 1.625 leading from
+  800px up (live: 1.5).
+- **Why:** callouts read as asides beside 18px text; the same leading keeps
+  their lines from looking cramped next to the note's.
+- **Evidence:** "sets note text larger with more leading from 800px up".
+
+### Paragraphs and list items wrap with `text-wrap: pretty`
+
+- **Change:** paragraphs and list items avoid a lone word on their last
+  line and even out the ragged edge (Chrome, Edge, Safari 26+; Firefox
+  wraps as before).
+- **Why:** cheap, and it only changes where lines break.
+- **Evidence:** "wraps paragraphs and list items with text-wrap: pretty".
+
+### h6 is letterspaced
+
+- **Change:** h6, set in capitals, has 0.05em letter-spacing
+  (`--tracking-wider`, a new token on Tailwind's step); live had none.
+- **Why:** text in capitals needs extra spacing to read evenly. No
+  published note has an h6 yet.
+- **Evidence:** "letterspaces uppercase h6 by 0.05em".

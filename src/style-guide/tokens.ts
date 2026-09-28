@@ -88,7 +88,7 @@ export const tokenNotes: Record<string, string> = {
   "--text-sm":
     "Interface text: the file tree, the search button, tags, and note dates. The old site's size, on Tailwind's line height.",
   "--text-base": "The default size: callouts and the search preview.",
-  "--text-lg": "h6, and search result titles.",
+  "--text-lg": "Note text from md up, h6, and search result titles.",
   "--text-xl": "h5.",
   "--text-2xl": "h4.",
   "--text-3xl": "h3, and the search preview's title.",
@@ -97,8 +97,11 @@ export const tokenNotes: Record<string, string> = {
 
   "--leading-tight": "Tables and callout titles.",
   "--leading-snug": "Unused; Tailwind's step, kept so the scale is whole.",
-  "--leading-normal": "Note text.",
-  "--leading-relaxed": "The file tree, keys, and the shortcut hint.",
+  "--leading-normal": "Note text on phones.",
+  "--leading-relaxed":
+    "Note text from md up, callouts from md up, the file tree, keys, and the shortcut hint.",
+
+  "--tracking-wider": "h6, which is set in capitals.",
 
   "--radius-xs": "Search matches.",
   "--radius-sm": "The shortcut hint, the copy button, and checkboxes.",

@@ -1050,3 +1050,11 @@ approval before committing and starting the next.
   records a callout once color and icon are both set. Evidence: `npm test`
   green; a forced build differs from HEAD only in the two client bundles'
   hashes, and their readable diffs match the source edits one for one.
+- Item 4 (typography): built per docs/typography-refinements.md. Note text
+  `--text-lg` on `--leading-relaxed` from `md`; the `lg`–`xl` column capped
+  at `--container-content`; callout leading relaxed from `md`; `p, li`
+  `text-wrap: pretty`; h6 `--tracking-wider` (new token, Tailwind's 0.05em).
+  Layout tests measure 82 characters a line at 1100/1280/1440 (≤ 90
+  asserted) and the computed sizes. h1–h3 tracking is unchanged pending
+  Olaolu's call. Screenshots:
+  https://claude.ai/artifact/JKREUvtR8Vyk8AdmwBC8qE.

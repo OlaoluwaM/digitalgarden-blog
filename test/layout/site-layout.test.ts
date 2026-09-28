@@ -1548,3 +1548,128 @@ describe("random page", () => {
     });
   });
 });
+
+describe("note typography", () => {
+  const NOTE = "/posts/dotfiles-reorg-a-journey/";
+
+  /** Median characters per full line across the note's paragraphs. */
+  async function charactersPerLine(page: Page) {
+    return page.evaluate(() => {
+      const counts: number[] = [];
+      for (const paragraph of document.querySelectorAll(
+        ".markdown-rendered main.content > p"
+      )) {
+        const lines = new Map<number, number>();
+        const walker = document.createTreeWalker(
+          paragraph,
+          NodeFilter.SHOW_TEXT
+        );
+        for (let text = walker.nextNode(); text; text = walker.nextNode()) {
+          const length = text.textContent?.length ?? 0;
+          for (let offset = 0; offset < length; offset++) {
+            const range = document.createRange();
+            range.setStart(text, offset);
+            range.setEnd(text, offset + 1);
+            const rect = range.getClientRects()[0];
+            if (!rect) continue;
+            const top = Math.round(rect.top);
+            lines.set(top, (lines.get(top) ?? 0) + 1);
+          }
+        }
+        // A paragraph's last line is short by nature; count full lines only.
+        counts.push(...[...lines.values()].slice(0, -1));
+      }
+      counts.sort((a, b) => a - b);
+      return counts[Math.floor(counts.length / 2)] ?? 0;
+    });
+  }
+
+  // Why: long-form lines past about 90 characters are hard to follow back
+  // to the next line (docs/typography-refinements.md). The note column
+  // used to widen to fill the space between 1000px and 1399px (120
+  // characters at 1280px), and 16.5px text ran about 92 at 700px.
+  for (const width of [1100, 1280, 1440]) {
+    it(`keeps note lines at or under 90 characters at ${width}px`, async () => {
+      await withPage(width, async page => {
+        await page.goto(`${origin}${NOTE}`, { waitUntil: "load" });
+        await page.evaluate(() => document.fonts.ready);
+        const column = await page.$eval(
+          "main.content",
+          main => main.getBoundingClientRect().width
+        );
+        assert.ok(column <= 700, `column ${column}px`);
+        const perLine = await charactersPerLine(page);
+        assert.ok(perLine <= 90, `${perLine} characters per line`);
+      });
+    });
+  }
+
+  // Why: from 800px up, note text is 18px (--text-lg) on a 1.625 line
+  // (--leading-relaxed): larger text shortens the lines, and longer lines
+  // need more leading. Phones keep 16.48px on 1.5, where lines are already
+  // short (about 42 characters at 390px). Callouts stay 16px as asides
+  // and take the same leading.
+  it("sets note text larger with more leading from 800px up", async () => {
+    const measure = (width: number) =>
+      withPage(width, async page => {
+        await page.goto(`${origin}${NOTE}`, { waitUntil: "load" });
+        const style = (selector: string) =>
+          page.$eval(selector, element => {
+            const { fontSize, lineHeight } = getComputedStyle(element);
+            return { fontSize, lineHeight };
+          });
+        return {
+          text: await style(".markdown-rendered main.content > p"),
+          callout: await style(".callout-content p"),
+        };
+      });
+    assert.deepEqual(await measure(1440), {
+      text: { fontSize: "18px", lineHeight: "29.25px" },
+      callout: { fontSize: "16px", lineHeight: "26px" },
+    });
+    assert.deepEqual(await measure(390), {
+      text: { fontSize: "16.48px", lineHeight: "24.72px" },
+      callout: { fontSize: "16px", lineHeight: "24px" },
+    });
+  });
+
+  // Why: `pretty` avoids a lone word on a paragraph's last line and evens
+  // the ragged edge; Firefox ignores it and wraps as before.
+  it("wraps paragraphs and list items with text-wrap: pretty", async () => {
+    await withPage(1440, async page => {
+      await page.goto(`${origin}${NOTE}`, { waitUntil: "load" });
+      const wrap = await page.evaluate(() => {
+        const main = document.querySelector(".markdown-rendered main.content");
+        const list = document.createElement("ul");
+        list.innerHTML = "<li>Item</li>";
+        main?.append(list);
+        const style = (selector: string) => {
+          const element = document.querySelector(selector);
+          return element ? getComputedStyle(element).textWrapStyle : "";
+        };
+        return {
+          paragraph: style(".markdown-rendered main.content > p"),
+          item: style(".markdown-rendered main.content li"),
+        };
+      });
+      assert.deepEqual(wrap, { paragraph: "pretty", item: "pretty" });
+    });
+  });
+
+  // Why: h6 is set in capitals, and capitals need extra letter-spacing to
+  // read evenly; lowercase text keeps the font's own spacing.
+  it("letterspaces uppercase h6 by 0.05em", async () => {
+    await withPage(1440, async page => {
+      await page.goto(`${origin}${NOTE}`, { waitUntil: "load" });
+      const spacing = await page.evaluate(() => {
+        const main = document.querySelector(".markdown-rendered main.content");
+        const heading = document.createElement("h6");
+        heading.textContent = "Further reading";
+        main?.append(heading);
+        const { letterSpacing, fontSize } = getComputedStyle(heading);
+        return parseFloat(letterSpacing) / parseFloat(fontSize);
+      });
+      assert.equal(Math.round(spacing * 100) / 100, 0.05);
+    });
+  });
+});

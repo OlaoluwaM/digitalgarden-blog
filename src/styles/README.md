@@ -35,6 +35,7 @@ in its order, one spacing unit. `test/design-system.test.ts` enforces it.
 | Text       | `xs`, `sm`, `base`, `lg`                                         | Tailwind's, with its paired line heights; `sm` is live's 0.85rem |
 | Text       | `xl` … `5xl` (h5 … h1)                                           | Ours: a Major Third from 3rem, own line heights, tracking        |
 | Leading    | `tight`, `snug`, `normal`, `relaxed` (`none` is built in)        | Tailwind's                                                       |
+| Tracking   | `wider` 0.05em                                                   | Tailwind's; for text in capitals (h6)                            |
 | Radius     | `xs` 2px, `sm` 4px, `md` 6px, `lg` 8px, `xl` 12px (`full`)       | Tailwind's                                                       |
 | Spacing    | `--spacing` 0.25rem; whole or half steps                         | Tailwind's                                                       |
 | Container  | `content` 700px, `sidebar`, `sidebar-min`, `site-name`, `6xl`    | Ours (layout), `6xl` Tailwind's                                  |
@@ -42,7 +43,8 @@ in its order, one spacing unit. `test/design-system.test.ts` enforces it.
 | Shadow     | `2xl`                                                            | Tailwind's shape at twice the strength                           |
 | Motion     | default 150ms, `cubic-bezier(0.4, 0, 0.2, 1)`; `ease-overshoot`  | Tailwind's; the hamburger keeps Obsidian's                       |
 
-Two sizes sit between steps: note text (1.03rem / 1.5, in `layout.css`) and
+Two sizes sit between steps: note text on phones (1.03rem / 1.5, in
+`layout.css`; from `md` up it is `lg` on `relaxed` leading) and
 the site name, the brand mark (live's 2rem / 1.1, `text-[2rem]` in
 `NavShell.astro`).
 

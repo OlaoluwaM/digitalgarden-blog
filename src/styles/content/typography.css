@@ -66,6 +66,11 @@
     p {
       unicode-bidi: plaintext;
     }
+    /* Avoid a lone word on the last line and even out the ragged edge.
+       Browsers without it wrap as before. */
+    :is(p, li) {
+      text-wrap: pretty;
+    }
     :is(strong, b) {
       font-weight: var(--font-weight-bold);
     }
@@ -112,6 +117,8 @@
       font-size: var(--text-lg);
       line-height: var(--text-lg--line-height);
       text-transform: uppercase;
+      /* Capitals need extra spacing to read evenly. */
+      letter-spacing: var(--tracking-wider);
     }
 
     /* Links: gray, underlined on hover. Unresolved wikilinks are dimmed. */

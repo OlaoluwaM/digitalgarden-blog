@@ -24,15 +24,24 @@
     padding-top: --spacing(22);
     padding-bottom: --spacing(15);
     color: var(--color-gray-50);
-    /* Note text: the site's reading size, between the sm and base steps. */
+    /* Note text on phones: live's reading size, between the sm and base
+       steps. Lines there are already short (about 42 characters). */
     font-size: 1.03rem;
     line-height: var(--leading-normal);
 
+    /* From md up, larger text keeps lines near 80 characters, and longer
+       lines get more leading (docs/typography-refinements.md). */
+    @variant md {
+      font-size: var(--text-lg);
+      line-height: var(--leading-relaxed);
+    }
+
     /* Between lg and xl the file tree keeps its 250px width and the column
-       widens to fill the rest: 270px on the left (the tree and a 20px gap),
-       30px on the right. */
+       sits 270px from the left (the tree and a 20px gap). It fills the
+       rest, 30px short of the right edge, up to the reading width; live let
+       it grow to 931px at 1280px, about 120 characters a line. */
     @variant max-xl {
-      max-width: calc(100vw - --spacing(75));
+      max-width: min(calc(100vw - --spacing(75)), var(--container-content));
       margin-left: --spacing(67.5);
     }
 

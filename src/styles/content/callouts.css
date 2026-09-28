@@ -100,6 +100,11 @@
     font-size: var(--text-base);
     line-height: var(--text-base--line-height);
     overflow-wrap: break-word;
+
+    /* An aside at 16px, with the note text's leading from md up. */
+    @variant md {
+      line-height: var(--leading-relaxed);
+    }
   }
 
   /* Title row: icon, title text, fold chevron. The toggle script makes a

@@ -1,9 +1,12 @@
 # Typography Refinements
 
-Agreed 2026-09-28. These changes make long-form notes easier to read. The
-main problem is line length. Line height and letter-spacing matter less.
-Nothing here is implemented yet. Log each visible change in
-[design-changes.md](design-changes.md) when it lands.
+Agreed and built 2026-09-28. These changes make long-form notes easier to
+read. The main problem is line length. Line height and letter-spacing
+matter less. The visible changes are logged in
+[design-changes.md](design-changes.md), and the tests are in
+`test/layout/site-layout.test.ts` ("note typography").
+
+Before and after screenshots: https://claude.ai/artifact/JKREUvtR8Vyk8AdmwBC8qE
 
 Preview (current and proposed rules on a real post, with a live
 characters-per-line count): https://claude.ai/artifact/AezzrntfR1ZLK4WXrF4x9n
