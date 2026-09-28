@@ -41,7 +41,8 @@ function save(path: string, open: boolean) {
 const observer = new MutationObserver(records => {
   for (const { target } of records) {
     const folder = target as HTMLDetailsElement;
-    save(folder.dataset.folderPath!, folder.open);
+    const path = folder.dataset.folderPath;
+    if (path !== undefined) save(path, folder.open);
   }
 });
 
@@ -49,9 +50,10 @@ export function initializeFolderState() {
   for (const folder of document.querySelectorAll<HTMLDetailsElement>(
     "details[data-folder-path]"
   )) {
-    if (initialized.has(folder)) continue;
+    const path = folder.dataset.folderPath;
+    if (path === undefined || initialized.has(folder)) continue;
     initialized.add(folder);
-    const saved = load(folder.dataset.folderPath!);
+    const saved = load(path);
     if (saved !== undefined) folder.open = saved;
     observer.observe(folder, { attributeFilter: ["open"] });
   }

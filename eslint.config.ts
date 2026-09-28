@@ -44,10 +44,6 @@ export default defineConfig(
   },
   {
     rules: {
-      // The code asserts non-null on purpose (DOM queries, regex groups);
-      // the type checker still checks nullability, and
-      // no-unnecessary-type-assertion removes assertions it can prove.
-      "@typescript-eslint/no-non-null-assertion": "off",
       // `() => voidCall()` is idiomatic in callbacks and tests; the fix
       // wraps every one in braces.
       "@typescript-eslint/no-confusing-void-expression": "off",
@@ -105,6 +101,9 @@ export default defineConfig(
       "@typescript-eslint/no-unnecessary-condition": "off",
       // Fakes are often async only to match a Promise-returning signature.
       "@typescript-eslint/require-await": "off",
+      // A test asserts on the element it just queried; a missing one fails
+      // the test either way.
+      "@typescript-eslint/no-non-null-assertion": "off",
     },
   },
   {

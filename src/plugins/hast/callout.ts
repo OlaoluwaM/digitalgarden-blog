@@ -328,7 +328,9 @@ function trimTitlePadding(nodes: ElementContent[]): ElementContent[] {
 
     while (trimmed.length > 0) {
       const index = edge === "start" ? 0 : trimmed.length - 1;
-      const node = trimmed[index]!;
+      const node = trimmed[index];
+      // Always set while the list is nonempty; this tells the type checker.
+      if (node === undefined) break;
 
       if (node.type === "text") {
         const value =

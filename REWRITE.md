@@ -6,7 +6,7 @@ In this order.
 
 1. [x] Upgrade Astro to 7.3.4+ ([#18070](https://github.com/withastro/astro/issues/18070) fixed); shrink the patch to the `glob.js` fix ([#18054](https://github.com/withastro/astro/issues/18054)).
 2. [x] Add linting: choose between Biome and ESLint (with Astro and TypeScript support), then add a `lint` script and run it in `npm test`.
-3. [ ] Turn on `@typescript-eslint/no-non-null-assertion` for `src` and `scripts` (tests keep `!` on DOM queries) and replace the 28 remaining `!` assertions with checks that fail with a clear error.
+3. [x] Turn on `@typescript-eslint/no-non-null-assertion` for `src` and `scripts` (tests keep `!` on DOM queries) and replace the remaining `!` assertions (32 on 28 lines) with checks that fail with a clear error.
 4. [ ] Apply the long-form typography refinements ([notes](docs/typography-refinements.md)).
 5. [ ] Add a table of contents for notes with at least three headings ([designs](https://claude.ai/artifact/GrmM5QYkynByeushqTNvy4)): a right rail at 1400px and wider (A), an inline Contents box from 800px to 1399px (B, collapsed by default), and a Contents button with a bottom sheet below 800px (D).
 6. [ ] Wrap each Markdown table in a scroll container ([demo](https://claude.ai/artifact/UeSoSyzgiyiULm27QqsCGg)): a hast plugin adds `div.table-wrapper` with `tabindex="0"`, `role="region"`, and a label; inside it the table is `width: max-content` with `word-break: normal` and cells capped at `max-width: 30ch`. Today a 5+ column table is clipped on phones.

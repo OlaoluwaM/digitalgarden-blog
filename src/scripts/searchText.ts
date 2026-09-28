@@ -17,7 +17,8 @@ const ELLIPSIS = "...";
  */
 export function searchTerms(query: string) {
   const terms = [...query.matchAll(/"([^"]+)"|(\S+)/g)]
-    .map(match => (match[1] ?? match[2]!).toLowerCase())
+    // Either a quoted phrase or a word matched; filter() drops "".
+    .map(match => (match[1] ?? match[2] ?? "").toLowerCase())
     .filter(term => term.length > 1);
   return terms.sort((a, b) => b.length - a.length);
 }

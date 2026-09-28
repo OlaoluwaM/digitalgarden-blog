@@ -1041,3 +1041,12 @@ approval before committing and starting the next.
   rejects rolled-over minutes and seconds (`10:00:75`). Its non-null
   assertions were replaced with checks; `Number()` results are checked for
   NaN. `npm test`: 488 unit tests.
+- Item 3 (no-non-null-assertion): on for `src`, `scripts`, and config;
+  off for tests (a test asserting on the element it just queried fails
+  either way). The 32 assertions (28 lines) became checks: attribute and
+  dataset reads skip or return when absent, array reads narrow with a
+  guard or `flatMap(... ?? [])`, the style guide reads tokens through
+  `tokenValue` (throws "tokens.css has no --x"), and the callout sync only
+  records a callout once color and icon are both set. Evidence: `npm test`
+  green; a forced build differs from HEAD only in the two client bundles'
+  hashes, and their readable diffs match the source edits one for one.

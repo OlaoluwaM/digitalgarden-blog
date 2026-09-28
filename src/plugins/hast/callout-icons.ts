@@ -78,7 +78,8 @@ export function getCalloutIconName(calloutType: string): string {
   // built-in instead of falling through to the default. Object.hasOwn
   // checks the map's own keys only, the same guard `toTitleCase` in
   // callout.ts uses for its title-case override lookup.
-  return Object.hasOwn(CALLOUT_ICON_NAMES, type)
-    ? CALLOUT_ICON_NAMES[type]!
-    : DEFAULT_CALLOUT_ICON_NAME;
+  const icon = Object.hasOwn(CALLOUT_ICON_NAMES, type)
+    ? CALLOUT_ICON_NAMES[type]
+    : undefined;
+  return icon ?? DEFAULT_CALLOUT_ICON_NAME;
 }

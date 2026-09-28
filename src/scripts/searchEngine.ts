@@ -78,7 +78,7 @@ export function createSearchEngine(documents: readonly SearchDocument[]) {
           .toSorted((a, b) => order.indexOf(a.field) - order.indexOf(b.field))
           .flatMap(field => field.result)
       );
-      return [...ids].map(id => documents[Number(id)]!);
+      return [...ids].flatMap(id => documents[Number(id)] ?? []);
     },
   };
 }

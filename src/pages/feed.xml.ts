@@ -55,20 +55,17 @@ function withAbsoluteUrls(html: string, base: URL): string {
     url.startsWith("#") ? url : new URL(url, base).href;
   for (const attribute of ["href", "src"]) {
     for (const element of root.querySelectorAll(`[${attribute}]`)) {
-      element.setAttribute(
-        attribute,
-        resolve(element.getAttribute(attribute)!)
-      );
+      const url = element.getAttribute(attribute);
+      if (url !== undefined) element.setAttribute(attribute, resolve(url));
     }
   }
   for (const element of root.querySelectorAll("[srcset]")) {
-    const candidates = element
-      .getAttribute("srcset")!
-      .split(",")
-      .map(candidate => {
-        const [url = "", ...descriptor] = candidate.trim().split(/\s+/);
-        return [resolve(url), ...descriptor].join(" ");
-      });
+    const srcset = element.getAttribute("srcset");
+    if (srcset === undefined) continue;
+    const candidates = srcset.split(",").map(candidate => {
+      const [url = "", ...descriptor] = candidate.trim().split(/\s+/);
+      return [resolve(url), ...descriptor].join(" ");
+    });
     element.setAttribute("srcset", candidates.join(", "));
   }
   return root.toString();

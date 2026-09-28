@@ -106,10 +106,9 @@ export function toRgbTriplet(value: string): string | undefined {
   if (hex) {
     // Expand shorthand (#abc) to full form (#aabbcc), then read each pair.
     const full = hex.length === 3 ? hex.replace(/./g, "$&$&") : hex;
-    return full
-      .match(/../g)!
-      .map(pair => parseInt(pair, 16))
-      .join(", ");
+    const pairs = full.match(/../g);
+    if (!pairs) return undefined;
+    return pairs.map(pair => parseInt(pair, 16)).join(", ");
   }
 
   const parts = (/^rgb\((.*)\)$/i.exec(text)?.[1] ?? text)
@@ -179,7 +178,7 @@ export function collectCustomCallouts(
     postcss.parse(snippet).walkRules(rule => {
       const types = [
         ...rule.selector.matchAll(/\.callout\[data-callout="([^"]+)"\]/g),
-      ].map(match => match[1]!);
+      ].flatMap(match => match[1] ?? []);
       for (const type of types) {
         const entry = found.get(type) ?? {};
         rule.walkDecls("--callout-color", decl => {
@@ -225,8 +224,13 @@ export function collectCustomCallouts(
       );
     }
 
-    if (failures.length > 0) problems.push(...failures);
-    else callouts.push({ type, color: color!, icon: icon! });
+    // A missing color or icon is always in `failures` too; checking them
+    // here as well lets the type checker see both are set.
+    if (color && icon && failures.length === 0) {
+      callouts.push({ type, color, icon });
+    } else {
+      problems.push(...failures);
+    }
   }
 
   return { callouts, problems };

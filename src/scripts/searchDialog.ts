@@ -103,7 +103,8 @@ export function initializeSearchDialog() {
       if (all.length === 0) return;
       event.preventDefault();
       const step = event.key === "ArrowDown" ? 1 : -1;
-      select(all[(current + step + all.length) % all.length]!);
+      const next = all[(current + step + all.length) % all.length];
+      if (next) select(next);
     } else if (event.key === "Enter" && all[current]) {
       event.preventDefault();
       all[current].click();

@@ -34,7 +34,7 @@ function mark(children: Node[]): Node {
 }
 
 function hasMarker(node: Node): boolean {
-  if (node.type === "text") return node.value!.includes("==");
+  if (node.type === "text") return (node.value ?? "").includes("==");
   return (
     (node.type === "paragraph" ||
       node.type === "heading" ||
@@ -48,7 +48,7 @@ type Piece = Node | { marker: number };
 
 /** The node with its highlights marked, its inline parents included. */
 function highlight<N extends Node>(node: N): N {
-  const children = node.children!.map(child =>
+  const children = (node.children ?? []).map(child =>
     INLINE_PARENTS.has(child.type) && hasMarker(child)
       ? highlight(child)
       : child
@@ -64,7 +64,7 @@ function highlight<N extends Node>(node: N): N {
       pieces.push(child);
       return;
     }
-    const value = child.value!;
+    const value = child.value ?? "";
     let from = 0;
     for (const match of value.matchAll(/=+/g)) {
       if (match[0].length !== 2) continue;
@@ -127,7 +127,10 @@ function mergeText(nodes: Node[]): Node[] {
   for (const node of nodes) {
     const last = merged.at(-1);
     if (node.type === "text" && last?.type === "text" && !last.data) {
-      merged[merged.length - 1] = { ...last, value: last.value! + node.value! };
+      merged[merged.length - 1] = {
+        ...last,
+        value: (last.value ?? "") + (node.value ?? ""),
+      };
     } else {
       merged.push(node);
     }

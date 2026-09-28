@@ -4,6 +4,13 @@
 // has no token.
 import postcss from "postcss";
 
+/** The value of `name`, failing the page build if tokens.css lacks it. */
+export function tokenValue(tokens: Map<string, string>, name: string): string {
+  const value = tokens.get(name);
+  if (value === undefined) throw new Error(`tokens.css has no ${name}`);
+  return value;
+}
+
 /** Every declaration in tokens.css, in file order, without the resets. */
 export function parseTokens(source: string): Map<string, string> {
   const tokens = new Map<string, string>();
@@ -29,21 +36,18 @@ export function steps(
 }
 
 function luminance(hex: string): number {
-  const [r, g, b] = [1, 3, 5].map(i => {
-    const channel = parseInt(hex.slice(i, i + 2), 16) / 255;
-    return channel <= 0.04045
-      ? channel / 12.92
-      : ((channel + 0.055) / 1.055) ** 2.4;
-  });
-  return 0.2126 * r! + 0.7152 * g! + 0.0722 * b!;
+  const channel = (start: number) => {
+    const value = parseInt(hex.slice(start, start + 2), 16) / 255;
+    return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
+  };
+  return 0.2126 * channel(1) + 0.7152 * channel(3) + 0.0722 * channel(5);
 }
 
 /** WCAG contrast ratio of two six-digit hex colors, from 1 to 21. */
 export function contrastRatio(foreground: string, background: string): number {
-  const [light, dark] = [luminance(foreground), luminance(background)].sort(
-    (a, b) => b - a
-  );
-  return (light! + 0.05) / (dark! + 0.05);
+  const a = luminance(foreground);
+  const b = luminance(background);
+  return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
 }
 
 /** What each token is for, as the page shows it. */

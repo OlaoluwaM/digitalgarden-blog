@@ -127,11 +127,11 @@ async function syncCallouts(): Promise<void> {
       )
     ),
   ]);
-  await Promise.all(
-    [TARGETS.css, TARGETS.icons].map((path, index) =>
-      writeFile(path, outputs[index]!)
-    )
-  );
+  const [css, icons] = outputs;
+  await Promise.all([
+    writeFile(TARGETS.css, css),
+    writeFile(TARGETS.icons, icons),
+  ]);
 
   console.log(
     `\nWrote ${Object.values(TARGETS)

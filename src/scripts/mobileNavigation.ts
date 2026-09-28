@@ -20,9 +20,8 @@ export function initializeMobileNavigation() {
   const hamburger = document.querySelector<HTMLButtonElement>(
     "button.hamburger-btn[popovertarget]"
   );
-  const tree = hamburger
-    ? document.getElementById(hamburger.getAttribute("popovertarget")!)
-    : null;
+  const treeId = hamburger?.getAttribute("popovertarget");
+  const tree = treeId ? document.getElementById(treeId) : null;
   if (!tree || initialized.has(tree)) return;
   initialized.add(tree);
 

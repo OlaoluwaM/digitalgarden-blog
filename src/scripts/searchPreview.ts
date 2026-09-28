@@ -53,7 +53,8 @@ export function initializeSearchPreview() {
     // Phones hide the panel; fetching for it would only cost data.
     if (!panel.checkVisibility()) return;
 
-    const url = option.getAttribute("href")!;
+    const url = option.getAttribute("href");
+    if (!url) return;
     let html: string;
     try {
       html = await fetchPage(url);

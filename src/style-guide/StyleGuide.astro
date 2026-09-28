@@ -16,7 +16,13 @@ import {
   getPublishedPosts,
   getRecentArticles,
 } from "../content/posts";
-import { contrastRatio, parseTokens, steps, tokenNotes } from "./tokens";
+import {
+  contrastRatio,
+  parseTokens,
+  steps,
+  tokenNotes,
+  tokenValue,
+} from "./tokens";
 import { Content as Sample } from "./sample.md";
 
 const tokens = parseTokens(tokensSource);
@@ -47,7 +53,10 @@ const textOn: Record<string, string> = {
 function contrast(name: string): string | undefined {
   const surface = textOn[name];
   if (!surface) return undefined;
-  const value = contrastRatio(tokens.get(name)!, tokens.get(surface)!);
+  const value = contrastRatio(
+    tokenValue(tokens, name),
+    tokenValue(tokens, surface)
+  );
   return `${value.toFixed(1)}:1 on ${stepName(surface, "--color-")}`;
 }
 
@@ -78,11 +87,11 @@ const layout: [string, string][] = [
   ...steps(tokens, "--breakpoint-"),
   [
     "--default-transition-duration",
-    tokens.get("--default-transition-duration")!,
+    tokenValue(tokens, "--default-transition-duration"),
   ],
   [
     "--default-transition-timing-function",
-    tokens.get("--default-transition-timing-function")!,
+    tokenValue(tokens, "--default-transition-timing-function"),
   ],
   ...steps(tokens, "--ease-"),
   ...steps(tokens, "--corner-shape-"),
@@ -226,9 +235,10 @@ const listClass = "list-none p-0 *:ms-0";
   </p>
   {
     steps(tokens, "--text-").map(([name, value]) => {
-      const lineHeight = tokens.get(`${name}--line-height`)!;
+      const lineHeight = tokenValue(tokens, `${name}--line-height`);
       const tracking = tokens.get(`${name}--letter-spacing`);
-      const heading = parseFloat(value) > parseFloat(tokens.get("--text-lg")!);
+      const heading =
+        parseFloat(value) > parseFloat(tokenValue(tokens, "--text-lg"));
       return (
         <div class="my-6">
           <p
