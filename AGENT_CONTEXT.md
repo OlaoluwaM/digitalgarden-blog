@@ -60,7 +60,9 @@ with Eleventy; there is no single filtering or ordering rule for every route.
   the Astro `/random/` (`src/pages/random.astro`, no tilde, old URL not
   kept) picks from `getPublishedArticles()`, without Home (Olaolu,
   2026-09-28). The shared head tags live in `src/components/SiteHead.astro`
-  (BaseLayout, 404, random).
+  (BaseLayout, 404, random). `assertUniquePermalinks` also fails the build
+  when a note's permalink takes a page's route (`PAGE_ROUTES` in
+  `src/content/permalinks.ts`; a test keeps it in step with `src/pages`).
   `src/site/search-index.njk` has no `dg-hide` filter.
 - The collection schema validates permalink format; `getPublishedPosts()`
   rejects duplicate effective routes after filtering published posts.

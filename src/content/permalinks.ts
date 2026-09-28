@@ -33,9 +33,21 @@ function isValidPermalink(value: string): boolean {
   return PERMALINK_REGEX.test(value);
 }
 
+// Routes the site's own pages claim, without the trailing slash: the files
+// in src/pages (except Home and the note route) and the dev-only style
+// guide that astro.config.ts injects. A note's URL comes from its
+// permalink, not its title, so only a permalink can collide with them.
+export const PAGE_ROUTES: readonly string[] = [
+  "/404",
+  "/random",
+  "/searchIndex.json",
+  "/style-guide",
+];
+
 // Call with published posts. A gardenEntry claims / regardless of its permalink.
 // Paths differing only by a trailing slash claim the same route.
-// Reject collisions with an error naming the route and both post IDs.
+// Reject collisions with an error naming the route and both post IDs, and
+// notes at a page's route with an error naming the route and the note.
 export function assertUniquePermalinks(
   posts: readonly PostWithPermalink[]
 ): void {
@@ -51,10 +63,13 @@ export function assertUniquePermalinks(
 
   const collisions: string[] = [];
   for (const [route, matchingPosts] of postsByRoute) {
-    if (matchingPosts.length < 2) continue;
-
     const postIds = matchingPosts.map(post => post.id).join(", ");
-    collisions.push(`Duplicate route "${route}": ${postIds}`);
+
+    if (PAGE_ROUTES.includes(route)) {
+      collisions.push(`Route "${route}" belongs to a site page: ${postIds}`);
+    } else if (matchingPosts.length > 1) {
+      collisions.push(`Duplicate route "${route}": ${postIds}`);
+    }
   }
 
   if (collisions.length > 0) {

@@ -1,8 +1,10 @@
 import assert from "node:assert/strict";
+import { readdirSync } from "node:fs";
 import { describe, it } from "node:test";
 
 import {
   assertUniquePermalinks,
+  PAGE_ROUTES,
   permalinkSchema,
   type PostWithPermalink,
 } from "../src/content/permalinks.ts";
@@ -226,5 +228,43 @@ describe("assertUniquePermalinks", () => {
     const original = structuredClone(posts);
     assertUniquePermalinks(Object.freeze(posts));
     assert.deepEqual(posts, original);
+  });
+});
+
+describe("routes the site's own pages claim", () => {
+  // Why: a note's URL comes from its permalink, not its title, so a note at
+  // /random/ would collide with the random page and one of them would be
+  // silently lost. The build must stop and name the note instead.
+  for (const permalink of ["/random/", "/random"]) {
+    it(`rejects a note at ${permalink}, the random page's route`, () => {
+      assert.throws(
+        () => assertUniquePermalinks([post("Chance", permalink)]),
+        error => {
+          assert.ok(error instanceof Error);
+          assert.match(error.message, /"\/random"/);
+          assert.match(error.message, /Chance/);
+          return true;
+        }
+      );
+    });
+  }
+
+  // Why: a note may still use a page's name further down a path.
+  it("accepts a note whose path only contains a page's name", () => {
+    assert.doesNotThrow(() =>
+      assertUniquePermalinks([post("Random", "/posts/random/")])
+    );
+  });
+
+  // Why: the claimed routes are listed by hand, so a page added to
+  // src/pages without its route would leave that route open to a note. The
+  // dev-only style guide is injected by astro.config.ts, not a file there.
+  it("claims the route of every page in src/pages, and the style guide", () => {
+    const routes = readdirSync("src/pages")
+      .filter(file => !file.startsWith("[") && file !== "index.astro")
+      .map(file => "/" + file.replace(/\.(astro|ts)$/, ""));
+    for (const route of [...routes, "/style-guide"]) {
+      assert.ok(PAGE_ROUTES.includes(route), route);
+    }
   });
 });
