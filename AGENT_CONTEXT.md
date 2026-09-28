@@ -165,8 +165,12 @@ and reports every conflicting route with all involved post IDs.
 - Keep Sätteri and adapt publisher Markdown at the Astro boundary.
 - Vendor the existing theme before cutover, preserving cascade order;
   remove remote theme fetching. See [ADR 0001](docs/adrs/0001-vendor-the-obsidian-theme-css-and-sever-the-remote-fetch.md).
-- Use custom `/feed.xml` and `/sitemap.xml` endpoints to preserve Atom with
-  full rendered content and the exact sitemap route. See [ADR 0002](docs/adrs/0002-hand-roll-the-atom-feed-and-sitemap-as-custom-endpoints.md).
+- `/feed.xml` is RSS 2.0 from `@astrojs/rss` with full content ([ADR 0004](docs/adrs/0004-use-astrojs-rss-for-the-feed.md),
+  2026-09-28). Notes render through the experimental container API because
+  `rendered.html` holds image placeholders; URLs are made absolute. Dates
+  are Central time (`site.timeZone`, `noteInstant`). The channel
+  description is `site.description` in `src/lib/site.ts`.
+- `/sitemap.xml` is still a hand-rolled endpoint under [ADR 0002](docs/adrs/0002-hand-roll-the-atom-feed-and-sitemap-as-custom-endpoints.md).
 
 ## Markdown and image gaps
 

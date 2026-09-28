@@ -39,6 +39,7 @@ function isValidPermalink(value: string): boolean {
 // permalink, not its title, so only a permalink can collide with them.
 export const PAGE_ROUTES: readonly string[] = [
   "/404",
+  "/feed.xml",
   "/random",
   "/searchIndex.json",
   "/style-guide",

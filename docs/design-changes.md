@@ -650,3 +650,15 @@ Found reviewing the dev site after the move onto Tailwind's scales.
   The Back loop trapped readers.
 - **Evidence:** `test/random-page.test.ts`; the "random page" tests in
   `test/layout/site-layout.test.ts`.
+
+## 2026-09-28: The feed is RSS
+
+- **Change:** `/feed.xml` is RSS 2.0 (was Atom), built with `@astrojs/rss`.
+  Items are newest first (live's order was arbitrary) and dated by each
+  note's `published` time in Central time (live used `updated`, read as
+  UTC). Items gain the note's description and tags; the channel gains a
+  description, a language, and a self link. Content is still the full
+  note, with absolute URLs and the site's optimized images.
+- **Why:** Olaolu chose Astro's standard feed package over hand-rolled Atom
+  (ADR 0004) and Central time for note dates.
+- **Evidence:** `test/feed.test.ts`; `noteInstant` in `test/dates.test.ts`.
