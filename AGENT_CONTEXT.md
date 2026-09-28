@@ -1001,3 +1001,9 @@ Keep these outside the migration checklist:
   `#` title in `.markdown-embed-title`, even for unpublished notes (it only
   omits the link). Designs: https://claude.ai/artifact/6Uq4RNhfRueyUJSmAB2r8P
   Olaolu chose B, the source card; not built yet.
+
+## Remaining work handed over (2026-09-28)
+
+Olaolu handed Claude the items in REWRITE.md's "Remaining Work" section, in
+the listed order. After each item: stop, show the result, and wait for his
+approval before committing and starting the next.

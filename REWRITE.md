@@ -1,5 +1,25 @@
 # Astro Rewrite Checklist
 
+## Remaining Work
+
+In this order.
+
+1. [ ] Upgrade Astro to 7.3.4+ ([#18070](https://github.com/withastro/astro/issues/18070) fixed); shrink the patch to the `glob.js` fix ([#18054](https://github.com/withastro/astro/issues/18054)).
+2. [ ] Add linting: choose between Biome and ESLint (with Astro and TypeScript support), then add a `lint` script and run it in `npm test`.
+3. [ ] Apply the long-form typography refinements ([notes](docs/typography-refinements.md)).
+4. [ ] Add a table of contents for notes with at least three headings ([designs](https://claude.ai/artifact/GrmM5QYkynByeushqTNvy4)): a right rail at 1400px and wider (A), an inline Contents box from 800px to 1399px (B, collapsed by default), and a Contents button with a bottom sheet below 800px (D).
+5. [ ] Wrap each Markdown table in a scroll container ([demo](https://claude.ai/artifact/UeSoSyzgiyiULm27QqsCGg)): a hast plugin adds `div.table-wrapper` with `tabindex="0"`, `role="region"`, and a label; inside it the table is `width: max-content` with `word-break: normal` and cells capped at `max-width: 30ch`. Today a 5+ column table is clipped on phones.
+6. [ ] Label task-list checkboxes, e.g. wrap each item's text in a `<label>`; axe flags them in the dev style guide's Markdown sample.
+7. [ ] Render `mermaid` and `plantuml` fences as inline SVG at build time through Kroki (kroki.io): exclude both from Shiki, cache by content hash, and fail the build when Kroki fails. Record the decision in an ADR.
+8. [ ] Style the publisher's transclusions as source cards (design B in the [designs](https://claude.ai/artifact/6Uq4RNhfRueyUJSmAB2r8P): a bordered card with a "From *note title*" header and the link icon on the right); turn the embed title into a label so each page keeps one `h1`; test wikilinks and heading IDs inside embeds.
+9. [ ] Add a GitHub Actions workflow that runs `npm test` and the build on every push and pull request.
+10. [ ] Update the publishing instructions. Include: embed only published notes (the publisher inlines an unpublished note's text).
+11. [ ] The rest of the cutover, in this order:
+    - [ ] Document each Markdown plugin and the Eleventy behavior it replaces.
+    - [ ] Complete the vault tasks in [TODO.md](TODO.md), then test a publisher round trip.
+    - [ ] Run the tests and a warning-free build.
+    - [ ] When `astro-rewrite` merges into `main`, switch the Vercel project's framework preset from Eleventy to Astro. Not before: `main`'s `vercel.json` names no framework, so the preset governs production's Eleventy builds until then (this branch's `vercel.json` already says Astro).
+
 ## Completed
 
 - [x] Add Astro 7 with strict TypeScript.
@@ -43,8 +63,6 @@
 - [x] Add `external-link`/`internal-link` classes and `target="_blank"` to links.
 - [x] Render inline math at build time.
 - [x] Render `==highlights==` as `<mark>`.
-- [ ] Render `mermaid` and `plantuml` fences as inline SVG at build time through Kroki (kroki.io): exclude both from Shiki, cache by content hash, and fail the build when Kroki fails. Record the decision in an ADR.
-- [ ] Style the publisher's transclusions as source cards (design B in the [designs](https://claude.ai/artifact/6Uq4RNhfRueyUJSmAB2r8P): a bordered card with a "From *note title*" header and the link icon on the right); turn the embed title into a label so each page keeps one `h1`; test wikilinks and heading IDs inside embeds.
 - [x] Remove unexplained Markdown and Shiki warnings.
 
 ## Routes and Data
@@ -82,7 +100,6 @@ Phase 2: design system.
 - [x] Revise the chrome styles into token-based components.
 - [x] Revise the Markdown content styles into a token-based stylesheet.
 - [x] Remove the legacy stylesheets and vendored theme; add Preflight.
-- [ ] Apply the long-form typography refinements ([notes](docs/typography-refinements.md)).
 
 ## Analytics
 
@@ -103,15 +120,9 @@ Phase 2: design system.
 
 - [x] Compare Eleventy and Astro route inventories ([inventory](https://claude.ai/artifact/6qEa9Jzk4T2mVvd3fjKyeG)).
 - [x] Crawl for broken links and missing assets.
-- [ ] Run the tests and a warning-free build.
-- [ ] Upgrade Astro to 7.3.4+ ([#18070](https://github.com/withastro/astro/issues/18070) fixed); shrink the patch to the `glob.js` fix ([#18054](https://github.com/withastro/astro/issues/18054)).
-- [ ] Complete the vault tasks in [TODO.md](TODO.md), then test a publisher round trip.
 - [x] Test a Vercel preview.
 - [x] Restore default `dev`/`build`/`preview` scripts and point `vercel.json` at the Astro build (`astro build --force` into `dist`).
-- [ ] When `astro-rewrite` merges into `main`, switch the Vercel project's framework preset from Eleventy to Astro. Not before: `main`'s `vercel.json` names no framework, so the preset governs production's Eleventy builds until then (this branch's `vercel.json` already says Astro).
 - [x] Update the README.
-- [ ] Update the publishing instructions. Include: embed only published notes (the publisher inlines an unpublished note's text).
-- [ ] Document each Markdown plugin and the Eleventy behavior it replaces.
 - [x] Remove Eleventy and migration-only code.
 - [x] Make `sharp` a direct dependency (Astro's image code imports it from the project root).
 - [x] Delete `get-theme` and the `THEME` settings (ADR 0001).
@@ -120,5 +131,5 @@ Phase 2: design system.
 
 ## After Cutover
 
-- [ ] Work through the deferred site features in [TODO.md](TODO.md): table of contents, linting, and the wide-table wrapper.
+- [ ] Work through the deferred site features in [TODO.md](TODO.md).
 - [ ] After Olaolu signs off on the site, add visual snapshot tests of the overall UI and key features (pages at phone and desktop widths, the search dialog, the mobile file tree, callouts, code blocks).
