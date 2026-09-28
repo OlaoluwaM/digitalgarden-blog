@@ -12,75 +12,21 @@
  */
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
-import {
-  createServer,
-  type IncomingMessage,
-  type Server,
-  type ServerResponse,
-} from "node:http";
-import { extname, join, normalize } from "node:path";
 import { after, before, describe, it } from "node:test";
 import { chromium, type Browser, type Page } from "playwright";
 import { buildSite, type SiteBuild } from "../support/site-build.ts";
+import { serveStatic, type StaticServer } from "../support/static-server.ts";
 
 let site: SiteBuild;
-let server: Server;
+let server: StaticServer;
 let browser: Browser;
 let origin: string;
 let axeSource: string;
 
-const CONTENT_TYPES: Record<string, string> = {
-  ".html": "text/html; charset=utf-8",
-  ".css": "text/css",
-  ".js": "text/javascript",
-  ".json": "application/json",
-  ".svg": "image/svg+xml",
-  ".png": "image/png",
-  ".webp": "image/webp",
-  ".ico": "image/x-icon",
-  ".woff2": "font/woff2",
-  ".webmanifest": "application/manifest+json",
-};
-
-// Serves the built site, like a static host: a directory's index.html,
-// else 404.html with status 404.
-async function serveBuiltFile(
-  request: IncomingMessage,
-  response: ServerResponse
-) {
-  const pathname = decodeURIComponent(
-    new URL(request.url!, "http://x").pathname
-  );
-  const relative = normalize(pathname).replace(/^(\.\.[/\\])+/, "");
-  const candidates = relative.endsWith("/")
-    ? [join(relative, "index.html")]
-    : [relative, join(relative, "index.html")];
-  for (const candidate of candidates) {
-    try {
-      const body = await readFile(join(site.outDir, candidate));
-      response.writeHead(200, {
-        "content-type":
-          CONTENT_TYPES[extname(candidate)] ?? "application/octet-stream",
-      });
-      response.end(body);
-      return;
-    } catch {
-      // Not there; try the next candidate.
-    }
-  }
-  response.writeHead(404, { "content-type": CONTENT_TYPES[".html"] });
-  response.end(await readFile(join(site.outDir, "404.html")));
-}
-
 before(async () => {
   site = await buildSite();
-  server = createServer(
-    (request, response) => void serveBuiltFile(request, response)
-  );
-  await new Promise<void>(resolve => server.listen(0, "127.0.0.1", resolve));
-  const address = server.address();
-  assert.ok(address && typeof address === "object");
-  origin = `http://127.0.0.1:${address.port}`;
+  server = await serveStatic(site.outDir);
+  origin = server.origin;
   browser = await chromium.launch({
     executablePath: process.env.AGENT_BROWSER_EXECUTABLE_PATH || undefined,
   });
@@ -89,7 +35,7 @@ before(async () => {
 
 after(async () => {
   await browser?.close();
-  await new Promise(resolve => server?.close(resolve));
+  await server?.close();
   await site?.cleanup();
 });
 

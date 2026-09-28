@@ -1,15 +1,19 @@
 ---
 // T2 (phase 1): note title, tags, and timestamps.
 import type { Post } from "../content/posts.ts";
+import type { ContentsEntry } from "../content/table-of-contents.ts";
 import Icon from "./Icon.astro";
+import TableOfContents from "./TableOfContents.astro";
 import Tag from "./Tag.astro";
 import { formatNoteDate } from "../lib/dates.ts";
 
 interface Props {
   post: Post;
+  /** The note's sections; none renders no table of contents. */
+  contents?: ContentsEntry[];
 }
 
-const { post } = Astro.props;
+const { post, contents = [] } = Astro.props;
 const { title, tags, published, last_updated } = post.data.rawNoteProps;
 ---
 
@@ -46,4 +50,5 @@ const { title, tags, published, last_updated } = post.data.rawNoteProps;
       </div>
     </div>
   </div>
+  <TableOfContents entries={contents} />
 </header>

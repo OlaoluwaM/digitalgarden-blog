@@ -1058,3 +1058,13 @@ approval before committing and starting the next.
   asserted) and the computed sizes. h1–h3 tracking is unchanged pending
   Olaolu's call. Screenshots:
   https://claude.ai/artifact/JKREUvtR8Vyk8AdmwBC8qE.
+- Item 5 (table of contents): `contentsEntries` (src/content/
+  table-of-contents.ts) keeps h2/h3 from Astro's `headings`, drops
+  `footnote-label`, and needs three. `TableOfContents.astro` renders in the
+  note header (so the content @scope and the search preview skip it):
+  `.toc-rail` (xl+, sticky, beside main.content), `details.toc-inline`
+  (md–xl), `button.toc-button` + popover `#toc-sheet` (below md);
+  `scripts/tableOfContents.ts` sets `aria-current="location"` and closes
+  the sheet on a link. Headings got `scroll-margin-top`. Tests build a
+  fixture site (`test/support/fixture-site.ts`, shared with images-build;
+  `test/support/static-server.ts`, shared with site-layout).

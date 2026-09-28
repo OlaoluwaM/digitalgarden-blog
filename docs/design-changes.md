@@ -790,3 +790,41 @@ https://claude.ai/artifact/AezzrntfR1ZLK4WXrF4x9n.
 - **Why:** text in capitals needs extra spacing to read evenly. No
   published note has an h6 yet.
 - **Evidence:** "letterspaces uppercase h6 by 0.05em".
+
+## 2026-09-28: Table of contents
+
+### Notes with three or more sections get a table of contents
+
+- **Change:** a note with at least three h2/h3 headings lists them, in
+  one of three designs by width
+  (https://claude.ai/artifact/GrmM5QYkynByeushqTNvy4): from 1400px, a rail
+  beside the note that stays in view and marks the section being read
+  (A); from 800px to 1399px, a closed "Contents" box under the header
+  (B); below 800px, a Contents button that opens a sheet from the bottom
+  of the screen (D). Live had none. No published note has three sections
+  yet, so no page shows one today.
+- **Why:** long notes need a way to see their structure and jump within
+  them. The box and the sheet are a `<details>` and a popover, so they
+  work without JavaScript.
+- **Evidence:** `test/table-of-contents.test.ts`,
+  `test/components/table-of-contents.test.ts`, and
+  `test/layout/table-of-contents.test.ts` (a fixture site with notes that
+  have sections: each width's design, placement, scrolling, the sheet,
+  no JavaScript, print, and axe).
+
+### Linked headings stop below the navbar
+
+- **Change:** headings keep 80px above them when a link jumps to them
+  below 1000px (under the fixed navbar), and 32px from 1000px up.
+- **Why:** a jump from the table of contents, or a wikilink to a heading,
+  hid the heading under the navbar on phones.
+- **Evidence:** "opens the sheet from the phone button and closes it on a
+  choice".
+
+### Room below notes for the phone button
+
+- **Change:** below 800px, a note with a table of contents has 96px below
+  it instead of 60px.
+- **Why:** the Contents button floats over the lower right corner and
+  covered the note's last line at the end of the page.
+- **Evidence:** "leaves the last line clear of the phone button".

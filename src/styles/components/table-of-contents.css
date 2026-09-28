@@ -1,0 +1,236 @@
+/*
+ * A note's table of contents (TableOfContents.astro), one variant per
+ * width: the rail from xl, the inline box from md to xl, and the button
+ * and sheet below md. It sits in the note's header, so the content
+ * stylesheets (scoped to stop at the header) and the search preview (which
+ * hides the header) leave it alone.
+ */
+@layer components {
+  .toc-label {
+    margin: 0;
+    color: var(--color-gray-300);
+    font-size: var(--text-xs);
+    line-height: var(--text-xs--line-height);
+    letter-spacing: var(--tracking-wider);
+    text-transform: uppercase;
+  }
+
+  .toc-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    & a {
+      display: block;
+      color: var(--color-gray-200);
+      font-size: var(--text-sm);
+      line-height: var(--leading-snug);
+      text-decoration: none;
+
+      &:hover,
+      &[aria-current] {
+        color: var(--color-gray-50);
+      }
+    }
+  }
+
+  :is(.toc-inline, .toc-button, .toc-close) svg {
+    width: --spacing(3.5);
+    height: --spacing(3.5);
+    flex: none;
+  }
+
+  /* A: xl and up. The rail spans the note column's height beside it
+     (main.content is position: relative, the column's top padding is
+     22 steps), so its list stays in view while the note scrolls. The
+     space right of the column is at least 370px from 1400px up. */
+  .toc-rail {
+    display: none;
+
+    @variant xl {
+      display: block;
+      position: absolute;
+      top: --spacing(22);
+      bottom: 0;
+      left: calc(100% + --spacing(15));
+      width: --spacing(57.5);
+    }
+
+    & nav {
+      position: sticky;
+      top: --spacing(8);
+      display: flex;
+      flex-direction: column;
+      gap: --spacing(3);
+    }
+
+    & .toc-list {
+      border-left: 1px solid var(--color-gray-700);
+
+      & a {
+        margin-left: -1px;
+        padding-block: --spacing(1);
+        padding-left: --spacing(3.5);
+        border-left: 2px solid transparent;
+
+        &[data-depth="3"] {
+          padding-left: --spacing(7);
+        }
+
+        &[aria-current] {
+          border-left-color: var(--color-gray-200);
+        }
+      }
+    }
+  }
+
+  /* B: md to xl. Closed by default, so it doesn't push the note down. */
+  .toc-inline {
+    display: none;
+    margin-top: --spacing(7);
+    border: 1px solid var(--color-gray-700);
+    border-radius: var(--radius-lg);
+    corner-shape: var(--corner-shape-soft);
+    background-color: var(--color-gray-900);
+
+    @variant md {
+      display: block;
+    }
+    @variant xl {
+      display: none;
+    }
+
+    & summary {
+      display: flex;
+      align-items: center;
+      gap: --spacing(2);
+      padding: --spacing(2.5) --spacing(3.5);
+      color: var(--color-gray-100);
+      font-size: var(--text-sm);
+      line-height: var(--text-sm--line-height);
+      list-style: none;
+      cursor: pointer;
+
+      &::-webkit-details-marker {
+        display: none;
+      }
+    }
+
+    & .toc-count {
+      color: var(--color-gray-300);
+    }
+
+    & .toc-chevron {
+      margin-left: auto;
+      color: var(--color-gray-300);
+      transition: rotate var(--default-transition-duration)
+        var(--default-transition-timing-function);
+    }
+
+    &[open] .toc-chevron {
+      rotate: 180deg;
+    }
+
+    & nav {
+      margin-inline: --spacing(3.5);
+      padding: --spacing(2) 0 --spacing(3) --spacing(5.5);
+      border-top: 1px solid var(--color-gray-700);
+    }
+
+    & .toc-list a {
+      padding-block: --spacing(1);
+
+      &[data-depth="3"] {
+        padding-left: --spacing(4);
+      }
+    }
+  }
+
+  /* D: below md. A pill over the note's lower right corner opens a sheet
+     from the bottom of the screen. */
+  .toc-button {
+    position: fixed;
+    right: --spacing(5);
+    bottom: --spacing(6);
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: --spacing(2);
+    height: --spacing(11);
+    padding-inline: --spacing(4);
+    border: 1px solid var(--color-gray-700);
+    border-radius: calc(infinity * 1px);
+    background-color: var(--color-gray-800);
+    box-shadow: var(--shadow-2xl);
+    color: var(--color-gray-100);
+    font-size: var(--text-sm);
+    font-weight: var(--font-weight-medium);
+    cursor: pointer;
+
+    @variant md {
+      display: none;
+    }
+  }
+
+  /* Room below the note, so the button never covers its last line. */
+  main.content:has(.toc-button) {
+    @variant max-md {
+      padding-bottom: --spacing(24);
+    }
+  }
+
+  /* The sheet is a popover: browsers center it in a bordered box in the
+     page's colors, so this places it along the bottom edge instead. */
+  .toc-sheet {
+    inset: auto 0 0;
+    width: 100%;
+    max-width: none;
+    max-height: 80dvh;
+    margin: 0;
+    padding: --spacing(2.5) --spacing(5) --spacing(7);
+    overflow-y: auto;
+    border: 0;
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    background-color: var(--color-gray-800);
+    color: var(--color-gray-100);
+
+    &::backdrop {
+      background-color: --alpha(var(--color-black) / 50%);
+    }
+
+    @variant md {
+      display: none;
+    }
+
+    & .toc-list a {
+      display: flex;
+      align-items: center;
+      min-height: --spacing(11);
+      border-bottom: 1px solid var(--color-gray-700);
+      color: var(--color-gray-100);
+      font-size: var(--text-base);
+
+      &[data-depth="3"] {
+        padding-left: --spacing(4);
+      }
+    }
+  }
+
+  .toc-sheet-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .toc-close {
+    display: grid;
+    place-items: center;
+    width: --spacing(11);
+    height: --spacing(11);
+    margin-right: calc(--spacing(3) * -1);
+    border: 0;
+    background: transparent;
+    color: var(--color-gray-100);
+    cursor: pointer;
+  }
+}

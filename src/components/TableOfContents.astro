@@ -1,0 +1,94 @@
+---
+// A note's sections, drawn three ways; the stylesheet shows one per width
+// (styles/components/table-of-contents.css, designs A, B, and D in
+// https://claude.ai/artifact/GrmM5QYkynByeushqTNvy4):
+//   - xl and up: a rail beside the note (A);
+//   - md to xl: a closed <details> box under the header (B);
+//   - below md: a Contents button that opens a bottom sheet (D).
+// The box and the sheet work without JavaScript; scripts/tableOfContents.ts
+// marks the section being read and closes the sheet once a link is chosen.
+// It renders nothing when `entries` is empty (contentsEntries decides).
+import type { ContentsEntry } from "../content/table-of-contents.ts";
+import Icon from "./Icon.astro";
+
+interface Props {
+  entries: ContentsEntry[];
+}
+
+const { entries } = Astro.props;
+const sections = `${entries.length} ${entries.length === 1 ? "section" : "sections"}`;
+---
+
+{
+  entries.length > 0 && (
+    <>
+      <div class="toc-rail print:hidden">
+        <nav aria-label="On this page">
+          <p class="toc-label">On this page</p>
+          <ul class="toc-list">
+            {entries.map(entry => (
+              <li>
+                <a href={`#${entry.slug}`} data-depth={entry.depth}>
+                  {entry.text}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </div>
+
+      <details class="toc-inline print:hidden">
+        <summary>
+          <Icon name="text-align-start" class="toc-icon" />
+          Contents <span class="toc-count">· {sections}</span>
+          <Icon name="chevron-down" class="toc-chevron" />
+        </summary>
+        <nav aria-label="Contents">
+          <ul class="toc-list">
+            {entries.map(entry => (
+              <li>
+                <a href={`#${entry.slug}`} data-depth={entry.depth}>
+                  {entry.text}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </details>
+
+      <button
+        type="button"
+        class="toc-button print:hidden"
+        popovertarget="toc-sheet"
+      >
+        <Icon name="text-align-start" class="toc-icon" />
+        Contents
+      </button>
+      <div id="toc-sheet" popover="auto" class="toc-sheet print:hidden">
+        <div class="toc-sheet-header">
+          <p class="toc-label">On this page</p>
+          <button
+            type="button"
+            class="toc-close"
+            popovertarget="toc-sheet"
+            popovertargetaction="hide"
+            aria-label="Close contents"
+          >
+            <Icon name="x" />
+          </button>
+        </div>
+        <nav aria-label="On this page">
+          <ul class="toc-list">
+            {entries.map(entry => (
+              <li>
+                <a href={`#${entry.slug}`} data-depth={entry.depth}>
+                  {entry.text}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </div>
+    </>
+  )
+}

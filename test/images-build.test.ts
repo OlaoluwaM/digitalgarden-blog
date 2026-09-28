@@ -1,145 +1,33 @@
 import assert from "node:assert/strict";
-import { spawn } from "node:child_process";
 import { once } from "node:events";
-import {
-  copyFile,
-  cp,
-  mkdir,
-  mkdtemp,
-  open,
-  readFile,
-  rm,
-  symlink,
-  writeFile,
-} from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { createServer } from "node:http";
-import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { it, type TestContext } from "node:test";
-import { fileURLToPath } from "node:url";
 import { parse } from "node-html-parser";
-
-const repository = fileURLToPath(new URL("../", import.meta.url));
-
-async function build(project: string) {
-  // Capture subprocess output to a file, as in the generator tests. This keeps
-  // build diagnostics available when subprocess pipes lose output in the sandbox.
-  const logPath = join(project, "build.log");
-  const log = await open(logPath, "w");
-  try {
-    const child = spawn(
-      join(project, "node_modules/.bin/astro"),
-      ["build", "--force"],
-      {
-        cwd: project,
-        env: { ...process.env, ASTRO_TELEMETRY_DISABLED: "1", NO_COLOR: "1" },
-        stdio: ["ignore", log.fd, log.fd],
-        timeout: 30_000,
-      }
-    );
-    const [status, signal] = (await once(child, "close")) as [
-      number | null,
-      NodeJS.Signals | null,
-    ];
-    const output = await readFile(logPath, "utf8");
-    assert.equal(
-      signal,
-      null,
-      `Build must finish without a signal:\n${output}`
-    );
-    assert.equal(typeof status, "number", output);
-    return { status, output };
-  } finally {
-    await log.close();
-  }
-}
+import {
+  buildFixture as build,
+  createFixtureProject,
+} from "./support/fixture-site.ts";
 
 async function fixture(t: TestContext) {
-  const project = await mkdtemp(join(tmpdir(), "images-build-test-"));
-  t.after(() => rm(project, { recursive: true, force: true }));
-
-  // Copy application code, never the real notes or image assets. Share installed
-  // dependencies while keeping generated output and caches inside the fixture.
-  await mkdir(join(project, "src"));
-  for (const directory of [
-    "content",
-    "pages",
-    "plugins",
-    "generated",
-    "scripts",
-    "layouts",
-    "components",
-    "lib",
-    "styles",
-  ]) {
-    await cp(
-      join(repository, "src", directory),
-      join(project, "src", directory),
-      {
-        recursive: true,
-      }
-    );
-  }
-  for (const file of [
-    "package.json",
-    "tsconfig.json",
-    "src/content.config.ts",
-  ]) {
-    await copyFile(join(repository, file), join(project, file));
-  }
-  await symlink(
-    join(repository, "node_modules"),
-    join(project, "node_modules")
-  );
-  await copyFile(
-    join(repository, "astro.config.ts"),
-    join(project, "site.config.ts")
-  );
-  await writeFile(
-    join(project, "astro.config.ts"),
-    `import siteConfig from "./site.config.ts";
-export default {
-  ...siteConfig,
-  cacheDir: "./.astro-cache",
-  vite: {
-    ...siteConfig.vite,
-    cacheDir: "./.vite-cache",
-    // node_modules is a symlink to the repository's. Resolving through it to
-    // the real path puts dependency .astro components (Vercel's analytics)
-    // outside this project root, where Astro cannot compile them.
-    resolve: { preserveSymlinks: true },
-  },
-};
-`
-  );
-
-  const notePath = join(project, "src/site/notes/Test note.md");
-  await mkdir(dirname(notePath), { recursive: true });
-  await mkdir(join(project, "src/site/img/user/Extras/Assets"), {
-    recursive: true,
-  });
-  const frontmatter = {
-    "dg-publish": true,
-    tags: ["gardenEntry"],
-    "dg-path": "Test note.md",
-    "dg-permalink": "/",
-    permalink: "/",
-    "dg-note-properties": {
-      title: "Test note",
-      description: "Image build fixture.",
-      tags: [],
-      published: "2026-01-01T00:00",
-      last_updated: "2026-01-01T00:00",
-    },
-  };
-  const note = (body: string) =>
-    `---\n${JSON.stringify(frontmatter)}\n---\n${body}\n`;
+  const site = await createFixtureProject("images-build-test");
+  t.after(site.cleanup);
+  const imageDirectory = join(site.project, "src/site/img/user");
+  await mkdir(join(imageDirectory, "Extras/Assets"), { recursive: true });
+  const notePath = join(site.notesDirectory, "Test note.md");
 
   return {
-    project,
+    project: site.project,
     notePath,
-    imageDirectory: join(project, "src/site/img/user"),
-    writeNote: (body: string) => writeFile(notePath, note(body)),
+    imageDirectory,
+    writeNote: (body: string) =>
+      site.writeNote("Test note.md", {
+        title: "Test note",
+        permalink: "/",
+        home: true,
+        body,
+      }),
   };
 }
 

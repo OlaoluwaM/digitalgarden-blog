@@ -51,12 +51,14 @@ const canonical = canonicalUrl(Astro.url.pathname);
       import { initializeSearch } from "../scripts/search";
       import { initializeSearchDialog } from "../scripts/searchDialog";
       import { initializeSearchPreview } from "../scripts/searchPreview";
+      import { initializeTableOfContents } from "../scripts/tableOfContents";
 
       initializeCopyButtons();
       initializeCalloutToggles();
       initializeScrollRegions();
       initializeMobileNavigation();
       initializeFolderState();
+      initializeTableOfContents();
       initializeSearch();
       initializeSearchPreview();
       // Last: a `?q=` link opens the dialog and searches at once.
