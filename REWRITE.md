@@ -99,8 +99,8 @@ Phase 2: design system.
 - [ ] Compare Eleventy and Astro route inventories.
 - [ ] Crawl for broken links and missing assets.
 - [ ] Compare desktop and mobile pages.
-- [ ] Upgrade Astro to 7.3.4+ ([#18070](https://github.com/withastro/astro/issues/18070) fixed); shrink the patch to the `glob.js` fix ([#18054](https://github.com/withastro/astro/issues/18054)).
 - [ ] Run the tests and a warning-free build.
+- [ ] Upgrade Astro to 7.3.4+ ([#18070](https://github.com/withastro/astro/issues/18070) fixed); shrink the patch to the `glob.js` fix ([#18054](https://github.com/withastro/astro/issues/18054)).
 - [ ] Complete the vault tasks in [TODO.md](TODO.md), then test a publisher round trip.
 - [ ] Test a Vercel preview.
 - [ ] Switch Vercel to Astro and restore working default build/start scripts; deploys build with `build:astro:prod` (`--force`, so plugin changes re-render every note).
