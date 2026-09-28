@@ -10,6 +10,7 @@ import { mkmdastAdmonitionCalloutPlugin } from "./src/plugins/mdast/admonitions.
 import { hastAdmonitionCalloutPlugin } from "./src/plugins/hast/callout.ts";
 import { hastLinkClassesPlugin } from "./src/plugins/hast/linkClasses.ts";
 import { hastTableWrapperPlugin } from "./src/plugins/hast/tableWrapper.ts";
+import { hastTaskListLabelsPlugin } from "./src/plugins/hast/taskListLabels.ts";
 import { mkmdastDigitalGardenImagesPlugin } from "./src/plugins/mdast/images.ts";
 import { mdastMathRenderPlugin } from "./src/plugins/mdast/math.ts";
 import { mdastHighlightsPlugin } from "./src/plugins/mdast/highlights.ts";
@@ -74,6 +75,7 @@ export default defineConfig({
         hastAdmonitionCalloutPlugin,
         hastLinkClassesPlugin,
         hastTableWrapperPlugin,
+        hastTaskListLabelsPlugin,
       ],
     }),
     shikiConfig: {

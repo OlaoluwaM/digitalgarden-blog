@@ -1078,3 +1078,8 @@ approval before committing and starting the next.
   shadows (Lea Verou's local/scroll backgrounds, gray-950 covers; none in
   callouts); the layout test samples pixels with the table hidden. Not
   built: a sticky first column.
+- Item 7 (task-list labels): `hastTaskListLabelsPlugin` (registered last)
+  visits `li` and `p`; when the first child is the checkbox, it wraps the
+  checkbox and the children before any nested `ul`/`ol` in a `<label>`.
+  Tests: processor cases (tight, nested, loose, ordered, disabled state)
+  and a fixture-site layout test (names, read-only, axe).

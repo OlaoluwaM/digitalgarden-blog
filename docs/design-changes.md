@@ -852,3 +852,16 @@ https://claude.ai/artifact/AezzrntfR1ZLK4WXrF4x9n.
   narrow table spanning the column, keyboard scrolling, a table in a
   callout, the edge shadows, and axe). Demo: https://claude.ai/artifact/UeSoSyzgiyiULm27QqsCGg;
   as built: https://claude.ai/artifact/6LXMnaWEsJZ4RsQLJHJtYg.
+
+## 2026-09-28: Task-list checkboxes have labels
+
+- **Change:** each task-list checkbox and its item's text sit in a
+  `<label>` (`plugins/hast/taskListLabels.ts`), so the checkbox is named
+  by the text; a nested list stays outside its parent's label. The boxes
+  look and behave as before: disabled, in their checked or open state.
+  Live's checkboxes had no name. No published note has a task list yet.
+- **Why:** screen readers announced them only as "checkbox, not checked",
+  and axe flagged them (`label`) in the style guide's Markdown sample.
+- **Evidence:** `test/task-list-labels.test.ts` and
+  `test/layout/task-lists.test.ts` (names, read-only boxes, and axe on a
+  fixture site); all three layout tests fail without the plugin.
