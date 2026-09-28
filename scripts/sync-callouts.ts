@@ -7,9 +7,7 @@
  * the vault (default ~/Desktop/digital-brain), merges them by the rules in
  * scripts/callout-sync.ts, and writes:
  *   - the color rules between the markers in src/styles/content/callouts.css;
- *   - the icon entries between the markers in src/plugins/hast/callout-icons.ts;
- *   - Eleventy's src/site/styles/user/callouts.scss, which production reads
- *     until cutover.
+ *   - the icon entries between the markers in src/plugins/hast/callout-icons.ts.
  *
  * A type the site cannot render (an icon with no Lucide equivalent, a color
  * from a theme variable) means nothing is written. The run ends by listing
@@ -25,7 +23,6 @@ import {
   MARKERS,
   renderCss,
   renderIconEntries,
-  renderScss,
   replaceGenerated,
   type AdmonitionSettings,
 } from "./callout-sync.ts";
@@ -33,7 +30,6 @@ import {
 const TARGETS = {
   css: resolve("src/styles/content/callouts.css"),
   icons: resolve("src/plugins/hast/callout-icons.ts"),
-  scss: resolve("src/site/styles/user/callouts.scss"),
 };
 
 /** `type=value` pairs from a repeated option. */
@@ -115,7 +111,7 @@ async function syncCallouts(): Promise<void> {
     return;
   }
 
-  // Build every file before writing any, so a failure leaves all three as
+  // Build every file before writing any, so a failure leaves both as
   // they were.
   const outputs = await Promise.all([
     readFile(TARGETS.css, "utf8").then(source =>
@@ -130,10 +126,9 @@ async function syncCallouts(): Promise<void> {
         replaceGenerated(source, renderIconEntries(callouts), MARKERS.ts)
       )
     ),
-    formatted(TARGETS.scss, renderScss(callouts)),
   ]);
   await Promise.all(
-    [TARGETS.css, TARGETS.icons, TARGETS.scss].map((path, index) =>
+    [TARGETS.css, TARGETS.icons].map((path, index) =>
       writeFile(path, outputs[index]!)
     )
   );

@@ -1,47 +1,31 @@
-// Maps each Obsidian callout `data-callout` type to the Lucide icon name its
-// `--callout-icon` CSS custom property declares, with any "lucide-" prefix
-// already stripped. The live site resolves `--callout-icon` with
-// `getComputedStyle` in the browser and swaps in the icon client-side;
-// Astro instead resolves it here, once, at build time.
+// Maps each Obsidian callout `data-callout` type to its Lucide icon name,
+// without the "lucide-" prefix. Live resolved each callout's
+// `--callout-icon` in the browser and swapped in the icon; Astro resolves it
+// here, once, at build time.
 //
-// Sources, in cascade order (the Eleventy styles, kept until cutover):
-//   1. src/site/styles/obsidian-base.scss -- Obsidian's built-in callout
-//      types, including alias selectors such as `[data-callout="summary"]`.
-//   2. src/site/styles/user/callouts.scss -- custom types from the Obsidian
-//      vault. `npm run sync-callouts` writes them there and, between the
-//      markers below, here.
+// Two parts:
+//   - Obsidian's built-in types, with the icons Obsidian gives them (taken
+//     from Obsidian's stylesheet, which the Eleventy site shipped).
+//     `test/callout-icons.test.ts` holds the same table and fails on drift.
+//   - Custom types from the Obsidian vault, between the sync markers below.
+//     `npm run sync-callouts` writes them, and their colors in
+//     src/styles/content/callouts.css.
 //
-// `test/callout-icons.test.ts` parses those same sources with a real CSS
-// parser and fails if this map drifts from them, so re-running
-// `npm run sync-callouts` (which regenerates callouts.scss) can't silently desync
-// icons from what actually renders.
-//
-// Why a literal map instead of reading those sources at build time:
-//   - The Markdown pipeline stays independent of stylesheets. Parsing SCSS
-//     with a CSS parser is fragile, so that belongs in the test, not the build.
-//   - Cutover deletes the Eleventy sources; this map outlives them and
-//     becomes the source of truth for callout icons.
-//   - `npm run sync-callouts` (scripts/sync-callouts.ts) writes the custom
-//     types here and their colors in src/styles/content/callouts.css, so
-//     the vault is the one source for both.
-//
-// One deliberate departure from those sources: Obsidian's `quote`/`cite`
-// callouts declare `quote-glyph`, an Obsidian-only icon that Lucide does not
-// ship, so live rendered no icon for them. They use Lucide's `quote` icon
-// instead (ADR 0003 phase 2). The drift test lists this override.
+// One deliberate departure: Obsidian's `quote`/`cite` callouts use
+// `quote-glyph`, an Obsidian-only icon that Lucide does not ship, so live
+// rendered no icon for them. They use Lucide's `quote` icon instead (ADR
+// 0003 phase 2).
 //
 // `getCalloutIconName` returns the name as-is; resolving it to an actual
-// icon (or the empty-`<i>` fallback for a name Lucide doesn't have, such as
-// one a future `npm run sync-callouts` copies from Obsidian) is `lucide-icon.ts`'s
-// job.
+// icon (or the empty-`<i>` fallback for a name Lucide doesn't have) is
+// `lucide-icon.ts`'s job.
 
-// The bare `.callout` rule's icon: used by any type with no more specific
-// `[data-callout="..."]` rule (for example "note", which has no rule of its
-// own in obsidian-base.scss).
+// Obsidian's default icon: used by any type with no entry of its own (for
+// example "note").
 export const DEFAULT_CALLOUT_ICON_NAME = "pencil";
 
 export const CALLOUT_ICON_NAMES: Readonly<Record<string, string>> = {
-  // From src/site/styles/obsidian-base.scss.
+  // Obsidian's built-in types.
   abstract: "clipboard-list",
   summary: "clipboard-list",
   tldr: "clipboard-list",

@@ -2,8 +2,7 @@
  * Tests for `npm run sync-callouts`, which copies the Obsidian vault's custom
  * callout types (color and icon) into the site: the color rules in
  * src/styles/content/callouts.css, the icon map in
- * src/plugins/hast/callout-icons.ts, and, until cutover, Eleventy's
- * src/site/styles/user/callouts.scss.
+ * src/plugins/hast/callout-icons.ts.
  *
  * Why these levels: the merge rules (which vault values win, which are
  * unusable) are pure, so unit tests pin them against the vault's real data
@@ -262,7 +261,7 @@ describe("the checked-in outputs", () => {
   });
 });
 
-// A project with the three target files as they are in the repository, and
+// A project with the two target files as they are in the repository, and
 // a vault with the given plugin data and snippets.
 async function fixture(
   t: TestContext,
@@ -273,7 +272,6 @@ async function fixture(
   const targets = [
     "src/styles/content/callouts.css",
     "src/plugins/hast/callout-icons.ts",
-    "src/site/styles/user/callouts.scss",
   ];
   for (const file of [...targets, ".prettierrc"]) {
     await mkdir(dirname(join(root, "project", file)), { recursive: true });
@@ -339,7 +337,8 @@ describe("npm run sync-callouts", () => {
     assert.deepEqual(await read(), before);
   });
 
-  // Why: a new vault type must reach all three files in one run.
+  // Why: a new vault type must reach both files in one run, and nothing
+  // else: Eleventy's Sass copy went with Eleventy.
   it("writes a new type to every target", async t => {
     const plugin = structuredClone(PLUGIN);
     plugin.userAdmonitions["pro-tip"] = {
@@ -353,15 +352,14 @@ describe("npm run sync-callouts", () => {
     });
     const { code, output } = await sync(project, ["--vault", vault]);
     assert.equal(code, 0, output);
-    const [css, icons, scss] = await read();
+    const [css, icons] = await read();
     assert.match(
       css!,
       /\.callout\[data-callout="pro-tip"\] \{\s*--callout-color: 180, 190, 254;\s*\}/
     );
     assert.match(icons!, /"pro-tip": "star",/);
-    assert.match(
-      scss!,
-      /--callout-color: 180, 190, 254;\s*--callout-icon: lucide-star;/
+    await assert.rejects(
+      readFile(join(project, "src/site/styles/user/callouts.scss"))
     );
     assert.match(output, /pro-tip/);
   });

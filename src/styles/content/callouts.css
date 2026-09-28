@@ -3,8 +3,8 @@
  *
  * Markup: src/plugins/hast/callout.ts. Collapse: src/scripts/callouts.ts
  * toggles `is-collapsed` on the callout. Sources: Obsidian's callout rules
- * (resolved from the live theme's computed styles),
- * src/site/styles/user/callout-overrides.scss, and custom.scss.
+ * (resolved from the live theme's computed styles) and the Eleventy site's
+ * callout overrides.
  *
  * Only the callout's own structure lives here. Its body text (paragraphs,
  * lists, code) uses the ordinary content styles.
@@ -14,8 +14,8 @@
    * Per-type colors, as "R, G, B" so the box can tint them. These are
    * callout data, not design tokens.
    *
-   * Built-in types: Obsidian's callout types (src/site/styles/obsidian-base.scss),
-   * resolved to the dark theme's colors as rendered on the live site.
+   * Built-in types: Obsidian's callout types, resolved to the dark theme's
+   * colors as rendered on the live site.
    * `.callout` alone is the default: note, and any type without a rule.
    */
   .callout {
