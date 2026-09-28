@@ -104,7 +104,7 @@ Phase 2: design system.
 - [ ] Complete the vault tasks in [TODO.md](TODO.md), then test a publisher round trip.
 - [ ] Test a Vercel preview.
 - [x] Restore default `dev`/`build`/`preview` scripts and point `vercel.json` at the Astro build (`astro build --force` into `dist`).
-- [ ] Switch the Vercel project's framework preset from Eleventy to Astro (`vercel.json` already overrides it).
+- [ ] When `astro-rewrite` merges into `main`, switch the Vercel project's framework preset from Eleventy to Astro. Not before: `main`'s `vercel.json` names no framework, so the preset governs production's Eleventy builds until then (this branch's `vercel.json` already says Astro).
 - [x] Update the README.
 - [ ] Update the publishing instructions.
 - [ ] Document each Markdown plugin and the Eleventy behavior it replaces.
