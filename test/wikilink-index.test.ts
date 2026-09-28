@@ -74,7 +74,10 @@ async function fixture(t: TestContext, files: Record<string, string>) {
         // Wait for the child and its output streams to close before reading.
         // A timeout or other signal is a test failure, even in a case where the
         // generator is expected to exit with a nonzero status.
-        const [status, signal] = await once(child, "close");
+        const [status, signal] = (await once(child, "close")) as [
+          number | null,
+          NodeJS.Signals | null,
+        ];
         const output = await readFile(logFile, "utf8");
         assert.equal(signal, null, output);
         return { status, output };
@@ -92,9 +95,9 @@ async function fixture(t: TestContext, files: Record<string, string>) {
 async function readIndex(outputFile: string): Promise<Record<string, string>> {
   const source = await readFile(outputFile, "utf8");
   const javascript = stripTypeScriptTypes(source);
-  const module = await import(
+  const module = (await import(
     `data:text/javascript;base64,${Buffer.from(javascript).toString("base64")}`
-  );
+  )) as { wikilinkIndex: Record<string, string> };
   return module.wikilinkIndex;
 }
 

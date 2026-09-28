@@ -45,7 +45,7 @@ const classes = ["lucide", `lucide-${name}`, "svg-icon", className]
 >
   {
     node.map(([Tag, attributes]) => {
-      const ElementTag = Tag as any;
+      const ElementTag = Tag;
       return <ElementTag {...attributes} />;
     })
   }

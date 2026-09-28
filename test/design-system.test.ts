@@ -126,15 +126,13 @@ function css(path: string): string {
 /** Declarations outside comments, with the file they come from. */
 function declarations(path: string) {
   const found: { prop: string; value: string; line: number }[] = [];
-  postcss
-    .parse(css(path))
-    .walkDecls(decl =>
-      found.push({
-        prop: decl.prop,
-        value: decl.value,
-        line: decl.source!.start!.line,
-      })
-    );
+  postcss.parse(css(path)).walkDecls(decl =>
+    found.push({
+      prop: decl.prop,
+      value: decl.value,
+      line: decl.source!.start!.line,
+    })
+  );
   return found;
 }
 

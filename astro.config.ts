@@ -86,7 +86,7 @@ export default defineConfig({
             // Blocks keep the theme's syntax colors but sit on the site's
             // raised gray, like inline code, instead of the theme's
             // #1e1e1e (the page's own color).
-            const style = String(node.properties.style ?? "");
+            const style = node.properties.style ?? "";
             node.properties.style = style.replace(
               /background-color:[^;]*/i,
               "background-color:var(--color-gray-900)"

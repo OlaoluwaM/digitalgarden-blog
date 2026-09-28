@@ -32,7 +32,9 @@ export async function fetchSearchDocuments(): Promise<SearchDocument[]> {
   if (!response.ok) {
     throw new Error(`${INDEX_URL} answered ${response.status}`);
   }
-  return response.json();
+  // The index is this site's own build output (test/search-index.test.ts
+  // checks its shape), so the JSON is typed, not validated.
+  return response.json() as Promise<SearchDocument[]>;
 }
 
 export function initializeSearch(
@@ -55,7 +57,7 @@ export function initializeSearch(
       .then(([documents, { createSearchEngine }]) =>
         createSearchEngine(documents)
       )
-      .catch(error => {
+      .catch((error: unknown) => {
         engine = undefined;
         throw error;
       }));

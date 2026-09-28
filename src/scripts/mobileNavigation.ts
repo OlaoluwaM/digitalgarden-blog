@@ -29,7 +29,7 @@ export function initializeMobileNavigation() {
   // The tree opens over the page, so keyboard users start in it. (The
   // browser returns focus to the hamburger when it closes.)
   tree.addEventListener("toggle", event => {
-    if ((event as ToggleEvent).newState === "open") {
+    if (event.newState === "open") {
       tree.querySelector<HTMLElement>("a[href], button, summary")?.focus();
     }
   });

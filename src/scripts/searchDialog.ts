@@ -60,7 +60,8 @@ export function initializeSearchDialog() {
   // without JavaScript), buttons in the preview. A click meant for a new
   // tab or window still follows the link.
   document.addEventListener("click", event => {
-    const tag = (event.target as Element | null)?.closest?.(".tag");
+    const target = event.target;
+    const tag = target instanceof Element ? target.closest(".tag") : null;
     if (!tag || !dialog.isConnected) return;
     let query: string | null = null;
     if (tag instanceof HTMLAnchorElement) {
@@ -75,7 +76,7 @@ export function initializeSearchDialog() {
       }
       query = new URL(tag.href).searchParams.get("q");
     } else if (tag instanceof HTMLButtonElement) {
-      query = tag.textContent?.trim() ?? null;
+      query = tag.textContent.trim();
     }
     if (!query) return;
     event.preventDefault();

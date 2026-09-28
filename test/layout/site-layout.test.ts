@@ -12,7 +12,12 @@
  */
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
-import { createServer, type Server } from "node:http";
+import {
+  createServer,
+  type IncomingMessage,
+  type Server,
+  type ServerResponse,
+} from "node:http";
 import { extname, join, normalize } from "node:path";
 import { after, before, describe, it } from "node:test";
 import { chromium, type Browser, type Page } from "playwright";
@@ -37,30 +42,41 @@ const CONTENT_TYPES: Record<string, string> = {
   ".webmanifest": "application/manifest+json",
 };
 
+// Serves the built site, like a static host: a directory's index.html,
+// else 404.html with status 404.
+async function serveBuiltFile(
+  request: IncomingMessage,
+  response: ServerResponse
+) {
+  const pathname = decodeURIComponent(
+    new URL(request.url!, "http://x").pathname
+  );
+  const relative = normalize(pathname).replace(/^(\.\.[/\\])+/, "");
+  const candidates = relative.endsWith("/")
+    ? [join(relative, "index.html")]
+    : [relative, join(relative, "index.html")];
+  for (const candidate of candidates) {
+    try {
+      const body = await readFile(join(site.outDir, candidate));
+      response.writeHead(200, {
+        "content-type":
+          CONTENT_TYPES[extname(candidate)] ?? "application/octet-stream",
+      });
+      response.end(body);
+      return;
+    } catch {
+      // Not there; try the next candidate.
+    }
+  }
+  response.writeHead(404, { "content-type": CONTENT_TYPES[".html"] });
+  response.end(await readFile(join(site.outDir, "404.html")));
+}
+
 before(async () => {
   site = await buildSite();
-  server = createServer(async (request, response) => {
-    const pathname = decodeURIComponent(
-      new URL(request.url!, "http://x").pathname
-    );
-    const relative = normalize(pathname).replace(/^(\.\.[/\\])+/, "");
-    const candidates = relative.endsWith("/")
-      ? [join(relative, "index.html")]
-      : [relative, join(relative, "index.html")];
-    for (const candidate of candidates) {
-      try {
-        const body = await readFile(join(site.outDir, candidate));
-        response.writeHead(200, {
-          "content-type":
-            CONTENT_TYPES[extname(candidate)] ?? "application/octet-stream",
-        });
-        response.end(body);
-        return;
-      } catch {}
-    }
-    response.writeHead(404, { "content-type": CONTENT_TYPES[".html"] });
-    response.end(await readFile(join(site.outDir, "404.html")));
-  });
+  server = createServer(
+    (request, response) => void serveBuiltFile(request, response)
+  );
   await new Promise<void>(resolve => server.listen(0, "127.0.0.1", resolve));
   const address = server.address();
   assert.ok(address && typeof address === "object");
@@ -969,6 +985,7 @@ describe("search dialog wiring", () => {
       await page.keyboard.type("haskell");
       await page.waitForSelector(".searchresult");
       const second = await page.getAttribute(".searchresult >> nth=1", "href");
+      assert.ok(second);
       await page.keyboard.press("ArrowDown");
       await Promise.all([
         page.waitForURL(origin + second),

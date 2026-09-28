@@ -28,7 +28,7 @@ async function locations(file: string, list: string, entry: string) {
   assert.equal(SyntaxValidator.validate(xml), true);
   const document = new XMLParser({ isArray: name => name === entry }).parse(
     xml
-  );
+  ) as Record<string, Record<string, unknown>>;
   return (document[list][entry] as { loc: string }[]).map(item => item.loc);
 }
 

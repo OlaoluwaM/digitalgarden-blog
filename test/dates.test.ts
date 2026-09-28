@@ -6,7 +6,8 @@
  * pin their output exactly.
  */
 import assert from "node:assert/strict";
-import { it } from "node:test";
+import { describe, it } from "node:test";
+import { noteDateSchema } from "../src/content/note-dates.ts";
 import { formatNoteDate, noteInstant } from "../src/lib/dates.ts";
 
 // Why: these are real note values and the strings thunk.blog shows for them
@@ -63,4 +64,45 @@ it("rejects a malformed note date with the value in the error", () => {
     () => noteInstant("2026-02-30T10:00", "America/Chicago"),
     /2026-02-30T10:00/
   );
+  // Date.UTC rolls a 75th second over into the next minute; the hour alone
+  // would not notice.
+  assert.throws(
+    () => noteInstant("2026-03-20T10:00:75", "America/Chicago"),
+    /2026-03-20T10:00:75/
+  );
+});
+
+// Why: the content schema checks every note's dates when notes load, so
+// Astro's error names the note file and the property. The pages and the
+// feed format these dates later, when only the value is known.
+describe("noteDateSchema", () => {
+  for (const value of ["2026-03-20T15:42", "2026-05-28T12:19:00"]) {
+    it(`accepts ${value} unchanged`, () => {
+      assert.equal(noteDateSchema.parse(value), value);
+    });
+  }
+
+  // Why: each is a way a hand-edited property could go wrong. A date
+  // without a time would pass the pages but fail the feed, so the schema
+  // holds every date to the feed's stricter form.
+  for (const value of [
+    "",
+    "March 20",
+    "2026-03-20",
+    "2026-02-30T10:00",
+    "2026-13-01T10:00",
+    "2026-03-20T24:00",
+    "2026-03-20T10:60",
+    "2026-03-20T10:00:75",
+    "2026-03-20T10:00Z",
+    " 2026-03-20T10:00",
+  ]) {
+    it(`rejects ${JSON.stringify(value)}, naming it and the expected form`, () => {
+      const result = noteDateSchema.safeParse(value);
+      assert.equal(result.success, false);
+      const message = result.error?.issues[0]?.message ?? "";
+      assert.match(message, /YYYY-MM-DDTHH:MM/);
+      assert.ok(message.includes(JSON.stringify(value)), message);
+    });
+  }
 });

@@ -45,7 +45,7 @@ describe("random page", () => {
   it("can pick every published note except Home", () => {
     const data = document.querySelector("script#random-notes");
     assert.equal(data?.getAttribute("type"), "application/json");
-    const urls = JSON.parse(data!.text) as string[];
+    const urls = JSON.parse(data.text) as string[];
     const notes = site.pages
       .filter(page => !["index.html", "404.html", PAGE].includes(page))
       .map(page => "/" + page.replace(/index\.html$/, ""));

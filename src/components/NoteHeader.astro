@@ -21,7 +21,9 @@ const { title, tags, published, last_updated } = post.data.rawNoteProps;
     <div class="header-tags flex flex-wrap gap-2">
       {tags.map((tag: string) => <Tag tag={tag} />)}
     </div>
-    <div class="timestamps mt-5 flex gap-2.5 text-sm text-gray-100 tabular-nums">
+    <div
+      class="timestamps mt-5 flex gap-2.5 text-sm text-gray-100 tabular-nums"
+    >
       <div
         title="Created at"
         aria-label="Created at"

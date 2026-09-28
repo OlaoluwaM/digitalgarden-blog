@@ -49,6 +49,6 @@ function labelFor(region: HTMLElement) {
   const title = region
     .closest(".callout")
     ?.querySelector(":scope > .callout-title .callout-title-inner")
-    ?.textContent?.trim();
+    ?.textContent.trim();
   return title ? `${title}, scrollable` : FALLBACK_LABEL;
 }

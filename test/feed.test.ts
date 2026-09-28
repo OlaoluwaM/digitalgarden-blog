@@ -37,7 +37,7 @@ before(async () => {
     ignoreAttributes: false,
     attributeNamePrefix: "@",
     isArray: name => name === "item",
-  }).parse(xml);
+  }).parse(xml) as { rss: { channel: Record<string, unknown> } };
   channel = document.rss.channel;
   items = (channel.item as Item[] | undefined) ?? [];
 });

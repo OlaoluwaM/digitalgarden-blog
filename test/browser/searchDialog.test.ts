@@ -9,7 +9,14 @@
  * scripts touch, with the search itself running on fixture entries; the
  * built pages are covered in test/layout/site-layout.test.ts.
  */
-import { afterEach, beforeEach, expect, it, vi } from "vitest";
+import {
+  afterEach,
+  beforeEach,
+  expect,
+  it,
+  vi,
+  type MockInstance,
+} from "vitest";
 import { userEvent } from "vitest/browser";
 import { initializeSearch } from "../../src/scripts/search.ts";
 import { initializeSearchDialog } from "../../src/scripts/searchDialog.ts";
@@ -46,14 +53,18 @@ const notes: Record<string, string> = {
   "/posts/deliberate/": "<p>Be deliberate.</p>",
 };
 
+// fetch() takes a string, a URL, or a Request.
+const requestUrl = (input: RequestInfo | URL) =>
+  input instanceof Request ? input.url : String(input);
+
 let root: HTMLElement;
-let fetchSpy: ReturnType<typeof vi.spyOn>;
+let fetchSpy: MockInstance<typeof window.fetch>;
 let delays: Record<string, Promise<void>>;
 
 beforeEach(() => {
   delays = {};
   fetchSpy = vi.spyOn(window, "fetch").mockImplementation(async input => {
-    const url = String(input);
+    const url = requestUrl(input);
     await delays[url];
     return new Response(
       `<!doctype html><body><main class="content">${notes[url]}</main></body>`
@@ -304,7 +315,7 @@ it("follows the selection, fetching each note once", async () => {
   await expect
     .poll(() => preview.querySelector(".preview-title")?.textContent)
     .toBe("IO in Haskell, an epiphany");
-  expect(fetchSpy.mock.calls.map(call => String(call[0]))).toEqual([
+  expect(fetchSpy.mock.calls.map(([input]) => requestUrl(input))).toEqual([
     "/posts/io/",
     "/posts/redis/",
   ]);

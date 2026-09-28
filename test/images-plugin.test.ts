@@ -38,9 +38,8 @@ async function fixture(t: TestContext) {
   return {
     processor,
     notePath,
-    render(markdown: string, filePath = notePath) {
-      return processor.render(markdown, { fileURL: pathToFileURL(filePath) });
-    },
+    render: (markdown: string, filePath = notePath) =>
+      processor.render(markdown, { fileURL: pathToFileURL(filePath) }),
   };
 }
 

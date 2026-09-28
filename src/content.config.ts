@@ -1,6 +1,7 @@
 import { glob } from "astro/loaders";
 import { defineCollection } from "astro:content";
 import { z } from "astro/zod";
+import { noteDateSchema } from "./content/note-dates.ts";
 import { permalinkSchema } from "./content/permalinks.ts";
 
 const posts = defineCollection({
@@ -32,8 +33,8 @@ const posts = defineCollection({
           title: z.string(),
           description: z.string(),
           tags: z.array(z.string()),
-          published: z.string(),
-          last_updated: z.string(),
+          published: noteDateSchema,
+          last_updated: noteDateSchema,
         }),
       })
       .transform(({ "dg-note-properties": rawNoteProps, ...pluginProps }) => ({

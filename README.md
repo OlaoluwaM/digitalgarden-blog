@@ -23,7 +23,9 @@ npm install
 npm run dev       # dev server at localhost:4321
 npm run build     # production build → dist/
 npm run preview   # serve the build locally
-npm test          # typecheck, then every test suite
+npm test          # typecheck, lint, format check, then every test suite
+npm run lint      # ESLint (typescript-eslint strict, eslint-plugin-astro)
+npm run format    # Prettier: format code and config (not Markdown)
 ```
 
 `dev` and `build` first apply the dependency patches in `patches/` and

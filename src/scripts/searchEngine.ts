@@ -33,6 +33,8 @@ function normalize(text: string) {
 }
 
 function encode(text: string) {
+  // \x00-\x7F is the ASCII range, not a literal control character.
+  // eslint-disable-next-line no-control-regex
   return normalize(text).split(/([^a-z]|[^\x00-\x7F])/);
 }
 

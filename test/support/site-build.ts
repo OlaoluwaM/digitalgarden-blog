@@ -95,8 +95,8 @@ function runAstroBuild(outDir: string, config: string): Promise<string> {
       { cwd: repository, stdio: ["ignore", "pipe", "pipe"] }
     );
     let log = "";
-    child.stdout.on("data", chunk => (log += chunk));
-    child.stderr.on("data", chunk => (log += chunk));
+    child.stdout.on("data", (chunk: Buffer) => (log += chunk.toString()));
+    child.stderr.on("data", (chunk: Buffer) => (log += chunk.toString()));
     child.on("error", reject);
     child.on("close", code =>
       code === 0

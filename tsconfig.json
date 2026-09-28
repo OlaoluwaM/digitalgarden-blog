@@ -3,11 +3,15 @@
   "include": [
     ".astro/types.d.ts",
     "astro.config.ts",
+    "eslint.config.ts",
+    "vitest.*.mts",
     "src/**/*",
     "scripts/**/*.ts"
   ],
   "exclude": ["dist"],
   "compilerOptions": {
+    // Indexing an array or record can miss: `list[0]` is `T | undefined`.
+    "noUncheckedIndexedAccess": true,
     "paths": { "@utils/*": ["./src/utils/*"] }
   }
 }

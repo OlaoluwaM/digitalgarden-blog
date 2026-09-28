@@ -1017,3 +1017,27 @@ approval before committing and starting the next.
   75 browser, typecheck clean), `test:images-build` 7/7, build 16 pages,
   and a forced build of the pre-upgrade commit is byte-identical (`diff -rq`
   over all of `dist`).
+- Item 2 (linting): ESLint 10 flat config (`eslint.config.ts`):
+  typescript-eslint `strictTypeChecked`, eslint-plugin-astro recommended
+  plus jsx-a11y-recommended (via `eslint-plugin-jsx-a11y-x`, which supports
+  ESLint 10), and eslint-config-prettier. Each rule change carries its reason
+  in the config. `.astro` files and component tests skip `no-unsafe-*`
+  (TypeScript alone can't type `.astro` modules; astro check covers them).
+  `tsconfig.json` now sets `noUncheckedIndexedAccess`; root config files are
+  included; `test/tsconfig.json` types the tests for linting. Prettier is
+  enforced by `format:check`; `.prettierignore` skips build output, the
+  plugin-owned `src/site/`, and all Markdown. `npm test` runs typecheck,
+  lint, format check, then the suites. Evidence: `npm test` green (476
+  unit, 53 component, 59 layout, 75 browser); a forced build differs from
+  the pre-lint build only in the client bundle's hash and the reformatted
+  manifest (same JSON); the bundle diff is the intended copy-code, clipboard,
+  search JSON, and tag-click changes.
+- Item 2 also: note dates are validated when notes load.
+  `src/content/note-dates.ts` (`noteDateSchema`) holds `published` and
+  `last_updated` to `YYYY-MM-DDTHH:MM[:SS]` as a real date and time, so a bad
+  value fails the build with Astro naming the note file, the property, the
+  expected form, and the value. `src/lib/dates.ts` shares one parser
+  (`readWallClock`) between the schema and `noteInstant`, and now also
+  rejects rolled-over minutes and seconds (`10:00:75`). Its non-null
+  assertions were replaced with checks; `Number()` results are checked for
+  NaN. `npm test`: 488 unit tests.

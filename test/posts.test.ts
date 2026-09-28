@@ -21,7 +21,9 @@ before(async () => {
     import { mock } from 'node:test';
     export const getCollection = mock.fn(async () => []);
   `)}`;
-  ({ getCollection } = await import(contentModuleUrl));
+  ({ getCollection } = (await import(contentModuleUrl)) as {
+    getCollection: typeof getCollection;
+  });
 
   const contentModuleHook = registerHooks({
     resolve(specifier, context, nextResolve) {

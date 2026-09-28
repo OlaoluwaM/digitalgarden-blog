@@ -1,0 +1,18 @@
+# Prettier checks code and config (`npm run format:check`).
+
+# Build output and generated files.
+dist/
+.astro/
+.vercel/
+.browser-artifacts/
+src/generated/
+package-lock.json
+
+# Published notes and images: the Digital Garden plugin owns them.
+src/site/
+
+# Prose: docs, checklists, and notes keep their authors' formatting.
+*.md
+
+# Local tool settings.
+.claude/

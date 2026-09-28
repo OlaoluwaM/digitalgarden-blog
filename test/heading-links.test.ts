@@ -68,7 +68,7 @@ for (const [heading, reference, expectedId] of headings) {
     const id = destination.querySelector("h2")?.getAttribute("id");
     assert.equal(id, expectedId);
     const source = await render(`[[${articleTarget}#${reference}]]`);
-    assertHeadingLink(source.querySelector("a"), articlePath, id!);
+    assertHeadingLink(source.querySelector("a"), articlePath, id);
   });
 }
 

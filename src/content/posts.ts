@@ -18,8 +18,8 @@ export async function getPublishedPosts(): Promise<Post[]> {
 }
 
 export function getHomePost(posts: Post[]): Post {
-  const homePosts = posts.filter(isHomePost);
-  const multipleHomePosts = homePosts.length > 1;
+  const [homePost, ...otherHomePosts] = posts.filter(isHomePost);
+  const multipleHomePosts = otherHomePosts.length > 0;
 
   if (multipleHomePosts) {
     throw new Error(
@@ -27,13 +27,11 @@ export function getHomePost(posts: Post[]): Post {
     );
   }
 
-  if (homePosts.length === 0) {
+  if (!homePost) {
     throw new Error(
       "No post with a top-level tag including 'gardenEntry'. This should be fixed "
     );
   }
-
-  const [homePost] = homePosts;
 
   return homePost;
 }
@@ -74,11 +72,4 @@ function toEpochTimestamp(date: string): number {
 
 function take<A>(arr: A[], limit: number): A[] {
   return arr.slice(0, Math.max(0, limit));
-}
-
-// From https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random#getting_a_random_integer_between_two_values
-function getRandomInt(min: number, max: number): number {
-  const minCeiled = Math.ceil(min);
-  const maxFloored = Math.floor(max);
-  return Math.floor(Math.random() * (maxFloored - minCeiled) + minCeiled); // The maximum is exclusive and the minimum is inclusive
 }

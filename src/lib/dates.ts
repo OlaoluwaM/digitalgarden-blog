@@ -46,6 +46,48 @@ export function formatNoteDate(value: string): string {
 
 const DATE_TIME = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2}))?$/;
 
+/** The form every note date takes; seconds are optional. */
+export const NOTE_DATE_TIME_FORM = "YYYY-MM-DDTHH:MM[:SS]";
+
+/**
+ * The wall-clock time a note date names, as milliseconds on the UTC scale,
+ * or `undefined` when the value is malformed or not a real date and time
+ * (February 30th, 24:00, a 75th second).
+ */
+function readWallClock(value: string): number | undefined {
+  const match = DATE_TIME.exec(value);
+  if (!match) return undefined;
+
+  // A missing group reads as NaN, which the check below rejects. Only the
+  // seconds are optional.
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  const hour = Number(match[4]);
+  const minute = Number(match[5]);
+  const second = Number(match[6] ?? 0);
+  const wallClock = Date.UTC(year, month - 1, day, hour, minute, second);
+  // Date.UTC rolls overflowing fields over (February 30th becomes March
+  // 2nd), so a real date reads back exactly as written.
+  const written = new Date(wallClock);
+  if (
+    Number.isNaN(wallClock) ||
+    written.getUTCMonth() !== month - 1 ||
+    written.getUTCDate() !== day ||
+    written.getUTCHours() !== hour ||
+    written.getUTCMinutes() !== minute ||
+    written.getUTCSeconds() !== second
+  ) {
+    return undefined;
+  }
+  return wallClock;
+}
+
+/** Whether `value` is a real date and time in {@link NOTE_DATE_TIME_FORM}. */
+export function isNoteDateTime(value: string): boolean {
+  return readWallClock(value) !== undefined;
+}
+
 /**
  * The moment a note date names, read as wall-clock time in `timeZone`.
  *
@@ -54,24 +96,11 @@ const DATE_TIME = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2}))?$/;
  * on that date (daylight saving included) is applied.
  */
 export function noteInstant(value: string, timeZone: string): Date {
-  const match = DATE_TIME.exec(value);
-  if (!match) {
+  const wallClock = readWallClock(value);
+  if (wallClock === undefined) {
     throw new Error(
-      `Cannot read note date "${value}": expected YYYY-MM-DDTHH:MM.`
+      `Cannot read note date "${value}": expected a real date as ${NOTE_DATE_TIME_FORM}.`
     );
-  }
-
-  const [year, month, day, hour, minute, second] = match
-    .slice(1)
-    .map(part => Number(part ?? 0));
-  const wallClock = Date.UTC(year!, month! - 1, day!, hour!, minute!, second);
-  const written = new Date(wallClock);
-  if (
-    written.getUTCMonth() !== month! - 1 ||
-    written.getUTCDate() !== day! ||
-    written.getUTCHours() !== hour!
-  ) {
-    throw new Error(`Cannot read note date "${value}": not a real date.`);
   }
 
   // The offset at the wall-clock time taken as UTC is close to the one at
@@ -83,27 +112,34 @@ export function noteInstant(value: string, timeZone: string): Date {
 
 /** How far `timeZone`'s clock is ahead of UTC at `instant`, in ms. */
 function offset(instant: number, timeZone: string): number {
-  const parts = Object.fromEntries(
-    new Intl.DateTimeFormat("en-US", {
-      timeZone,
-      hourCycle: "h23",
-      year: "numeric",
-      month: "numeric",
-      day: "numeric",
-      hour: "numeric",
-      minute: "numeric",
-      second: "numeric",
-    })
-      .formatToParts(instant)
-      .map(part => [part.type, Number(part.value)])
-  );
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone,
+    hourCycle: "h23",
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+    second: "numeric",
+  }).formatToParts(instant);
+  const part = (type: Intl.DateTimeFormatPartTypes) => {
+    const found = parts.find(candidate => candidate.type === type);
+    const value = Number(found?.value);
+    // Number() never throws; a missing or non-numeric part is NaN.
+    if (Number.isNaN(value)) {
+      throw new Error(
+        `No numeric ${type} when formatting a date in ${timeZone}.`
+      );
+    }
+    return value;
+  };
   const local = Date.UTC(
-    parts.year,
-    parts.month - 1,
-    parts.day,
-    parts.hour,
-    parts.minute,
-    parts.second
+    part("year"),
+    part("month") - 1,
+    part("day"),
+    part("hour"),
+    part("minute"),
+    part("second")
   );
   return local - Math.floor(instant / 1000) * 1000;
 }

@@ -15,7 +15,7 @@ export function initializeCopyButtons() {
 
     let btnTimeout: NodeJS.Timeout | undefined;
 
-    btn.addEventListener("click", async () => {
+    const copy = async () => {
       if (btn.disabled) return;
 
       // I assume a setTimeout is auto cleared once it fires
@@ -45,7 +45,8 @@ export function initializeCopyButtons() {
       } finally {
         btn.disabled = false;
       }
-    });
+    };
+    btn.addEventListener("click", () => void copy());
 
     pre.appendChild(btn);
     pre.classList.add(COPY_BUTTON_CLASS_NAME);
@@ -53,15 +54,19 @@ export function initializeCopyButtons() {
 }
 
 async function copyTextToClipboard(text: string) {
-  const clipboardIsAvailable =
-    typeof navigator !== "undefined" &&
-    navigator.clipboard &&
-    typeof navigator.clipboard.writeText === "function";
+  // Insecure contexts (plain http) have no navigator.clipboard, whatever
+  // the DOM types say.
+  const clipboard =
+    typeof navigator === "undefined"
+      ? undefined
+      : (navigator.clipboard as Clipboard | undefined);
 
-  if (!clipboardIsAvailable) return copyTextToClipboardWorkaround(text);
+  if (typeof clipboard?.writeText !== "function") {
+    return copyTextToClipboardWorkaround(text);
+  }
 
   try {
-    await navigator.clipboard.writeText(text);
+    await clipboard.writeText(text);
     return true;
   } catch (e) {
     console.error("navigator.clipboard.writeText failed:", e);
@@ -84,6 +89,8 @@ function copyTextToClipboardWorkaround(text: string) {
     document.body.appendChild(textarea);
     textarea.focus();
     textarea.select();
+    // Deprecated, but it's the only copy path without the Clipboard API.
+    // eslint-disable-next-line @typescript-eslint/no-deprecated
     return document.execCommand("copy");
   } catch (e) {
     console.error("execCommand copy fallback failed:", e);

@@ -18,7 +18,9 @@ const initialized = new WeakSet<HTMLDetailsElement>();
 // still work, they are just not remembered.
 function load(path: string): boolean | undefined {
   try {
-    const saved = JSON.parse(localStorage.getItem(KEY_PREFIX + path) ?? "null");
+    const saved: unknown = JSON.parse(
+      localStorage.getItem(KEY_PREFIX + path) ?? "null"
+    );
     return typeof saved === "boolean" ? saved : undefined;
   } catch {
     return undefined;

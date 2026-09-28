@@ -155,14 +155,14 @@ for (const throws of [false, true]) {
 }
 
 it("ignores overlapping clicks and allows another copy once settled", async () => {
-  const pending = Promise.withResolvers<void>();
+  const pending = Promise.withResolvers<undefined>();
   const writeText = vi.fn(() => pending.promise);
   const f = fixture({ clipboard: { writeText } });
   await f.click();
   assert.strictEqual(f.buttons()[0]!.disabled, true);
   f.buttons()[0]!.dispatchEvent(new MouseEvent("click"));
   assert.strictEqual(writeText.mock.calls.length, 1);
-  pending.resolve();
+  pending.resolve(undefined);
   await vi.advanceTimersByTimeAsync(0);
   assert.strictEqual(f.buttons()[0]!.disabled, false);
   await f.click();

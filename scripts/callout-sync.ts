@@ -104,11 +104,12 @@ export function toRgbTriplet(value: string): string | undefined {
   const text = value.trim();
   const hex = /^#([\da-f]{3}|[\da-f]{6})$/i.exec(text)?.[1];
   if (hex) {
-    const pairs =
-      hex.length === 3
-        ? [...hex].map(digit => digit + digit)
-        : hex.match(/../g)!;
-    return pairs.map(pair => parseInt(pair, 16)).join(", ");
+    // Expand shorthand (#abc) to full form (#aabbcc), then read each pair.
+    const full = hex.length === 3 ? hex.replace(/./g, "$&$&") : hex;
+    return full
+      .match(/../g)!
+      .map(pair => parseInt(pair, 16))
+      .join(", ");
   }
 
   const parts = (/^rgb\((.*)\)$/i.exec(text)?.[1] ?? text)

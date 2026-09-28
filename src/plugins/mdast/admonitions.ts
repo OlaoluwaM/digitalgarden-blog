@@ -50,10 +50,10 @@ function transformAdmonitionCodeBlock(
     throw new Error("An admonition must produce exactly one callout node");
   }
 
-  const generatedBlockquote = calloutTree.children[0];
-  if (generatedBlockquote.type !== "blockquote") {
+  const [generatedBlockquote] = calloutTree.children;
+  if (generatedBlockquote?.type !== "blockquote") {
     throw new Error(
-      `Expected ad-${type} to produce a blockquote, but got "${generatedBlockquote.type}"`
+      `Expected ad-${type} to produce a blockquote, but got "${generatedBlockquote?.type ?? "nothing"}"`
     );
   }
 
@@ -121,7 +121,11 @@ function parseAdmonitionBodyToParts(body: string): AdmonitionParts {
     const match = metadataLine.exec(line);
     if (!match) break;
 
-    const [_, _key, val] = match;
+    const [, _key, val] = match;
+    // The pattern requires both groups; this only guards the types.
+    if (_key === undefined || val === undefined) {
+      throw new Error(`Cannot read admonition metadata line "${line}"`);
+    }
 
     // This is safe because the regex explicitly checks for the words "title" or "collapse"
     // and if we get to this point, then either of those words should be the value for _key
@@ -136,7 +140,7 @@ function parseAdmonitionBodyToParts(body: string): AdmonitionParts {
         break;
       default:
         throw new Error(
-          `${key} is not recognized as a valid admonition metadata tag`
+          `${String(key)} is not recognized as a valid admonition metadata tag`
         );
     }
 
@@ -174,7 +178,7 @@ function collapseStateToSign(collapse: Collapse): string {
 
     default:
       throw new Error(
-        `Invalid collapse state: ${collapse}. Could not convert it to a sign`
+        `Invalid collapse state: ${String(collapse)}. Could not convert it to a sign`
       );
   }
 }

@@ -37,7 +37,10 @@ async function build(project: string) {
         timeout: 30_000,
       }
     );
-    const [status, signal] = await once(child, "close");
+    const [status, signal] = (await once(child, "close")) as [
+      number | null,
+      NodeJS.Signals | null,
+    ];
     const output = await readFile(logPath, "utf8");
     assert.equal(
       signal,
@@ -125,8 +128,8 @@ export default {
       title: "Test note",
       description: "Image build fixture.",
       tags: [],
-      published: "2026-01-01",
-      last_updated: "2026-01-01",
+      published: "2026-01-01T00:00",
+      last_updated: "2026-01-01T00:00",
     },
   };
   const note = (body: string) =>

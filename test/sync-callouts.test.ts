@@ -312,10 +312,10 @@ async function sync(cwd: string, args: string[]) {
     { cwd, stdio: ["ignore", "pipe", "pipe"] }
   );
   let output = "";
-  child.stdout.on("data", chunk => (output += chunk));
-  child.stderr.on("data", chunk => (output += chunk));
-  const [code] = await once(child, "close");
-  return { code: code as number, output };
+  child.stdout.on("data", (chunk: Buffer) => (output += chunk.toString()));
+  child.stderr.on("data", (chunk: Buffer) => (output += chunk.toString()));
+  const [code] = (await once(child, "close")) as [number];
+  return { code, output };
 }
 
 describe("npm run sync-callouts", () => {
@@ -388,9 +388,9 @@ describe("npm run sync-callouts", () => {
     const [resolved, unresolved] = failed.output.split(/^Not synced/m);
     assert.ok(unresolved, failed.output);
     assert.match(resolved!, /ai-text/);
-    assert.match(unresolved!, /odd.*dragon.*--icon odd=/);
-    assert.match(unresolved!, /nothing was written/i);
-    assert.doesNotMatch(unresolved!, /ai-text/);
+    assert.match(unresolved, /odd.*dragon.*--icon odd=/);
+    assert.match(unresolved, /nothing was written/i);
+    assert.doesNotMatch(unresolved, /ai-text/);
     assert.deepEqual(await read(), before);
 
     const fixed = await sync(project, [

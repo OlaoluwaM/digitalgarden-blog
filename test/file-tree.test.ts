@@ -51,12 +51,12 @@ const tree = (...posts: ReturnType<typeof post>[]) =>
 // this narrows without repeating the same `if` guard in every test.
 function folder(node: FileTreeNode) {
   assert.equal(node.type, "folder");
-  return node as FileTreeNode & { type: "folder" };
+  return node;
 }
 
 function file(node: FileTreeNode) {
   assert.equal(node.type, "file");
-  return node as FileTreeNode & { type: "file" };
+  return node;
 }
 
 describe("folder grouping", () => {

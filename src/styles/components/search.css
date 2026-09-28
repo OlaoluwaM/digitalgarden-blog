@@ -62,9 +62,7 @@
 
     &:hover,
     &[aria-selected="true"] {
-      background-image: linear-gradient(
-        --alpha(var(--color-white) / 5%) 0 0
-      );
+      background-image: linear-gradient(--alpha(var(--color-white) / 5%) 0 0);
     }
     &[aria-selected="true"] {
       border-color: var(--color-gray-200);

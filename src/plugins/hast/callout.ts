@@ -39,7 +39,7 @@ function transformBlockquoteToCallout(blockquoteNode: Element): HastNode {
     properties: {
       className: ["callout-content"],
     },
-    children: calloutContent as ElementContent[],
+    children: calloutContent,
   };
 
   return {
@@ -144,9 +144,7 @@ function parseCallout(blockquoteNode: Element): Callout | null {
 function getOpeningParagraph(
   blockquoteNodeChildren: ElementContent[]
 ): [Element, ElementContent[]] | [null, null] {
-  for (let i = 0; i < blockquoteNodeChildren.length; i++) {
-    const child = blockquoteNodeChildren[i];
-
+  for (const [i, child] of blockquoteNodeChildren.entries()) {
     // Whitespace advances to the next child, skipping the returns below.
     // The loop stops when it reaches the first non-whitespace child.
     if (child.type === "text" && child.value.trim() === "") continue;
@@ -257,7 +255,8 @@ function splitNodeAtFirstNewline(node: ElementContent): TitleBodyPartition {
       foundBoundary: partition.foundBoundary,
     };
   } else if (node.type === "text" && node.value.includes("\n")) {
-    const [beforeNewline, ...afterNewline] = node.value.split("\n");
+    // split() always returns at least one part.
+    const [beforeNewline = "", ...afterNewline] = node.value.split("\n");
     const afterNewlineText = afterNewline.join("\n");
     const noAfterNewlineText = afterNewlineText === "";
 
@@ -302,9 +301,12 @@ const CALLOUT_TITLE_OVERRIDES: Record<string, string> = {
 
 function toTitleCase(str: string) {
   const calloutTitle = str.toLowerCase();
-  const override = CALLOUT_TITLE_OVERRIDES[calloutTitle];
+  // hasOwn skips inherited keys such as "constructor".
+  const override = Object.hasOwn(CALLOUT_TITLE_OVERRIDES, calloutTitle)
+    ? CALLOUT_TITLE_OVERRIDES[calloutTitle]
+    : undefined;
 
-  if (Object.hasOwn(CALLOUT_TITLE_OVERRIDES, calloutTitle)) {
+  if (override !== undefined) {
     return override;
   }
 

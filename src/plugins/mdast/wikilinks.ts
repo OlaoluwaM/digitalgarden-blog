@@ -67,7 +67,8 @@ function resolveWikilinkTarget(
 } {
   const unresolvedNoteUrl = "/404";
 
-  const [noteTarget, ...fragmentParts] = wikilinkTarget.split("#");
+  // split() always returns at least one part.
+  const [noteTarget = "", ...fragmentParts] = wikilinkTarget.split("#");
   // Only the first # separates the note from the heading; preserve later ones.
   const headingText = fragmentParts.join("#");
   const headingId = slug(headingText);

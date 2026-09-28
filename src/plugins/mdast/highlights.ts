@@ -70,10 +70,10 @@ function highlight<N extends Node>(node: N): N {
       if (match[0].length !== 2) continue;
       const start = match.index;
       const end = start + 2;
-      const before = start > 0 ? value[start - 1] : index > 0 ? "" : " ";
+      const before = start > 0 ? value.charAt(start - 1) : index > 0 ? "" : " ";
       const after =
         end < value.length
-          ? value[end]
+          ? value.charAt(end)
           : index < children.length - 1
             ? ""
             : " ";
