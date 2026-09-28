@@ -662,3 +662,14 @@ Found reviewing the dev site after the move onto Tailwind's scales.
 - **Why:** Olaolu chose Astro's standard feed package over hand-rolled Atom
   (ADR 0004) and Central time for note dates.
 - **Evidence:** `test/feed.test.ts`; `noteInstant` in `test/dates.test.ts`.
+
+## 2026-09-28: The sitemap moves, and robots.txt names it
+
+- **Change:** the sitemap is `/sitemap-index.xml` (with `/sitemap-0.xml`),
+  from `@astrojs/sitemap`; `/sitemap.xml` is gone. It lists Home and every
+  note, without `/random/` or the 404 page (live listed `/404/`), and has
+  no `lastmod` (live's were mostly a bulk-update date). A new `/robots.txt`
+  allows every crawler and names the sitemap index; live had none.
+- **Why:** Olaolu chose Astro's standard sitemap over a hand-rolled
+  `/sitemap.xml` (ADR 0005).
+- **Evidence:** `test/sitemap.test.ts`.

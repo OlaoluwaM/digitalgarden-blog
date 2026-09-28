@@ -2,6 +2,7 @@ import { fileURLToPath } from "node:url";
 import type { AstroIntegration } from "astro";
 import { defineConfig } from "astro/config";
 import { satteri } from "@astrojs/markdown-satteri";
+import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
 import { wikilinkIndex } from "./src/generated/wikilink-index.ts";
 import { mkmdastWikilinksPlugin } from "./src/plugins/mdast/wikilinks.ts";
@@ -36,7 +37,16 @@ const styleGuide: AstroIntegration = {
 export default defineConfig({
   site: "https://thunk.blog",
   outDir: "dist-astro",
-  integrations: [styleGuide],
+  integrations: [
+    styleGuide,
+    // /sitemap-index.xml and /sitemap-0.xml; robots.txt names the index.
+    // /random/ only redirects, so it is left out. The site has no news,
+    // images, video, or translations to annotate.
+    sitemap({
+      filter: page => new URL(page).pathname !== "/random/",
+      namespaces: { news: false, xhtml: false, image: false, video: false },
+    }),
+  ],
   vite: {
     plugins: [tailwindcss()],
   },

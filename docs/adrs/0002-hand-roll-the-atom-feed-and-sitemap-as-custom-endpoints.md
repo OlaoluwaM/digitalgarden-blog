@@ -1,6 +1,6 @@
 # ADR 0002: Hand-Roll the Atom Feed and Sitemap as Custom Endpoints
 
-- **Status:** Accepted; the feed half is superseded by [ADR 0004](0004-use-astrojs-rss-for-the-feed.md)
+- **Status:** Superseded by [ADR 0004](0004-use-astrojs-rss-for-the-feed.md) (feed) and [ADR 0005](0005-use-astrojs-sitemap.md) (sitemap)
 - **Date:** 2026-08-29
 
 ## Context

@@ -258,12 +258,18 @@ describe("routes the site's own pages claim", () => {
 
   // Why: the claimed routes are listed by hand, so a page added to
   // src/pages without its route would leave that route open to a note. The
-  // dev-only style guide is injected by astro.config.ts, not a file there.
-  it("claims the route of every page in src/pages, and the style guide", () => {
+  // dev-only style guide and the sitemap files come from astro.config.ts,
+  // not files there.
+  it("claims every page in src/pages, the style guide, and the sitemap", () => {
     const routes = readdirSync("src/pages")
       .filter(file => !file.startsWith("[") && file !== "index.astro")
       .map(file => "/" + file.replace(/\.(astro|ts)$/, ""));
-    for (const route of [...routes, "/style-guide"]) {
+    for (const route of [
+      ...routes,
+      "/style-guide",
+      "/sitemap-index.xml",
+      "/sitemap-0.xml",
+    ]) {
       assert.ok(PAGE_ROUTES.includes(route), route);
     }
   });

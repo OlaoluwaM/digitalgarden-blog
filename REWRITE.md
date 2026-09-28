@@ -48,7 +48,7 @@
 - [x] Rebuild `/404`.
 - [x] Rebuild `/~random/` (now `/random/`).
 - [x] Rebuild `/feed.xml` (RSS, ADR 0004).
-- [ ] Rebuild `/sitemap.xml`.
+- [x] Rebuild the sitemap (`/sitemap-index.xml` and `/robots.txt`, ADR 0005).
 - [x] Rebuild `/searchIndex.json` from published entries.
 - [ ] Make `/sync-callouts` generate the callout icon map in `src/plugins/hast/callout-icons.ts`, and decide where its `--callout-color` output lives once phase 2 removes the legacy Sass.
 

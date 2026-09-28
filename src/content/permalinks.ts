@@ -34,14 +34,17 @@ function isValidPermalink(value: string): boolean {
 }
 
 // Routes the site's own pages claim, without the trailing slash: the files
-// in src/pages (except Home and the note route) and the dev-only style
-// guide that astro.config.ts injects. A note's URL comes from its
+// in src/pages (except Home and the note route), and the dev-only style
+// guide and sitemap files that astro.config.ts adds. A note's URL comes from its
 // permalink, not its title, so only a permalink can collide with them.
 export const PAGE_ROUTES: readonly string[] = [
   "/404",
   "/feed.xml",
   "/random",
+  "/robots.txt",
   "/searchIndex.json",
+  "/sitemap-0.xml",
+  "/sitemap-index.xml",
   "/style-guide",
 ];
 

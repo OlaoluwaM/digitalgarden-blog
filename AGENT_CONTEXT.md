@@ -170,7 +170,10 @@ and reports every conflicting route with all involved post IDs.
   `rendered.html` holds image placeholders; URLs are made absolute. Dates
   are Central time (`site.timeZone`, `noteInstant`). The channel
   description is `site.description` in `src/lib/site.ts`.
-- `/sitemap.xml` is still a hand-rolled endpoint under [ADR 0002](docs/adrs/0002-hand-roll-the-atom-feed-and-sitemap-as-custom-endpoints.md).
+- The sitemap comes from `@astrojs/sitemap` ([ADR 0005](docs/adrs/0005-use-astrojs-sitemap.md),
+  2026-09-28): `/sitemap-index.xml` and `/sitemap-0.xml`, without `/random/`,
+  and no `lastmod`. `src/pages/robots.txt.ts` names the index. `/sitemap.xml`
+  is gone.
 
 ## Markdown and image gaps
 
