@@ -977,3 +977,27 @@ Keep these outside the migration checklist:
   it restores the Eleventy files.
 - Inventory of parity, deliberate changes, and what was left out:
   https://claude.ai/artifact/6qEa9Jzk4T2mVvd3fjKyeG.
+
+## Cutover checks and typography (2026-09-28)
+
+- Crawl of a fresh build: 0 broken internal links, anchors, or assets
+  (476 references); the only unresolved wikilink (`[[Polynomials]]`) goes
+  to `/404`. External: all 200 except two StackOverflow 403s (bot block).
+- Preview `dpl_8X5zndPDmuxqRft4BEYaeGoPdTxa` (`a1e3af1`) READY; a missing
+  URL returns the site's 404 page with status 404. Other preview URLs sit
+  behind Vercel Authentication (the MCP fetch hits SSO); Olaolu checked
+  them in a browser.
+- Agreed typography refinements, not yet built:
+  [docs/typography-refinements.md](docs/typography-refinements.md). The
+  column widens to 931px at 1280 (120 cpl); the cap plus 18px text gives
+  82 cpl at 1100–1440px.
+- A 5+ column table is clipped on phones today (no way to scroll to it);
+  the wrapper stays a TODO until a note has one.
+- Diagrams (agreed): `mermaid` and `plantuml` fences render to inline SVG
+  at build time through kroki.io; the build fails when Kroki fails. Needs
+  an ADR. Digital Garden 2.94.1 does not touch these fences.
+- Transclusions: the plugin inlines `![[embeds]]` at publish time as
+  `div.transclusion > a.markdown-embed-link + div.markdown-embed` with a
+  `#` title in `.markdown-embed-title`, even for unpublished notes (it only
+  omits the link). Designs: https://claude.ai/artifact/6Uq4RNhfRueyUJSmAB2r8P
+  Olaolu chose B, the source card; not built yet.

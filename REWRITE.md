@@ -22,6 +22,7 @@
 - [x] Fail on duplicate or malformed permalinks.
 - [x] Fail unless exactly one published `gardenEntry` exists.
 - [x] Fail on duplicate or malformed wikilink-index entries.
+- [x] Fail the build when a note's permalink takes a page route (`PAGE_ROUTES`).
 
 ## Markdown and Assets
 
@@ -41,6 +42,9 @@
 - [x] Turn off smart punctuation to match Eleventy.
 - [x] Add `external-link`/`internal-link` classes and `target="_blank"` to links.
 - [x] Render inline math at build time.
+- [x] Render `==highlights==` as `<mark>`.
+- [ ] Render `mermaid` and `plantuml` fences as inline SVG at build time through Kroki (kroki.io): exclude both from Shiki, cache by content hash, and fail the build when Kroki fails. Record the decision in an ADR.
+- [ ] Style the publisher's transclusions as source cards (design B in the [designs](https://claude.ai/artifact/6Uq4RNhfRueyUJSmAB2r8P): a bordered card with a "From *note title*" header and the link icon on the right); turn the embed title into a label so each page keeps one `h1`; test wikilinks and heading IDs inside embeds.
 - [x] Remove unexplained Markdown and Shiki warnings.
 
 ## Routes and Data
@@ -74,10 +78,11 @@ Phase 1: parity shell ([ADR 0003](docs/adrs/0003-build-a-tailwind-token-design-s
 Phase 2: design system.
 
 - [x] Add Tailwind v4 with the cascade layer order.
-- [x] Define tokens from the live site and add a style guide page.
+- [x] Define tokens from the live site and add a dev-only style guide that documents the design system.
 - [x] Revise the chrome styles into token-based components.
 - [x] Revise the Markdown content styles into a token-based stylesheet.
 - [x] Remove the legacy stylesheets and vendored theme; add Preflight.
+- [ ] Apply the long-form typography refinements ([notes](docs/typography-refinements.md)).
 
 ## Analytics
 
@@ -105,13 +110,15 @@ Phase 2: design system.
 - [x] Restore default `dev`/`build`/`preview` scripts and point `vercel.json` at the Astro build (`astro build --force` into `dist`).
 - [ ] When `astro-rewrite` merges into `main`, switch the Vercel project's framework preset from Eleventy to Astro. Not before: `main`'s `vercel.json` names no framework, so the preset governs production's Eleventy builds until then (this branch's `vercel.json` already says Astro).
 - [x] Update the README.
-- [ ] Update the publishing instructions.
+- [ ] Update the publishing instructions. Include: embed only published notes (the publisher inlines an unpublished note's text).
 - [ ] Document each Markdown plugin and the Eleventy behavior it replaces.
 - [x] Remove Eleventy and migration-only code.
+- [x] Make `sharp` a direct dependency (Astro's image code imports it from the project root).
 - [x] Delete `get-theme` and the `THEME` settings (ADR 0001).
 - [x] Stop `sync-callouts` writing `callouts.scss`; check `test/callout-icons.test.ts` against a fixed table of Obsidian's built-in icons instead of the Eleventy Sass.
 - [x] Add `"type": "module"` to `package.json` to remove `MODULE_TYPELESS_PACKAGE_JSON` warnings.
 
 ## After Cutover
 
+- [ ] Work through the deferred site features in [TODO.md](TODO.md): table of contents, linting, and the wide-table wrapper.
 - [ ] After Olaolu signs off on the site, add visual snapshot tests of the overall UI and key features (pages at phone and desktop widths, the search dialog, the mobile file tree, callouts, code blocks).
