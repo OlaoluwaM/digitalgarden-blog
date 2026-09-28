@@ -2,10 +2,10 @@
  * A throwaway copy of the site with its own notes, for tests that need
  * content no published note has (a missing image, a note with sections).
  *
- * The project copies the application code, never the real notes or image
- * assets, and shares the installed dependencies through a symlink. Its
- * build output and caches stay inside the project, which lives in the
- * system's temporary directory.
+ * The project copies the application code and the site's static files
+ * (`public/`), never the real notes or their images, and shares the
+ * installed dependencies through a symlink. Its build output and caches
+ * stay inside the project, which lives in the system's temporary directory.
  */
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
@@ -67,6 +67,11 @@ export async function createFixtureProject(
       { recursive: true }
     );
   }
+  // Fonts, icons, and images the pages load from the site root, so fixture
+  // pages render as the real site's do.
+  await cp(join(repository, "public"), join(project, "public"), {
+    recursive: true,
+  });
   for (const file of [
     "package.json",
     "tsconfig.json",
