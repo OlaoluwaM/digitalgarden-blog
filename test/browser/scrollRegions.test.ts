@@ -106,3 +106,33 @@ it("is safe to run twice", () => {
     null,
   ]);
 });
+
+function tableFixture(widths: number[], inCallout = false) {
+  root = document.createElement("main");
+  const wrappers = widths
+    .map(
+      width =>
+        `<div class="table-wrapper" style="width: 200px; overflow-x: auto"><table style="width: ${width}px"><tr><td>Cell</td></tr></table></div>`
+    )
+    .join("");
+  root.innerHTML = inCallout
+    ? `<div class="callout"><div class="callout-title"><div class="callout-title-inner">Horner's Method</div></div><div class="callout-content">${wrappers}</div></div>`
+    : wrappers;
+  document.body.append(root);
+  return [...root.querySelectorAll<HTMLElement>(".table-wrapper")];
+}
+
+// Why: a table wider than the note column scrolls inside its wrapper, and
+// keyboard users need the same tab stop to scroll it. It is named as a
+// table, even inside a callout, because the table is what scrolls.
+it("makes an overflowing table wrapper focusable and names it as a table", () => {
+  for (const inCallout of [false, true]) {
+    const [wide, narrow] = tableFixture([500, 100], inCallout);
+    initializeScrollRegions();
+    expect(wide!.getAttribute("tabindex")).toBe("0");
+    expect(wide!.getAttribute("role")).toBe("group");
+    expect(wide!.getAttribute("aria-label")).toBe("Table, scrollable");
+    expect(narrow!.hasAttribute("tabindex")).toBe(false);
+    root.remove();
+  }
+});

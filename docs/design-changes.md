@@ -828,3 +828,27 @@ https://claude.ai/artifact/AezzrntfR1ZLK4WXrF4x9n.
 - **Why:** the Contents button floats over the lower right corner and
   covered the note's last line at the end of the page.
 - **Evidence:** "leaves the last line clear of the phone button".
+
+## 2026-09-28: Wide tables scroll
+
+### A table wider than the note column scrolls sideways
+
+- **Change:** every Markdown table sits in a `div.table-wrapper`
+  (`plugins/hast/tableWrapper.ts`) that scrolls it sideways when it is
+  wider than the column. Tables take their natural width (at least the
+  column's), cells stop at 30ch and wrap between words, and code in a cell
+  wraps too. While a wrapper overflows, `scripts/scrollRegions.ts` gives it a
+  tab stop, `role="group"`, and the name "Table, scrollable", as it already
+  did for callout bodies. Edge shadows show where there is more table to
+  scroll to, and fade out at the table's own edges (not in callouts, whose
+  tinted background the technique can't match). Live squeezed wide tables into the column
+  (`word-break: break-word`, breaking words mid-letter), clipped cell text
+  with an ellipsis, and on phones cut off the last columns with no way to
+  scroll to them. No published note has a table yet.
+- **Why:** a table's last columns must be reachable, and its words whole.
+- **Evidence:** `test/table-wrapper.test.ts`, the table case in
+  `test/browser/scrollRegions.test.ts`, and `test/layout/tables.test.ts`
+  (a fixture site: scrolling on phones, whole words, the 30ch cap, a
+  narrow table spanning the column, keyboard scrolling, a table in a
+  callout, the edge shadows, and axe). Demo: https://claude.ai/artifact/UeSoSyzgiyiULm27QqsCGg;
+  as built: https://claude.ai/artifact/6LXMnaWEsJZ4RsQLJHJtYg.

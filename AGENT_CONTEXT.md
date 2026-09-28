@@ -1068,3 +1068,13 @@ approval before committing and starting the next.
   the sheet on a link. Headings got `scroll-margin-top`. Tests build a
   fixture site (`test/support/fixture-site.ts`, shared with images-build;
   `test/support/static-server.ts`, shared with site-layout).
+- Item 6 (table wrapper): `hastTableWrapperPlugin` wraps every `table`
+  (`ctx.wrapNode`), registered last in astro.config.ts. Table margins moved
+  to `.table-wrapper`; tables are `width: max-content; min-width: 100%`,
+  cells `max-width: 30ch` with `overflow-wrap: anywhere` (no ellipsis), and
+  code in cells wraps. Keyboard access reuses `scrollRegions.ts` (tab stop,
+  `role="group"`, "Table, scrollable" only while overflowing) instead of the
+  static `tabindex`/`role="region"` REWRITE.md first described. Edge
+  shadows (Lea Verou's local/scroll backgrounds, gray-950 covers; none in
+  callouts); the layout test samples pixels with the table hidden. Not
+  built: a sticky first column.

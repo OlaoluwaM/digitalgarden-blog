@@ -9,6 +9,7 @@ import { mkmdastWikilinksPlugin } from "./src/plugins/mdast/wikilinks.ts";
 import { mkmdastAdmonitionCalloutPlugin } from "./src/plugins/mdast/admonitions.ts";
 import { hastAdmonitionCalloutPlugin } from "./src/plugins/hast/callout.ts";
 import { hastLinkClassesPlugin } from "./src/plugins/hast/linkClasses.ts";
+import { hastTableWrapperPlugin } from "./src/plugins/hast/tableWrapper.ts";
 import { mkmdastDigitalGardenImagesPlugin } from "./src/plugins/mdast/images.ts";
 import { mdastMathRenderPlugin } from "./src/plugins/mdast/math.ts";
 import { mdastHighlightsPlugin } from "./src/plugins/mdast/highlights.ts";
@@ -69,7 +70,11 @@ export default defineConfig({
         // Last: it rewrites paragraph text the plugins above read.
         mdastHighlightsPlugin,
       ],
-      hastPlugins: [hastAdmonitionCalloutPlugin, hastLinkClassesPlugin],
+      hastPlugins: [
+        hastAdmonitionCalloutPlugin,
+        hastLinkClassesPlugin,
+        hastTableWrapperPlugin,
+      ],
     }),
     shikiConfig: {
       theme: "dark-plus",

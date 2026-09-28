@@ -26,7 +26,7 @@
        stylesheets can set the edges of their own content. Paragraphs, lists,
        tables, and headings: Obsidian's --p-spacing. Quotes: 16px. Rules:
        Obsidian's `hr { margin: 2rem 0 }`. */
-    :where(p, ul, ol, table, h1, h2, h3, h4, h5, h6) {
+    :where(p, ul, ol, .table-wrapper, h1, h2, h3, h4, h5, h6) {
       margin-block: --spacing(7);
     }
     :where(blockquote) {
@@ -43,7 +43,7 @@
       margin-block-start: 1.5em;
     }
     /* Obsidian's --heading-spacing: a heading after a block. */
-    :where(:is(p, pre, table, ul, ol) + :is(h1, h2, h3, h4, h5, h6)) {
+    :where(:is(p, pre, .table-wrapper, ul, ol) + :is(h1, h2, h3, h4, h5, h6)) {
       margin-block-start: 2em;
     }
     :where(:is(ul, ol) :is(ul, ol)) {
@@ -263,26 +263,61 @@
       border-top: 2px solid var(--color-gray-700);
     }
 
-    /* Tables: full width, 1px cell borders (transparent in the header),
-       top-aligned cells. Alignment from Markdown arrives as inline
-       text-align and overrides the start default. Cell text and column
-       width: Obsidian's --table-text-size and --table-column-min-width. */
+    /* Tables: at least full width, 1px cell borders (transparent in the
+       header), top-aligned cells. Alignment from Markdown arrives as inline
+       text-align and overrides the start default. Cell text and minimum
+       column width: Obsidian's --table-text-size and
+       --table-column-min-width.
+       A table wider than the column scrolls in its wrapper
+       (plugins/hast/tableWrapper.ts) instead of being squeezed, so it takes
+       its natural width and cells stop at 30ch, wrapping between words. A
+       word or code span breaks only when it alone is wider than that. Live
+       squeezed wide tables, breaking words mid-letter, and clipped the rest
+       on phones. */
+    /* Edge shadows show there is more table to scroll to (Lea Verou's
+       background-attachment technique). The page-colored covers scroll with
+       the table and hide a shadow at the table's own edge; the shadows stay
+       put at the wrapper's edges. The covers need the page's color, so a
+       table in a callout, on a tinted background, goes without. */
+    .table-wrapper {
+      overflow-x: auto;
+      background:
+        linear-gradient(to right, var(--color-gray-950) 30%, transparent) left /
+          --spacing(10) 100% no-repeat local,
+        linear-gradient(to left, var(--color-gray-950) 30%, transparent) right /
+          --spacing(10) 100% no-repeat local,
+        radial-gradient(
+            farthest-side at 0 50%,
+            --alpha(var(--color-black) / 75%),
+            transparent
+          )
+          left / --spacing(4) 100% no-repeat scroll,
+        radial-gradient(
+            farthest-side at 100% 50%,
+            --alpha(var(--color-black) / 75%),
+            transparent
+          )
+          right / --spacing(4) 100% no-repeat scroll;
+    }
+    .callout .table-wrapper {
+      background: none;
+    }
     table {
+      width: max-content;
       min-width: 100%;
       border-collapse: separate;
       border-spacing: 0;
       line-height: var(--leading-tight);
-      word-break: break-word;
     }
     :is(th, td) {
       min-width: 6ch;
+      max-width: 30ch;
       padding: --spacing(2);
-      overflow: hidden;
       border: 1px solid var(--color-gray-700);
       font-size: 0.933em;
       text-align: start;
-      text-overflow: ellipsis;
       white-space: break-spaces;
+      overflow-wrap: anywhere;
       vertical-align: top;
     }
     th {

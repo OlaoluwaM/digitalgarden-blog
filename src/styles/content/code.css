@@ -27,6 +27,12 @@
     box-decoration-break: clone;
   }
 
+  /* In a table cell, which stops at 30ch, a code span wraps instead of
+     running past the cell's edge. */
+  :is(.content, .preview-body) :is(th, td) code {
+    white-space: normal;
+  }
+
   /* Code blocks. The language label and copy button inherit the block's
      font. (Live left the `pre` on the browser's generic monospace, which is
      Courier on some systems; see docs/design-changes.md.) */

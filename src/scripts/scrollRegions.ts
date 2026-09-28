@@ -1,10 +1,12 @@
-// Content boxes that scroll sideways (callout bodies holding wide math) need
-// a tab stop, or keyboard users cannot scroll them (WCAG 2.1.1). Only boxes
+// Content boxes that scroll sideways (callout bodies holding wide math, and
+// the wrappers around wide tables) need a tab stop, or keyboard users cannot
+// scroll them (WCAG 2.1.1). Only boxes
 // that actually overflow get one, and overflow depends on the viewport, so a
 // ResizeObserver re-checks each box whenever its size changes, including
 // when a callout collapses and hides it.
-const SCROLL_REGION_SELECTOR = ".callout-content";
+const SCROLL_REGION_SELECTOR = ".callout-content, .table-wrapper";
 const FALLBACK_LABEL = "Scrollable content";
+const TABLE_LABEL = "Table, scrollable";
 
 // Boxes we're already watching, so running the setup twice is harmless.
 // Without this, we'd ask to watch the same box again.
@@ -46,6 +48,8 @@ function updateRegion(region: HTMLElement) {
 }
 
 function labelFor(region: HTMLElement) {
+  // A table scrolls in its own wrapper, even inside a callout.
+  if (region.classList.contains("table-wrapper")) return TABLE_LABEL;
   const title = region
     .closest(".callout")
     ?.querySelector(":scope > .callout-title .callout-title-inner")
