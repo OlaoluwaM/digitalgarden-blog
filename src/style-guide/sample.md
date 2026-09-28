@@ -1,7 +1,7 @@
 ## Heading 2
 
 Body text sets the reading rhythm. It has **bold**, _italic_, ~~struck~~,
-`inline code`, a [link to Home](/) and an
+`inline code`, ==highlighted text==, a [link to Home](/) and an
 [external link](https://docs.astro.build/).
 
 ### Heading 3

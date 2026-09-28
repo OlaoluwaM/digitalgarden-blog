@@ -11,6 +11,7 @@ import { hastAdmonitionCalloutPlugin } from "./src/plugins/hast/callout.ts";
 import { hastLinkClassesPlugin } from "./src/plugins/hast/linkClasses.ts";
 import { mkmdastDigitalGardenImagesPlugin } from "./src/plugins/mdast/images.ts";
 import { mdastMathRenderPlugin } from "./src/plugins/mdast/math.ts";
+import { mdastHighlightsPlugin } from "./src/plugins/mdast/highlights.ts";
 
 const mdastWikilinksPlugin = mkmdastWikilinksPlugin(wikilinkIndex);
 const mdastAdmonitionCalloutPlugin =
@@ -66,6 +67,8 @@ export default defineConfig({
         mdastAdmonitionCalloutPlugin,
         mdastMathRenderPlugin,
         mdastDigitalGardenImagesPlugin,
+        // Last: it rewrites paragraph text the plugins above read.
+        mdastHighlightsPlugin,
       ],
       hastPlugins: [hastAdmonitionCalloutPlugin, hastLinkClassesPlugin],
     }),
