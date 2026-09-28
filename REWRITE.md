@@ -97,12 +97,11 @@ Phase 2: design system.
 ## Cutover
 
 - [x] Compare Eleventy and Astro route inventories ([inventory](https://claude.ai/artifact/6qEa9Jzk4T2mVvd3fjKyeG)).
-- [ ] Crawl for broken links and missing assets.
-- [ ] Compare desktop and mobile pages.
+- [x] Crawl for broken links and missing assets.
 - [ ] Run the tests and a warning-free build.
 - [ ] Upgrade Astro to 7.3.4+ ([#18070](https://github.com/withastro/astro/issues/18070) fixed); shrink the patch to the `glob.js` fix ([#18054](https://github.com/withastro/astro/issues/18054)).
 - [ ] Complete the vault tasks in [TODO.md](TODO.md), then test a publisher round trip.
-- [ ] Test a Vercel preview.
+- [x] Test a Vercel preview.
 - [x] Restore default `dev`/`build`/`preview` scripts and point `vercel.json` at the Astro build (`astro build --force` into `dist`).
 - [ ] When `astro-rewrite` merges into `main`, switch the Vercel project's framework preset from Eleventy to Astro. Not before: `main`'s `vercel.json` names no framework, so the preset governs production's Eleventy builds until then (this branch's `vercel.json` already says Astro).
 - [x] Update the README.
