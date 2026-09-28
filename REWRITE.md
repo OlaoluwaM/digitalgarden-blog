@@ -96,20 +96,22 @@ Phase 2: design system.
 
 ## Cutover
 
-- [ ] Compare Eleventy and Astro route inventories.
+- [x] Compare Eleventy and Astro route inventories ([inventory](https://claude.ai/artifact/6qEa9Jzk4T2mVvd3fjKyeG)).
 - [ ] Crawl for broken links and missing assets.
 - [ ] Compare desktop and mobile pages.
 - [ ] Run the tests and a warning-free build.
 - [ ] Upgrade Astro to 7.3.4+ ([#18070](https://github.com/withastro/astro/issues/18070) fixed); shrink the patch to the `glob.js` fix ([#18054](https://github.com/withastro/astro/issues/18054)).
 - [ ] Complete the vault tasks in [TODO.md](TODO.md), then test a publisher round trip.
 - [ ] Test a Vercel preview.
-- [ ] Switch Vercel to Astro and restore working default build/start scripts; deploys build with `build:astro:prod` (`--force`, so plugin changes re-render every note).
-- [ ] Update the README and publishing instructions.
+- [x] Restore default `dev`/`build`/`preview` scripts and point `vercel.json` at the Astro build (`astro build --force` into `dist`).
+- [ ] Switch the Vercel project's framework preset from Eleventy to Astro (`vercel.json` already overrides it).
+- [x] Update the README.
+- [ ] Update the publishing instructions.
 - [ ] Document each Markdown plugin and the Eleventy behavior it replaces.
-- [ ] Remove Eleventy and migration-only code.
-- [ ] Delete `get-theme` and the `THEME` settings (ADR 0001).
-- [ ] Stop `sync-callouts` writing `callouts.scss`; compare `test/callout-icons.test.ts` against `callouts.css` instead of the Eleventy Sass.
-- [ ] Add `"type": "module"` to `package.json` to remove `MODULE_TYPELESS_PACKAGE_JSON` warnings.
+- [x] Remove Eleventy and migration-only code.
+- [x] Delete `get-theme` and the `THEME` settings (ADR 0001).
+- [x] Stop `sync-callouts` writing `callouts.scss`; check `test/callout-icons.test.ts` against a fixed table of Obsidian's built-in icons instead of the Eleventy Sass.
+- [x] Add `"type": "module"` to `package.json` to remove `MODULE_TYPELESS_PACKAGE_JSON` warnings.
 
 ## After Cutover
 

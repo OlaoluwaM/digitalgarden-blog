@@ -141,7 +141,7 @@ export default {
 }
 
 async function emittedImage(project: string, alt: string, page = "index.html") {
-  const html = await readFile(join(project, "dist-astro", page), "utf8");
+  const html = await readFile(join(project, "dist", page), "utf8");
   const images = parse(html).querySelectorAll("img");
   assert.equal(images.length, 1, html);
   const image = images[0]!;
@@ -155,7 +155,7 @@ async function emittedImage(project: string, alt: string, page = "index.html") {
     const pathname = new URL(url, "https://fixture.test").pathname;
     // Decode the browser URL once to locate the emitted file on disk.
     const bytes = await readFile(
-      join(project, "dist-astro", decodeURIComponent(pathname).slice(1))
+      join(project, "dist", decodeURIComponent(pathname).slice(1))
     );
     assert.ok(bytes.length > 0, `Empty image asset: ${url}`);
     return bytes;
@@ -194,7 +194,7 @@ it("preserves remote images without fetching them during the build", async t => 
   assert.equal(result.status, 0, result.output);
   assert.equal(imageRequests, 0, "The build must not download remote images");
   for (const page of ["index.html", "direct/index.html"]) {
-    const html = await readFile(join(project, "dist-astro", page), "utf8");
+    const html = await readFile(join(project, "dist", page), "utf8");
     const images = parse(html).querySelectorAll("img");
     assert.equal(images.length, 1, html);
     const image = images[0]!;
@@ -300,7 +300,7 @@ it("fails an Astro build when a note references a missing image", async t => {
   const baseline = await build(project);
   assert.equal(baseline.status, 0, baseline.output);
   assert.match(
-    await readFile(join(project, "dist-astro/index.html"), "utf8"),
+    await readFile(join(project, "dist/index.html"), "utf8"),
     /A note without an image\./
   );
 

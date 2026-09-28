@@ -14,7 +14,7 @@
  * either avoids `astro:content` entirely or substitutes it, this is that
  * same pattern: test the markup deterministically against a fixture, and
  * leave the real `getPublishedPosts()` + `buildFileTree()` wiring to
- * `npm run build:astro` (confirmed to render all 14 live posts correctly)
+ * `npm run build` (confirmed to render all 14 live posts correctly)
  * and to `test/file-tree.test.ts` (the tree builder's own unit tests).
  *
  * Why this level: the markup (classes, nesting, which note is marked

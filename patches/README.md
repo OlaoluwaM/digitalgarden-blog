@@ -4,7 +4,7 @@
 `postinstall`. Install development dependencies for this build project; they
 include `patch-package`. An unapplicable patch must fail the install.
 
-`dev:astro` and `build:astro` reapply the patches first (`patch-dependencies`),
+`npm run dev` and `npm run build` reapply the patches first (`patch-dependencies`),
 because npm 11 can skip `postinstall` scripts and silently drop a patch.
 Reapplying an applied patch is a no-op.
 
@@ -40,7 +40,7 @@ before the fix:
 
 ```sh
 npm run test:images-build
-npm run build:astro -- --force
+npm run build
 ```
 
 For upstream PRs, port these fixes separately to Astro's source and test suite:

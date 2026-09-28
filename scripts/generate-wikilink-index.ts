@@ -6,7 +6,7 @@
  *
  * Run `npm run generate:wikilink-index` from the repository root with Node 24.
  * The npm commands for Astro dev and build run this first through their
- * predev:astro and prebuild:astro hooks. This script runs once and exits;
+ * predev and prebuild hooks. This script runs once and exits;
  * it doesn't watch for later note changes. Rerun it when the index needs updating.
  *
  * Read notes from src/site/notes and write src/generated/wikilink-index.ts.

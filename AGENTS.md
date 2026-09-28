@@ -40,6 +40,7 @@ Olaolu is implementing the rewrite in Learn / Guide mode. Guide and review
 unless he asks for implementation. Documentation maintenance does not change
 that mode. Preserve his unfinished code and names when updating context.
 
-Keep Eleventy as the parity reference until cutover. Check the actual consumer
+The Eleventy code is gone; the live site, thunk.blog, is the parity reference
+until cutover. Check the actual consumer
 before sharing filtering, sorting, or date logic across routes. Preserve public
 URLs, publisher output, and the existing design unless a change is agreed.

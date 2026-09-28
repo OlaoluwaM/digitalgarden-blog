@@ -37,7 +37,6 @@ const styleGuide: AstroIntegration = {
 
 export default defineConfig({
   site: "https://thunk.blog",
-  outDir: "dist-astro",
   integrations: [
     styleGuide,
     // /sitemap-index.xml and /sitemap-0.xml; robots.txt names the index.

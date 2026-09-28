@@ -1,8 +1,13 @@
 # Thunks & Thoughts
 
-The source for [thunk.blog](https://thunk.blog) — a digital garden & blog built with [Eleventy 3.x](https://www.11ty.dev/) and the [Obsidian Digital Garden](https://github.com/oleeskild/Obsidian-Digital-Garden) plugin template.
+The source for [thunk.blog](https://thunk.blog), a digital garden and blog
+built with [Astro](https://astro.build) from notes in an Obsidian vault.
 
-Markdown notes from an Obsidian vault are compiled into a static site with wiki-links, callouts, graph visualization, and search.
+Notes are published from Obsidian with the
+[Digital Garden](https://github.com/oleeskild/Obsidian-Digital-Garden)
+plugin, which commits them to `src/site/notes/` and their images to
+`src/site/img/user/`. Astro renders them with wikilinks, callouts, math,
+highlighted code, and search.
 
 ## Setup
 
@@ -12,34 +17,63 @@ Requires **Node 24.x**.
 npm install
 ```
 
-## Development
+## Commands
 
 ```sh
-npm start          # dev server at localhost:8080 (Sass watch + Eleventy live reload)
+npm run dev       # dev server at localhost:4321
+npm run build     # production build → dist/
+npm run preview   # serve the build locally
+npm test          # typecheck, then every test suite
 ```
 
-## Build
+`dev` and `build` first apply the dependency patches in `patches/` and
+regenerate the wikilink index (`src/generated/wikilink-index.ts`). `build`
+re-renders every note (`--force`), because Astro's content cache does not
+notice changes to the Markdown plugins.
+
+Plugin changes during `npm run dev` need a restart with `npm run dev -- --force`.
+
+## Layout
+
+| Path                 | Holds                                                     |
+| -------------------- | --------------------------------------------------------- |
+| `src/site/notes/`    | Published notes (written by the Obsidian plugin)          |
+| `src/site/img/user/` | Note images (written by the Obsidian plugin)              |
+| `src/pages/`         | Routes: notes, Home, 404, `/random/`, feed, robots        |
+| `src/components/`    | Page chrome: navigation, search, note header, footer      |
+| `src/plugins/`       | Markdown plugins (wikilinks, callouts, highlights, …)     |
+| `src/styles/`        | Design tokens and styles ([README](src/styles/README.md)) |
+| `src/scripts/`       | Client scripts (search, file tree, copy buttons)          |
+| `scripts/`           | Wikilink index and callout sync                           |
+| `docs/`              | Architecture decisions and the design-change log          |
+
+The dev server also serves a style guide at `/style-guide/`.
+
+## Custom callouts
+
+Custom callout types (color and icon) come from the Obsidian vault:
 
 ```sh
-npm run build      # production build → dist/
+npm run sync-callouts
 ```
+
+It reads the Admonition plugin's settings and the enabled CSS snippets and
+writes `src/styles/content/callouts.css` and
+`src/plugins/hast/callout-icons.ts`. If a type cannot be resolved, it writes
+nothing and ends by listing the `--icon` or `--color` option that fixes it.
 
 ## Testing
 
 ```sh
-npm test                 # Node tests, then browser tests
-npm run test:unit        # Node tests only
-npm run test:browser     # Vitest Browser Mode in headless Chrome
-npm run test:copy-code   # copy-button browser tests
+npm run test:unit        # Node tests, including builds of the site
+npm run test:components  # Astro components (Vitest)
+npm run test:layout      # built pages in Chrome: layout, focus, axe
+npm run test:browser     # client scripts in Vitest Browser Mode
 ```
-
-Browser tests live in `test/browser/`. They use real DOM elements and browser
-interactions; clipboard failure cases use mocks, and one case copies to the
-real browser clipboard with permission granted by the test runner.
 
 For an existing Chrome/Chromium installation, copy `.env.browser.example` to
 `.env.browser.local` and set `AGENT_BROWSER_EXECUTABLE_PATH` to its absolute
-executable path. Both browser tools read this ignored, machine-local file.
+executable path. The browser tools read this ignored, machine-local file.
 Otherwise, install the browser for each tool:
 
 ```sh
@@ -51,15 +85,13 @@ npm run browser -- install
 
 Install the recommended **Vitest** extension (`vitest.explorer`). Workspace
 settings select `vitest.browser.config.mts` and load `.env.browser.local`, so
-the extension uses the same Chrome executable as the npm commands. Run the
-browser tests from the Testing sidebar or the buttons beside each test.
-The Node tests still run through `npm run test:unit`.
+the extension uses the same Chrome executable as the npm commands.
 
 ### Visual browser checks
 
-The project includes agent-browser and its Codex skill in
-`.agents/skills/agent-browser`. Start the Astro development server with
-`npm run dev:astro`, then use a session name unique to your task:
+The project includes agent-browser and its skill in
+`.agents/skills/agent-browser`. Start `npm run dev`, then use a session name
+unique to your task:
 
 ```sh
 npm run browser -- skills get core
@@ -70,20 +102,12 @@ npm run browser -- --session garden-review close
 ```
 
 Screenshots go in `.browser-artifacts/`; Vitest failure artifacts go in
-`.vitest/`. Both directories are ignored. Add `--headed` when opening a browser
-to see its window. These commands launch a separate browser session, not your
-personal Chrome profile.
-
-## Custom Callouts
-
-Custom admonition types (colors + icons) are synced from the Obsidian vault. Run the `/sync-callouts` Claude Code skill to regenerate `src/site/styles/user/callouts.scss` from the vault's admonition plugin config.
-
-Structural callout overrides (icon sizing, nested margins) live in `src/site/styles/user/callout-overrides.scss`.
+`.vitest/`. Both directories are ignored.
 
 ## Deployment
 
-Configured for both [Vercel](https://vercel.com) (`vercel.json`) and [Netlify](https://netlify.com) (`netlify.toml`). Output directory: `dist/`.
+Vercel builds the site with `npm run build` and serves `dist/`
+(`vercel.json`). Missing pages get `404.html`.
 
-## Reference
-
-See [INFO.md](./INFO.md) for CSS variable documentation and upstream template details.
+Do not merge the Digital Garden plugin's "Update template" pull requests:
+they would restore the Eleventy site this repository replaced.

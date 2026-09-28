@@ -6,8 +6,9 @@ Recheck source before relying on this snapshot.
 ## Scope and document ownership
 
 Olaolu is implementing in Learn / Guide mode. Preserve published content,
-public URLs, and the existing desktop/mobile design. Eleventy remains the
-reference until parity and cutover; Astro builds separately into `dist-astro`.
+public URLs, and the existing desktop/mobile design. The Eleventy code was
+removed on 2026-09-28; the live site (still the Eleventy build on `main`)
+is the parity reference until cutover. Astro builds into `dist`.
 Exception agreed on 2026-09-17: original `/img/user/*` URLs need not remain available.
 Vault publishing remains paused pending the tasks in [TODO.md](TODO.md).
 
@@ -749,10 +750,9 @@ Eleventy's markdown-it options. Olaolu put all resulting items in scope.
   config changes; the digest drops functions, so edits to remark/rehype
   plugins or Shiki transformers leave unchanged notes with stale HTML
   (reproduced with the code-block background). Vercel restores
-  `node_modules/**` between builds, so deploys use `build:astro:prod`
-  (`astro build --force`, via `build:astro` so its prebuild runs;
-  `test/build-scripts.test.ts`). Locally, run `npm run dev:astro -- --force`
-  after changing a plugin.
+  `node_modules/**` between builds, so `npm run build` is
+  `astro build --force` (`test/build-scripts.test.ts`). Locally, run
+  `npm run dev -- --force` after changing a plugin.
 
 ### Analytics (2026-09-26)
 
@@ -942,10 +942,11 @@ Posts integration checks on 2026-09-10:
   limits, empty input, and input preservation. These are not persisted tests.
 - `git diff --check`: passed. No separate TypeScript check was run.
 
-`vercel.json` still targets `dist` and invokes `npm run build` / `npm run start`.
-Neither script exists in `package.json`; explicit `build:eleventy`,
-`start:eleventy`, `build:astro`, and `dev:astro` scripts do. Reconcile defaults
-at cutover. Live Vercel settings were not inspected or changed.
+Since 2026-09-28 `vercel.json` sets the framework to Astro, builds with
+`npm run build`, and serves `dist`; it has no routes (Vercel serves
+`404.html`). The Vercel project's own framework preset still says Eleventy
+(read, not changed). Before this, previews of `astro-rewrite` failed on the
+missing `build` script.
 
 ## Deferred work
 
@@ -959,3 +960,20 @@ Keep these outside the migration checklist:
   2026-09-25; Speed Insights is done.)
 - Upstream Sätteri issues in [TODO.md](TODO.md), then removal of superseded
   local workarounds.
+
+## Eleventy removed (2026-09-28)
+
+- Deleted `.eleventy.js`, `src/site/_includes`, `_data`, `styles`, `fonts`,
+  the `.njk` routes, `get-theme.js`, `src/helpers/`, their three `.js`
+  tests, `plugin-info.json`, `.env`, the Eleventy npm scripts, and 28
+  Eleventy-only dependencies. `package.json` is `"type": "module"`.
+- Kept `src/site/notes/**/*.md` and `src/site/img/user/`: the Digital
+  Garden plugin publishes there (hard-coded paths) and Astro reads them.
+- Scripts are Astro's standard `dev`, `build` (`--force`), and `preview`,
+  with `predev`/`prebuild` applying patches and the wikilink index.
+- `test/callout-icons.test.ts` holds Obsidian's built-in icons as a fixed
+  table; `npm run sync-callouts` no longer writes Eleventy's Sass.
+- Never merge the Digital Garden plugin's "Update template" pull request:
+  it restores the Eleventy files.
+- Inventory of parity, deliberate changes, and what was left out:
+  https://claude.ai/artifact/6qEa9Jzk4T2mVvd3fjKyeG.

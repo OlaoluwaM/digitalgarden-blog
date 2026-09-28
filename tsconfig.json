@@ -6,7 +6,7 @@
     "src/**/*",
     "scripts/**/*.ts"
   ],
-  "exclude": ["dist", "dist-astro"],
+  "exclude": ["dist"],
   "compilerOptions": {
     "paths": { "@utils/*": ["./src/utils/*"] }
   }
