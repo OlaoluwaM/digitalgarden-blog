@@ -37,7 +37,8 @@ In the order they run (`src/plugins/mdast/`).
 | `images.ts`                                        | Resolves the publisher's `/img/user/…` URLs to files in `src/site/img/user/`, so Astro's image pipeline sizes and optimizes them (a missing image fails the build).                                                                                               | The `picture` transform (`@11ty/eleventy-img`, which ignored failures).                                                                   | `images-plugin.test.ts`, `images-build.test.ts`, `digital-garden-images.test.ts`      |
 | `diagrams.ts`                                      | Renders ` ```mermaid ` and ` ```plantuml ` fences to inline SVG through Kroki at build time; a failure fails the build ([ADR 0006](adrs/0006-render-mermaid-and-plantuml-at-build-time-through-kroki.md)).                                                        | Mermaid rendered in the browser (`<pre class="mermaid">` plus Mermaid's script) and `markdown-it-plantuml` (an image from plantuml.com).  | `diagrams.test.ts`, `kroki.test.ts`, `diagram-svg.test.ts`, `layout/diagrams.test.ts` |
 | `transclusions.ts` (`mdastEmbeddedHeadingsPlugin`) | Records which headings sit inside embeds, by position, so the table of contents leaves them out. Runs after every plugin that adds or removes headings.                                                                                                           | Nothing: Eleventy's table of contents (`eleventy-plugin-nesting-toc`) was off.                                                            | `transclusions.test.ts`, `table-of-contents.test.ts`                                  |
-| `highlights.ts`                                    | Renders `==text==` as `<mark>`. Last, because it rewrites paragraph text the plugins above read.                                                                                                                                                                  | `markdown-it-mark`.                                                                                                                       | `highlights.test.ts`                                                                  |
+| `highlights.ts`                                    | Renders `==text==` as `<mark>`. After the plugins above, because it rewrites paragraph text they read.                                                                                                                                                                  | `markdown-it-mark`.                                                                                                                       | `highlights.test.ts`                                                                  |
+| `softBreaks.ts` | Turns each single newline in a paragraph into a `<br>`, as Obsidian shows it; a callout's opening paragraph keeps the newline after its title, where the callout plugin splits it. Last, because it splits paragraph text the plugins above match across lines. | markdown-it's `breaks: true`. | `soft-breaks.test.ts` |
 
 ## hast plugins
 
@@ -72,9 +73,6 @@ These run inside the processor, around the plugins above.
 
 No published note used these when the Eleventy site was removed.
 
-- `breaks: true`: a single line break in a paragraph was a `<br>`. Sätteri
-  follows CommonMark (a space). The one note it affected needs a vault fix
-  ([TODO.md](../TODO.md)).
 - Body hashtags (`taggify`): `#tag` in the text became a tag-search link.
 - ` ```gist ` fences (GitHub gist scripts) and ` ```transclusion ` fences.
 - Obsidian Bases, Dataview output, canvases, and Excalidraw drawings.

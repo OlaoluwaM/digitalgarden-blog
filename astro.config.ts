@@ -18,6 +18,7 @@ import { hastTaskListLabelsPlugin } from "./src/plugins/hast/taskListLabels.ts";
 import { mkmdastDigitalGardenImagesPlugin } from "./src/plugins/mdast/images.ts";
 import { mdastMathRenderPlugin } from "./src/plugins/mdast/math.ts";
 import { mdastHighlightsPlugin } from "./src/plugins/mdast/highlights.ts";
+import { mdastSoftBreaksPlugin } from "./src/plugins/mdast/softBreaks.ts";
 import { mkmdastDiagramsPlugin } from "./src/plugins/mdast/diagrams.ts";
 import {
   mdastEmbeddedHeadingsPlugin,
@@ -88,8 +89,11 @@ export default defineConfig({
         mkmdastDiagramsPlugin(),
         // After every plugin that adds or removes headings.
         mdastEmbeddedHeadingsPlugin,
-        // Last: it rewrites paragraph text the plugins above read.
+        // After the plugins above: it rewrites paragraph text they read.
         mdastHighlightsPlugin,
+        // Last: it splits paragraph text at each newline, which would
+        // separate the text the plugins above match across lines.
+        mdastSoftBreaksPlugin,
       ],
       hastPlugins: [
         hastAdmonitionCalloutPlugin,
