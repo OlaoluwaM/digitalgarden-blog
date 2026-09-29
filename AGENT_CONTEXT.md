@@ -1187,4 +1187,16 @@ approval before committing and starting the next.
   "package" sub-list lost one tab per line and now nests. Drafts and
   `On Creating Content.md` untouched. Backup of the prior Outbox in the
   session scratchpad. Still to do: a publisher round trip.
+- Item 12 (performance review, one Sonnet 5 subagent, read-only; report
+  checked against the repo): LCP is always a paragraph (0.7–1.0 s on a
+  throttled phone, local), TBT 0 except the Maths note, one shared
+  stylesheet (9 KB br) and one bundle (4 KB br); search loads lazily.
+  Olaolu had two fixes made: `vercel.json` caches `/_astro/*` as
+  `public, max-age=31536000, immutable` (not `/fonts/*`: unhashed names),
+  and MathJax uses `fontCache: "local"` (314 KB → 256 KB, screenshots
+  identical at 390/1440; glyph IDs `MJX-<n>-…` come from one renderer's
+  counter, so they're unique per build; `local` doesn't share glyphs
+  across expressions). Deferred to TODO.md: CLS 0.13–0.14 on Home and the
+  image post (root cause unknown), the Commit Mono weight for the Ctrl K
+  hint, and the Maths note's 500/600 weights.
 

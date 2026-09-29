@@ -61,6 +61,25 @@ describe("vercel.json", () => {
     );
   });
 
+  // Why: Astro names everything under /_astro/ by a hash of its content,
+  // so a file there never changes; browsers may keep it a year without
+  // asking the server again. Vercel otherwise has them revalidate on every
+  // page. Nothing else is cached this way: fonts, the search index, and
+  // the feed keep their names when their content changes.
+  it("caches only Astro's hashed assets as immutable", () => {
+    assert.deepEqual(vercel.headers, [
+      {
+        source: "/_astro/(.*)",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+    ]);
+  });
+
   // Why: the Eleventy-era catch-all sent every missing URL to `/404`, the
   // folder Eleventy built. Astro builds `404.html`, which Vercel serves for
   // missing URLs by itself.

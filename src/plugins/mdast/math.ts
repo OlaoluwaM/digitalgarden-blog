@@ -30,12 +30,19 @@ export const mdastMathRenderPlugin = defineMdastPlugin({
   },
 });
 
-// Mirrors markdown-it-mathjax3, which Eleventy uses: TeX with every package,
-// self-contained SVG glyphs, and assistive MathML for screen readers.
+// Mirrors markdown-it-mathjax3, which Eleventy uses: TeX with every package
+// and assistive MathML for screen readers. Unlike Eleventy (`fontCache:
+// "none"`, every glyph drawn out in full each time it appears), each
+// expression draws a glyph once in its own <defs> and reuses it, which
+// took the Maths note's page from 314 KB to 256 KB with no visible
+// change. Each SVG still holds every
+// glyph it uses, so it renders alone (in the feed, or embedded in another
+// note). The glyph IDs (`MJX-<n>-…`) come from a counter on this one
+// renderer, so no two expressions in a build share one.
 const documentOptions = {
   InputJax: new TeX({ packages: AllPackages }),
   OutputJax: new SVG<LiteElement, LiteText, LiteDocument>({
-    fontCache: "none",
+    fontCache: "local",
   }),
 };
 

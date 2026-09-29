@@ -19,6 +19,11 @@ Astro implementation: [REWRITE.md](REWRITE.md).
 - [ ] Add a "collapse all folders" button to the file tree once the vault has more than one folder ([mockups](https://claude.ai/artifact/VnPJxBcZ2LEPgo6ZtNjpD8); leaning toward a square button beside the search button).
 - [ ] Keep one `<h1>` per page: the navbar and sidebar site names are `<h1>`s too (inherited from live), so heading navigation meets the site name twice before the note title.
 
+## Performance (from the 2026-09-29 review)
+
+- [ ] Find the layout shift on Home and on posts with an image (CLS 0.13–0.14 at 1440px, just after first paint). Not fonts or the client scripts; the file tree's scrolling list is among the shifted elements. Needs a DevTools layout-shift trace.
+- [ ] Decide whether the search button's "Ctrl K" hint needs Commit Mono: it loads the 47 KB font on every page. Also find what makes the Maths note load the 500 and 600 weights.
+
 ## Deferred upstream PRs
 
 - [ ] Astro: upstream the Markdown rendering error fix and regression tests from the [local patch](patches/astro+7.3.5.patch) ([#18054](https://github.com/withastro/astro/issues/18054)).

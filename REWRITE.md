@@ -15,7 +15,7 @@ In this order.
 9. [x] Style the publisher's transclusions as source cards (design B in the [designs](https://claude.ai/artifact/6Uq4RNhfRueyUJSmAB2r8P): a bordered card with a "From *note title*" header and the link icon on the right); turn the embed title into a label so each page keeps one `h1`; test wikilinks and heading IDs inside embeds.
 10. [x] Add a GitHub Actions workflow that runs `npm test` and the build on pull requests and on pushes to `main`. First GitHub run pending: it needs the branch pushed and a pull request into `main`.
 11. [x] Update the publishing instructions. Include: embed only published notes (the publisher inlines an unpublished note's text).
-12. [ ] Perf review with subagent
+12. [x] Perf review with subagent. Done: immutable caching for `/_astro/*`, MathJax glyph reuse. Deferred in [TODO.md](TODO.md): layout shift on Home, the keyboard-hint font.
 13. [ ] The rest of the cutover, in this order:
     - [x] Document each Markdown plugin and the Eleventy behavior it replaces ([pipeline](docs/markdown-pipeline.md)).
     - [x] Run the tests and a warning-free build. The one warning left, `data store cleared (force)`, is expected: `build` passes `--force` on purpose.

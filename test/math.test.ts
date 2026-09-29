@@ -69,15 +69,28 @@ describe("inline math", () => {
   });
 
   it("keeps each expression self-contained", async () => {
-    // Eleventy uses fontCache: 'none'; shared glyph <defs> would break when
-    // expressions are copied into the feed or rendered in isolation.
-    const document = await render("$x$ and $x^2$");
+    // Why: an expression is copied into the feed and into notes that embed
+    // this one, so every glyph it reuses must be defined in its own SVG,
+    // not in another expression's. Glyph IDs must also be unique on the
+    // page, or a reference could reach another expression's glyph.
+    const document = await render("$x$ and $x^2$ and $x$");
     const containers = mathContainers(document);
-    assert.equal(containers.length, 2);
+    assert.equal(containers.length, 3);
+    const ids: string[] = [];
     for (const container of containers) {
-      assert.equal(container.querySelector("use"), null);
-      assert.equal(container.querySelector("defs"), null);
+      const defined = container
+        .querySelectorAll("defs [id]")
+        .map(glyph => glyph.id);
+      const used = container
+        .querySelectorAll("use")
+        .map(use => use.getAttribute("xlink:href") ?? use.getAttribute("href"));
+      assert.ok(used.length > 0, "Expected reused glyphs");
+      for (const reference of used) {
+        assert.ok(defined.includes(reference?.slice(1) ?? ""), reference);
+      }
+      ids.push(...defined);
     }
+    assert.equal(new Set(ids).size, ids.length, ids.join(", "));
   });
 
   it("keeps surrounding prose and punctuation", async () => {
