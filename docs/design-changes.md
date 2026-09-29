@@ -984,3 +984,23 @@ https://claude.ai/artifact/AezzrntfR1ZLK4WXrF4x9n.
   and what reaches `getImage()`) and `test/images-build.test.ts` (a
   400 x 200 image comes out 300 x 150 for `|300` and 300 x 100 for
   `|300x100`, with the alt text `photo.png`).
+
+## 2026-09-29: Excalidraw drawings scroll like diagrams
+
+- **Change:** an Excalidraw drawing embedded in a note, which the Digital
+  Garden publisher inlines as SVG, becomes the same figure as a Mermaid or
+  PlantUML diagram (`plugins/mdast/excalidraw.ts`). It shrinks to fit the
+  note column but not below 70% of its drawn width; past that it scrolls
+  sideways with the edge fade, a tab stop, and the name "Excalidraw
+  drawing, scrollable". The SVG itself is named "Excalidraw drawing", and
+  its ids get a per-drawing prefix. An embed size (`|500`, `|50%`) sets
+  the drawn width; a height is dropped so the drawing keeps its
+  proportions. Eleventy passed the publisher's markup through unchanged;
+  with the SVG export the publisher now uses, a drawing shrank to fit
+  without limit and had no name. No published note has a drawing.
+- **Why:** on a phone a wide drawing's text became too small to read, and
+  screen readers met an unnamed graphic.
+- **Evidence:** `test/excalidraw.test.ts` (the figure, the name, embed
+  sizes, distinct ids) and `test/layout/excalidraw.test.ts` (a 900px
+  drawing fits at 1440px and scrolls at 70% on a phone, with a tab stop,
+  a name, the edge fade, and axe).

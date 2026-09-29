@@ -21,6 +21,7 @@ import { mdastMathRenderPlugin } from "./src/plugins/mdast/math.ts";
 import { mdastHighlightsPlugin } from "./src/plugins/mdast/highlights.ts";
 import { mdastSoftBreaksPlugin } from "./src/plugins/mdast/softBreaks.ts";
 import { mkmdastDiagramsPlugin } from "./src/plugins/mdast/diagrams.ts";
+import { mdastExcalidrawPlugin } from "./src/plugins/mdast/excalidraw.ts";
 import {
   mdastEmbeddedHeadingsPlugin,
   mkmdastTransclusionsPlugin,
@@ -88,6 +89,8 @@ export default defineConfig({
         mdastDigitalGardenImagesPlugin,
         // After the callout plugin, so diagrams inside callouts render.
         mkmdastDiagramsPlugin(),
+        // Excalidraw drawings become the same figure as diagrams.
+        mdastExcalidrawPlugin,
         // After every plugin that adds or removes headings.
         mdastEmbeddedHeadingsPlugin,
         // After the plugins above: it rewrites paragraph text they read.
