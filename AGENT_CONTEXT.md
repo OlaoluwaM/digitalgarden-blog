@@ -1084,9 +1084,13 @@ approval before committing and starting the next.
   cells `max-width: 30ch` with `overflow-wrap: anywhere` (no ellipsis), and
   code in cells wraps. Keyboard access reuses `scrollRegions.ts` (tab stop,
   `role="group"`, "Table, scrollable" only while overflowing) instead of the
-  static `tabindex`/`role="region"` the checklist first described. Edge
-  shadows (Lea Verou's local/scroll backgrounds, gray-950 covers; none in
-  callouts); the layout test samples pixels with the table hidden. Not
+  static `tabindex`/`role="region"` the checklist first described. The
+  scroll cue is the diagrams' edge fade, shared with `.diagram` in one rule
+  outside the content `@scope` (keyframes `edge-fade`); it works in
+  callouts. It replaced Lea Verou's local/scroll background shadows, whose
+  page-colored covers left callout tables without a cue (2026-09-29,
+  option B of https://claude.ai/artifact/FYAFygCTsY73vj3fLZX5hh). Layout
+  tests read `--fade-start`/`--fade-end`, as the diagram test does. Not
   built: a sticky first column.
 - Item 7 (task-list labels): `hastTaskListLabelsPlugin` (registered last)
   visits `li` and `p`; when the first child is the checkbox, it wraps the
@@ -1103,7 +1107,7 @@ approval before committing and starting the next.
   `--diagram-width`; CSS shrinks to ≥70% then scrolls; scrollRegions covers
   `.diagram`. Scrolling diagrams get an edge-fade mask moved by a
   scroll-driven animation (`@property --fade-start/--fade-end`, keyframes
-  `diagram-edge-fade`), off on `:focus-visible`. Write its animation as
+  `edge-fade`, shared with table wrappers), off on `:focus-visible`. Write its animation as
   longhands: Lightning CSS folds `animation` + `animation-timeline` into a
   shorthand browsers reject. The content @scope stops at `.diagram` (Mermaid labels are
   HTML `<p>`). Tests use test/support/fake-kroki.ts with real Kroki SVGs in

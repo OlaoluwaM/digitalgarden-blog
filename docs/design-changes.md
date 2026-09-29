@@ -839,9 +839,12 @@ https://claude.ai/artifact/AezzrntfR1ZLK4WXrF4x9n.
   column's), cells stop at 30ch and wrap between words, and code in a cell
   wraps too. While a wrapper overflows, `scripts/scrollRegions.ts` gives it a
   tab stop, `role="group"`, and the name "Table, scrollable", as it already
-  did for callout bodies. Edge shadows show where there is more table to
-  scroll to, and fade out at the table's own edges (not in callouts, whose
-  tinted background the technique can't match). Live squeezed wide tables into the column
+  did for callout bodies. The wrapper fades out at the edge with more table
+  to scroll to, and the fade clears at the table's own edges: the diagrams'
+  edge fade, a mask moved by a scroll-driven animation, so it shows in
+  callouts too (Firefox shows no fade). Edge shadows came first; their
+  page-colored covers left tables in callouts without a cue
+  (https://claude.ai/artifact/FYAFygCTsY73vj3fLZX5hh). Live squeezed wide tables into the column
   (`word-break: break-word`, breaking words mid-letter), clipped cell text
   with an ellipsis, and on phones cut off the last columns with no way to
   scroll to them. No published note has a table yet.
@@ -850,7 +853,8 @@ https://claude.ai/artifact/AezzrntfR1ZLK4WXrF4x9n.
   `test/browser/scrollRegions.test.ts`, and `test/layout/tables.test.ts`
   (a fixture site: scrolling on phones, whole words, the 30ch cap, a
   narrow table spanning the column, keyboard scrolling, a table in a
-  callout, the edge shadows, and axe). Demo: https://claude.ai/artifact/UeSoSyzgiyiULm27QqsCGg;
+  callout, the edge fade in a note and in a callout, the fade stepping
+  aside for the focus ring, and axe). Demo: https://claude.ai/artifact/UeSoSyzgiyiULm27QqsCGg;
   as built: https://claude.ai/artifact/6LXMnaWEsJZ4RsQLJHJtYg.
 
 ## 2026-09-28: Task-list checkboxes have labels

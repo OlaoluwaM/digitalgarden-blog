@@ -280,33 +280,10 @@
        word or code span breaks only when it alone is wider than that. Live
        squeezed wide tables, breaking words mid-letter, and clipped the rest
        on phones. */
-    /* Edge shadows show there is more table to scroll to (Lea Verou's
-       background-attachment technique). The page-colored covers scroll with
-       the table and hide a shadow at the table's own edge; the shadows stay
-       put at the wrapper's edges. The covers need the page's color, so a
-       table in a callout, on a tinted background, goes without. */
+    /* A wrapper that scrolls fades out at the edge with more table to
+       scroll to: the edge fade below, shared with diagrams. */
     .table-wrapper {
       overflow-x: auto;
-      background:
-        linear-gradient(to right, var(--color-gray-950) 30%, transparent) left /
-          --spacing(10) 100% no-repeat local,
-        linear-gradient(to left, var(--color-gray-950) 30%, transparent) right /
-          --spacing(10) 100% no-repeat local,
-        radial-gradient(
-            farthest-side at 0 50%,
-            --alpha(var(--color-black) / 75%),
-            transparent
-          )
-          left / --spacing(4) 100% no-repeat scroll,
-        radial-gradient(
-            farthest-side at 100% 50%,
-            --alpha(var(--color-black) / 75%),
-            transparent
-          )
-          right / --spacing(4) 100% no-repeat scroll;
-    }
-    .callout .table-wrapper {
-      background: none;
     }
     table {
       width: max-content;
@@ -376,8 +353,8 @@
     }
   }
 
-  /* The diagram edge fades' widths over the scroll (see below). */
-  @keyframes diagram-edge-fade {
+  /* The edge fades' widths over the scroll (see below). */
+  @keyframes edge-fade {
     from {
       --fade-start: 0;
       --fade-end: --spacing(10);
@@ -415,14 +392,18 @@
       height: auto;
       margin-inline: auto;
     }
+  }
 
-    /* A diagram that scrolls fades out at the edge with more to scroll to,
-       and the fade clears at each end. It is drawn over the diagram: the
-       tables' edge shadow sits behind content, where a diagram's filled
-       shapes hide it. A scroll-driven animation moves each fade with the
-       scroll position; one that doesn't scroll has no active timeline, so
-       nothing fades. Browsers without scroll-driven animations (Firefox)
-       show no fade. */
+  /* A table or diagram that scrolls fades out at the edge with more to
+     scroll to, and the fade clears at each end. The fade is a mask, so it
+     shows on any background (a table in a tinted callout) and over a
+     diagram's filled shapes. A scroll-driven animation moves each fade with
+     the scroll position; a box that doesn't scroll has no active timeline,
+     so nothing fades. Browsers without scroll-driven animations (Firefox)
+     show no fade. Outside the scope above, which stops at diagrams. */
+  .markdown-rendered
+    :is(main.content, .preview-body)
+    :is(.table-wrapper, .diagram) {
     @supports (animation-timeline: scroll()) {
       mask-image: linear-gradient(
         to right,
@@ -433,12 +414,12 @@
       );
       /* Longhands: the minifier folds `animation` and the timeline into one
          shorthand, which browsers reject. */
-      animation-name: diagram-edge-fade;
+      animation-name: edge-fade;
       animation-timing-function: linear;
       animation-fill-mode: both;
       animation-timeline: scroll(self inline);
 
-      /* The mask would clip the focus ring drawn around the figure. */
+      /* The mask would clip the focus ring drawn around the box. */
       &:focus-visible {
         mask-image: none;
       }
@@ -446,8 +427,8 @@
   }
 }
 
-/* The diagram edge fades' widths, animated with the scroll position
-   (the `diagram-edge-fade` keyframes above). `@property` sits outside
+/* The edge fades' widths, animated with the scroll position
+   (the `edge-fade` keyframes above). `@property` sits outside
    layers. */
 @property --fade-start {
   syntax: "<length>";

@@ -13,7 +13,6 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { after, before, describe, it } from "node:test";
 import { chromium, type Browser, type Page } from "playwright";
-import sharp from "sharp";
 import {
   buildFixture,
   createFixtureProject,
@@ -92,22 +91,20 @@ async function withPage<T>(
   }
 }
 
-/** Where an element sits in the viewport, in CSS pixels. */
-async function rect(page: Page, selector: string) {
-  return page.$eval(selector, element => {
-    const { top, right, bottom, left } = element.getBoundingClientRect();
-    return { top, right, bottom, left };
+/** A wrapper's edge fade widths: [start, end]. */
+async function fades(page: Page, selector: string) {
+  return page.$eval(selector, wrapper => {
+    const style = getComputedStyle(wrapper);
+    return [
+      style.getPropertyValue("--fade-start"),
+      style.getPropertyValue("--fade-end"),
+    ];
   });
-}
-
-/** The mean of a one-pixel PNG's color channels, 0 to 255. */
-async function brightness(png: Buffer) {
-  const { data } = await sharp(png).raw().toBuffer({ resolveWithObject: true });
-  return (data[0]! + data[1]! + data[2]!) / 3;
 }
 
 const WIDE_WRAPPER = "main.content > .table-wrapper:nth-of-type(1)";
 const NARROW_WRAPPER = "main.content > .table-wrapper:nth-of-type(2)";
+const CALLOUT_WRAPPER = ".callout .table-wrapper";
 
 describe("tables", () => {
   // Why: on phones a wide table used to run past the screen's edge, where
@@ -242,36 +239,57 @@ describe("tables", () => {
   });
 
   // Why: a wrapper that scrolls needs a cue that the table continues, since
-  // scrollbars are hidden on phones and macOS. Edge shadows fade in where
-  // there is more to scroll to and out at the table's own edges.
-  it("shows a shadow only at an edge with more table beyond it", async () => {
+  // scrollbars are hidden on phones and macOS. The edge with more table
+  // beyond it fades out, and the fade clears at each end; a table that fits
+  // doesn't fade. (A scroll-driven animation moves the fades; Firefox,
+  // without one, shows none.)
+  it("fades the edge of a scrolling table that has more beyond it", async () => {
     await withPage(390, async page => {
-      // Hide the table's text and borders, keeping its size, so only the
-      // wrapper's background is sampled.
-      await page.addStyleTag({
-        content: `${WIDE_WRAPPER} table { visibility: hidden; }`,
-      });
-      const edge = async (side: "left" | "right") => {
-        const box = await rect(page, WIDE_WRAPPER);
-        const x = side === "left" ? box.left + 2 : box.right - 3;
-        // The shadows are strongest at the wrapper's vertical middle.
-        const y = Math.round((box.top + box.bottom) / 2);
-        const image = await page.screenshot({
-          clip: { x, y, width: 1, height: 1 },
-        });
-        return brightness(image);
-      };
-      const atStart = { left: await edge("left"), right: await edge("right") };
+      assert.deepEqual(await fades(page, WIDE_WRAPPER), ["0px", "40px"]);
       await page.$eval(WIDE_WRAPPER, wrapper => {
         wrapper.scrollLeft = wrapper.scrollWidth;
       });
-      const atEnd = { left: await edge("left"), right: await edge("right") };
-      // Darker than the page (#1e1e1e, 30) means a shadow.
-      assert.ok(
-        atStart.right < 25 && atStart.left >= 29,
-        JSON.stringify(atStart)
+      await page.waitForFunction(
+        selector =>
+          getComputedStyle(document.querySelector(selector)!).getPropertyValue(
+            "--fade-end"
+          ) === "0px",
+        WIDE_WRAPPER
       );
-      assert.ok(atEnd.left < 25 && atEnd.right >= 29, JSON.stringify(atEnd));
+      assert.deepEqual(await fades(page, WIDE_WRAPPER), ["40px", "0px"]);
+      assert.deepEqual(await fades(page, NARROW_WRAPPER), ["0px", "0px"]);
+    });
+  });
+
+  // Why: the shadows this fade replaced were drawn with page-colored covers,
+  // so a table on a callout's tinted background had no cue. The fade is a
+  // mask and doesn't depend on the background.
+  it("fades a scrolling table in a callout too", async () => {
+    await withPage(390, async page => {
+      assert.deepEqual(await fades(page, CALLOUT_WRAPPER), ["0px", "40px"]);
+    });
+  });
+
+  // Why: the fade is a mask, and a mask also clips the focus ring drawn
+  // around the wrapper. While a keyboard user has the table focused, the
+  // fade steps aside so the ring shows in full.
+  it("drops the fade while the table has keyboard focus", async () => {
+    await withPage(390, async page => {
+      const mask = () =>
+        page.$eval(
+          WIDE_WRAPPER,
+          wrapper => getComputedStyle(wrapper).maskImage
+        );
+      assert.notEqual(await mask(), "none");
+      await page.focus(WIDE_WRAPPER);
+      await page.keyboard.press("ArrowRight");
+      assert.equal(
+        await page.$eval(WIDE_WRAPPER, wrapper =>
+          wrapper.matches(":focus-visible")
+        ),
+        true
+      );
+      assert.equal(await mask(), "none");
     });
   });
 

@@ -161,8 +161,8 @@ describe("diagrams", () => {
     });
   });
 
-  // Why: a diagram that scrolls needs a cue that it continues, and the
-  // tables' edge shadow hides behind a diagram's filled shapes. Instead the
+  // Why: a diagram that scrolls needs a cue that it continues, and an edge
+  // shadow drawn behind it would hide under its filled shapes. Instead the
   // edge with more to scroll to fades out, over the shapes, and clears at
   // each end; a diagram that fits doesn't fade. (A scroll-driven animation
   // moves the fades; Firefox, without one, shows none.)
