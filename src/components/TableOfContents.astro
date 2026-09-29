@@ -19,76 +19,74 @@ const { entries } = Astro.props;
 const sections = `${entries.length} ${entries.length === 1 ? "section" : "sections"}`;
 ---
 
-{
-  entries.length > 0 && (
-    <>
-      <div class="toc-rail print:hidden">
-        <nav aria-label="On this page">
-          <p class="toc-label">On this page</p>
-          <ul class="toc-list">
-            {entries.map(entry => (
-              <li>
-                <a href={`#${entry.slug}`} data-depth={entry.depth}>
-                  {entry.text}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
-      </div>
+{entries.length > 0 && (
+  <>
+    <div class="toc-rail print:hidden">
+      <nav aria-label="On this page">
+        <p class="toc-label">On this page</p>
+        <ul class="toc-list">
+          {entries.map(entry => (
+            <li>
+              <a href={`#${entry.slug}`} data-depth={entry.depth}>
+                {entry.text}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </div>
 
-      <details class="toc-inline print:hidden">
-        <summary>
-          <Icon name="text-align-start" class="toc-icon" />
-          Contents <span class="toc-count">· {sections}</span>
-          <Icon name="chevron-down" class="toc-chevron" />
-        </summary>
-        <nav aria-label="Contents">
-          <ul class="toc-list">
-            {entries.map(entry => (
-              <li>
-                <a href={`#${entry.slug}`} data-depth={entry.depth}>
-                  {entry.text}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
-      </details>
-
-      <button
-        type="button"
-        class="toc-button print:hidden"
-        popovertarget="toc-sheet"
-      >
+    <details class="toc-inline print:hidden">
+      <summary>
         <Icon name="text-align-start" class="toc-icon" />
-        Contents
-      </button>
-      <div id="toc-sheet" popover="auto" class="toc-sheet print:hidden">
-        <div class="toc-sheet-header">
-          <p class="toc-label">On this page</p>
-          <button
-            type="button"
-            class="toc-close"
-            popovertarget="toc-sheet"
-            popovertargetaction="hide"
-            aria-label="Close contents"
-          >
-            <Icon name="x" />
-          </button>
-        </div>
-        <nav aria-label="On this page">
-          <ul class="toc-list">
-            {entries.map(entry => (
-              <li>
-                <a href={`#${entry.slug}`} data-depth={entry.depth}>
-                  {entry.text}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
+        Contents <span class="toc-count">· {sections}</span>
+        <Icon name="chevron-down" class="toc-chevron" />
+      </summary>
+      <nav aria-label="Contents">
+        <ul class="toc-list">
+          {entries.map(entry => (
+            <li>
+              <a href={`#${entry.slug}`} data-depth={entry.depth}>
+                {entry.text}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </details>
+
+    <button
+      type="button"
+      class="toc-button print:hidden"
+      popovertarget="toc-sheet"
+    >
+      <Icon name="text-align-start" class="toc-icon" />
+      Contents
+    </button>
+    <div id="toc-sheet" popover="auto" class="toc-sheet print:hidden">
+      <div class="toc-sheet-header">
+        <p class="toc-label">On this page</p>
+        <button
+          type="button"
+          class="toc-close"
+          popovertarget="toc-sheet"
+          popovertargetaction="hide"
+          aria-label="Close contents"
+        >
+          <Icon name="x" />
+        </button>
       </div>
-    </>
-  )
-}
+      <nav aria-label="On this page">
+        <ul class="toc-list">
+          {entries.map(entry => (
+            <li>
+              <a href={`#${entry.slug}`} data-depth={entry.depth}>
+                {entry.text}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </div>
+  </>
+)}

@@ -58,9 +58,7 @@ const { tree, activePathname } = Astro.props;
   aria-label="Site"
   class="navbar fixed inset-x-0 top-0 z-3 flex w-full items-center justify-between bg-gray-800 px-8 py-1.5 lg:hidden print:hidden"
 >
-  <div
-    class="navbar-inner flex grow cursor-pointer items-center gap-8 max-md:gap-2"
-  >
+  <div class="navbar-inner flex grow cursor-pointer items-center gap-8 max-md:gap-2">
     <button
       type="button"
       class="hamburger-btn flex h-8 cursor-pointer appearance-none items-center justify-center rounded-full border-none bg-transparent p-0 text-inherit transition-all duration-300 ease-overshoot select-none motion-reduce:transition-none"
@@ -77,13 +75,9 @@ const { tree, activePathname } = Astro.props;
       style="text-decoration:none"
       class="grow text-left text-gray-200 hover:text-gray-100"
     >
-      {
-        /* The site name is not a heading: each page's one h1 is its own
-           title. It keeps the look it had as an h1 on the live site. */
-      }
-      <span
-        class="site-name-header m-0 block font-serif text-[2rem] leading-none font-normal text-pretty text-inherit max-md:text-2xl"
-      >
+      {/* The site name is not a heading: each page's one h1 is its own
+           title. It keeps the look it had as an h1 on the live site. */}
+      <span class="site-name-header m-0 block font-serif text-[2rem] leading-none font-normal text-pretty text-inherit max-md:text-2xl">
         {site.name}
       </span>
     </a>
@@ -105,23 +99,15 @@ const { tree, activePathname } = Astro.props;
       style="text-decoration:none"
       class="text-gray-200 hover:text-gray-100"
     >
-      <span
-        class="mx-auto my-7 block w-site-name shrink-0 text-center font-serif text-[2rem] leading-[1.1] font-normal text-pretty text-inherit"
-      >
+      <span class="mx-auto my-7 block w-site-name shrink-0 text-center font-serif text-[2rem] leading-[1.1] font-normal text-pretty text-inherit">
         {site.name}
       </span>
     </a>
     <NavSearchButton placement="sidebar" />
     <div class="folder flex-1 overflow-auto [scrollbar-width:thin]">
-      {
-        tree.map(node => (
-          <FileTreeEntry
-            node={node}
-            depth={0}
-            activePathname={activePathname}
-          />
-        ))
-      }
+      {tree.map(node => (
+        <FileTreeEntry node={node} depth={0} activePathname={activePathname} />
+      ))}
     </div>
   </nav>
 </div>
