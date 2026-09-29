@@ -950,3 +950,17 @@ https://claude.ai/artifact/AezzrntfR1ZLK4WXrF4x9n.
   post is built, `noindex`, and in none of the listings; fails with the
   old `dg-hide` key).
 
+## 2026-09-29: The site name is no longer a heading
+
+- **Change:** the site name in the navbar and in the file-tree sidebar is
+  plain text inside its home link, not an `<h1>`; each page's one `<h1>`
+  is its own title (a note's title, Home's `# Welcome`, the 404 message).
+  It looks the same: its size, line height, and margins come from its
+  classes.
+- **Why:** live had three `<h1>`s per page, so heading navigation met the
+  site name twice before the title.
+- **Evidence:** `test/layout/site-layout.test.ts` (one `h1` per page at
+  390px and 1440px) and `test/components/site-navigation.test.ts`;
+  screenshots of Home, a post, and the 404 page at 390, 900, and 1440px,
+  and the phone file tree, are pixel-identical before and after.
+

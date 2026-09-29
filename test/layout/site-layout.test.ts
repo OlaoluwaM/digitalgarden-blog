@@ -1023,6 +1023,30 @@ describe("links", () => {
 });
 
 describe("site name and file tree", () => {
+  // Why: heading navigation starts at the page's own title. The site name
+  // was an h1 in both the navbar and the sidebar (inherited from live), so
+  // a screen reader met it twice before the title; it is now plain text in
+  // the home links.
+  it("has one h1 per page: its own title", async () => {
+    for (const [path, title] of [
+      ["/", "Welcome"],
+      ["/posts/be-deliberate/", "Be deliberate"],
+      ["/404.html", "There is nothing here"],
+    ] as const) {
+      for (const width of [390, 1440]) {
+        await withPage(width, async page => {
+          await page.goto(origin + path, { waitUntil: "load" });
+          const headings = await page.locator("h1").allTextContents();
+          assert.deepEqual(
+            headings.map(text => text.trim()),
+            [title],
+            `${path} at ${width}px`
+          );
+        });
+      }
+    }
+  });
+
   // Why: the site name is the brand mark, kept at live's 2rem with live's
   // 1.1 line height and no tracking, between the heading steps (3xl is
   // 30.7px). As the 3xl step it read smaller and tighter than live.
@@ -1038,7 +1062,7 @@ describe("site name and file tree", () => {
       });
     await withPage(1440, async page => {
       await page.goto(origin + "/", { waitUntil: "load" });
-      assert.deepEqual(await name(page, ".filetree-sidebar h1"), {
+      assert.deepEqual(await name(page, ".filetree-sidebar > a > span"), {
         size: "32px",
         lineHeight: "35.2px",
         tracking: "normal",
@@ -1046,7 +1070,7 @@ describe("site name and file tree", () => {
     });
     await withPage(900, async page => {
       await page.goto(origin + "/", { waitUntil: "load" });
-      assert.deepEqual(await name(page, ".navbar h1"), {
+      assert.deepEqual(await name(page, ".navbar .site-name-header"), {
         size: "32px",
         lineHeight: "32px",
         tracking: "normal",

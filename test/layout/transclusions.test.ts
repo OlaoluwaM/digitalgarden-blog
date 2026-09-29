@@ -1,7 +1,7 @@
 /**
  * Transclusions in real Chrome: the source card's header spans the top of
  * the card with the link at its end, a link to a block lands below the
- * navbar, the table of contents leaves out embedded headings, the note
+ * navbar, the table of contents leaves out embedded headings, the page
  * keeps one h1, and axe finds
  * nothing to flag (the header's quieter "From" included).
  *
@@ -175,14 +175,11 @@ describe("transclusions", () => {
     });
   });
 
-  // Why: the embed title arrives as a `#` heading; the note's only h1 is
-  // its own title. (The site name in the navigation is also an h1, a
-  // separate TODO.)
-  it("keeps one h1 in the note", async () => {
+  // Why: the embed title arrives as a `#` heading; the page's only h1 is
+  // the note's own title.
+  it("keeps one h1 on the page", async () => {
     await withPage(1440, async page => {
-      assert.deepEqual(await page.locator("main h1").allTextContents(), [
-        "Embeds",
-      ]);
+      assert.deepEqual(await page.locator("h1").allTextContents(), ["Embeds"]);
     });
   });
 

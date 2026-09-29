@@ -81,8 +81,11 @@ describe("structure", () => {
     expect(hamburger).not.toBeNull();
     expect(hamburger!.getAttribute("aria-label")).toBe("Toggle navigation");
 
-    const heading = navbar!.querySelector("h1.site-name-header");
-    expect(heading?.text).toBe("Thunks & Thoughts");
+    // The site name links home but is not a heading: each page's one h1
+    // is its own title.
+    const name = navbar!.querySelector("a > span.site-name-header");
+    expect(name?.text.trim()).toBe("Thunks & Thoughts");
+    expect(navbar!.querySelector("h1")).toBeNull();
   });
 
   it("renders the desktop sidebar with the filetree wrapper and site name", async () => {
@@ -92,11 +95,13 @@ describe("structure", () => {
 
     const sidebar = wrapper!.querySelector("nav.filetree-sidebar");
     expect(sidebar).not.toBeNull();
-    // Eleventy renders the sidebar's <h1> without the navbar's
-    // `site-name-header` class; kept for parity with its markup.
-    const heading = sidebar!.querySelector(":scope > a > h1");
-    expect(heading?.classList.contains("site-name-header")).toBe(false);
-    expect(heading?.text).toBe("Thunks & Thoughts");
+    // Eleventy renders the sidebar's site name without the navbar's
+    // `site-name-header` class; kept for parity with its markup. Like the
+    // navbar's, it is not a heading.
+    const name = sidebar!.querySelector(":scope > a > span");
+    expect(name?.classList.contains("site-name-header")).toBe(false);
+    expect(name?.text.trim()).toBe("Thunks & Thoughts");
+    expect(sidebar!.querySelector("h1")).toBeNull();
   });
 
   // Why: below lg the file tree is a popover the hamburger opens through

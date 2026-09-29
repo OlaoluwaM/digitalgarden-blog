@@ -1221,4 +1221,8 @@ approval before committing and starting the next.
   across runs and under TZ=UTC (MathJax IDs are deterministic within one
   test process). Fixture notes now take `tags` and `published`. Update
   with `node --test --test-update-snapshots <file>` after reading the diff.
+- One h1 per page (2026-09-29): NavShell's navbar and sidebar site names
+  are `<span class="block …">` (classes unchanged) instead of `<h1>`;
+  screenshots pixel-identical. site-layout tests select them as
+  `.navbar .site-name-header` and `.filetree-sidebar > a > span`.
 
