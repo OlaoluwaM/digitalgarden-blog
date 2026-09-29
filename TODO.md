@@ -29,6 +29,11 @@
 ## Deferred Items
 
 - [ ] Features that were off on live: backlinks, the local and global graph, link previews, and note icons.
-- [ ] Markdown that no published note used, so it wasn't ported ([list](docs/markdown-pipeline.md#eleventy-behavior-not-ported)): body `#tags`, gist fences, Bases, Dataview, canvases, and `{.class}` attributes. Port each when a note needs it.
+- [ ] Eleventy Markdown behavior not ported, since no published note used it when the Eleventy site was removed. Port each when a note needs it:
+  - [ ] Body hashtags (`taggify`): `#tag` in the text became a tag-search link.
+  - [ ] Obsidian Bases
+  - [ ] Dataview output
+  - [ ] Obsidian canvases
+  - [ ] `markdown-it-attrs` beyond block IDs (`{.class}` and other attributes).
 - [ ] Hot-reload the wikilink index, if generating it before `astro dev` stops being enough.
 - [ ] Revisit the publishing boundary.

@@ -70,14 +70,3 @@ These run inside the processor, around the plugins above.
 - **Image collection.** Local images become Astro image components.
   [`patches/`](../patches/README.md) holds one fix to Astro's Markdown
   rendering errors.
-
-## Eleventy behavior not ported
-
-No published note used these when the Eleventy site was removed.
-
-- Body hashtags (`taggify`): `#tag` in the text became a tag-search link.
-- ` ```transclusion ` fences.
-- Obsidian Base support
-- Dataview output support
-- Obsidian canvases support.
-- `markdown-it-attrs` beyond block IDs (`{.class}` and other attributes).
