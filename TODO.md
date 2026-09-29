@@ -25,3 +25,10 @@
   - Preserve wikilink provenance without source-position slicing.
   - Fix the trailing backslash in escaped aliases (`[[Note\|Alias]]`).
   - Discuss `ctx.sourceText(node)` if maintainers prefer a general source-access API.
+
+## Deferred Items
+
+- [ ] Features that were off on live: backlinks, the local and global graph, link previews, and note icons.
+- [ ] Markdown that no published note used, so it wasn't ported ([list](docs/markdown-pipeline.md#eleventy-behavior-not-ported)): body `#tags`, gist fences, Bases, Dataview, canvases, and `{.class}` attributes. Port each when a note needs it.
+- [ ] Hot-reload the wikilink index, if generating it before `astro dev` stops being enough.
+- [ ] Revisit the publishing boundary.
