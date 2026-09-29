@@ -13,6 +13,13 @@ Astro implementation: [REWRITE.md](REWRITE.md).
 ## At the cutover
 
 - [ ] Close Dependabot PRs #33–37 on `main` without merging: they bump Eleventy-era packages (`npm-run-all2`, `cross-env`, `@11ty/eleventy-plugin-rss`, `dotenv`) this branch removed, and `node-html-parser`, which this branch already has at 9.x.
+- [ ] After the merge, once the CI workflow has run on `main` and passed, make production wait for CI:
+  1. In Vercel, open the `digitalgarden-blog` project's Settings > Build and Deployment > Deployment Checks and choose Add Check > GitHub Actions.
+  2. Under "Send workflow updates to Vercel", enter the check name `CI`. The snippet should read `name: Vercel - digitalgarden-blog: CI`, the status the workflow already sets; skip adding the snippet.
+  3. Choose Add.
+  4. Check: push a commit to `main`. Its deployment should wait until the workflow's `Vercel - digitalgarden-blog: CI` status passes, then take thunk.blog.
+
+  Not before the merge: `main` has no workflow until then, so production would wait for a status that never comes, and published notes would never go live.
 
 ## Deferred site features
 

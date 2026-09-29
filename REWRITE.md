@@ -21,6 +21,7 @@ In this order.
     - [x] Run the tests and a warning-free build. The one warning left, `data store cleared (force)`, is expected: `build` passes `--force` on purpose.
     - [ ] Complete the vault tasks in [TODO.md](TODO.md), then test a publisher round trip.
     - [ ] When `astro-rewrite` merges into `main`, switch the Vercel project's framework preset from Eleventy to Astro. Not before: `main`'s `vercel.json` names no framework, so the preset governs production's Eleventy builds until then (this branch's `vercel.json` already says Astro).
+    - [ ] Once the CI workflow has run on `main`, add the check `CI` in the Vercel project's Settings > Deployment Checks (GitHub Actions; its status is `Vercel - digitalgarden-blog: CI`), so production waits for it. Not before: `main` has no workflow until the merge, so production would wait for a status that never comes.
 
 ## Completed
 

@@ -1,6 +1,10 @@
 # Run the checks and tests (`npm test`: typecheck, lint, format check, then
 # every suite) and the production build on pull requests and on pushes to
-# main.
+# main. The job reports its result as the commit status
+# "Vercel - digitalgarden-blog: CI", the name Vercel's Deployment Checks
+# settings give the check; the Vercel project requires it before a
+# production deployment takes thunk.blog: a commit on main goes live only
+# once this passes. Previews don't wait for it.
 name: CI
 
 on:
@@ -20,8 +24,22 @@ jobs:
   test:
     runs-on: ubuntu-24.04
     timeout-minutes: 30
+    # The status action writes the commit status and reads this run's jobs
+    # to find their result.
+    permissions:
+      contents: read
+      statuses: write
+      actions: read
     steps:
       # Actions are pinned to commits; Dependabot updates them.
+
+      # Sets the commit status to pending now, and to success or failure
+      # when the job ends (from the steps' results). The name must match
+      # the check in Vercel's Deployment Checks settings.
+      - uses: vercel/repository-dispatch/actions/status@30f760c6640485cd92f8c785ef361382555fb712 # v1
+        with:
+          name: "Vercel - digitalgarden-blog: CI"
+
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0

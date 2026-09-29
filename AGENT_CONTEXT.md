@@ -1199,4 +1199,17 @@ approval before committing and starting the next.
   across expressions). Deferred to TODO.md: CLS 0.13–0.14 on Home and the
   image post (root cause unknown), the Commit Mono weight for the Ctrl K
   hint, and the Maths note's 500/600 weights.
+- Production gating (2026-09-29, Olaolu chose Vercel Deployment Checks,
+  which his plan has, over deploying from CI with a token): Vercel still
+  builds every push; previews are unaffected. The CI job's first step,
+  `vercel/repository-dispatch/actions/status@v1` (pinned to 30f760c), sets
+  the commit status `Vercel - digitalgarden-blog: CI` (the name Vercel's Deployment
+  Checks dialog generates for a check named `CI`; they must match) to
+  pending, then success or failure in its post
+  step from the job's step results; it works on push and pull_request
+  events (uses `context.sha`), needs `statuses: write` and `actions: read`.
+  Olaolu adds the Deployment Check only after the merge
+  (REWRITE.md 13): until then main has no workflow and production would
+  wait forever. A superseded run cancelled by concurrency leaves its
+  commit pending, so only the newest commit on main goes live.
 

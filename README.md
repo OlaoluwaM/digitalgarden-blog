@@ -148,5 +148,12 @@ Screenshots go in `.browser-artifacts/`; Vitest failure artifacts go in
 Vercel builds the site with `npm run build` and serves `dist/`
 (`vercel.json`). Missing pages get `404.html`.
 
+Every push to a branch other than `main` gets a preview deployment. A push
+to `main` (including the Digital Garden plugin's commits) is built at once
+but goes live on thunk.blog only when the CI workflow
+([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) passes: its job
+sets the commit status `Vercel - digitalgarden-blog: CI`, which the Vercel project requires
+under Settings > Deployment Checks.
+
 Do not merge the Digital Garden plugin's "Update template" pull requests:
 they would restore the Eleventy site this repository replaced.
