@@ -1165,4 +1165,12 @@ approval before committing and starting the next.
   links, Kroki, sync-callouts). The README's "Publishing a note" section
   is the repo-side list the template links to (the link resolves once the
   README is on `main`). He chose to build `dg-hide` rather than drop it.
+- Item 13a/13b (cutover): docs/markdown-pipeline.md documents the parser
+  features, each mdast/hast plugin in order with the Eleventy behavior it
+  replaces and its tests, Astro's own steps, and what was not ported
+  (checked against `.eleventy.js` at ee0c949; Eleventy also had the
+  `table-wrapper` transform). `npm run build`: 16 pages, one warning,
+  `[WARN] [content] data store cleared (force)`, which Olaolu accepted as
+  expected (keep `--force`; don't swap it for deleting
+  node_modules/.astro/data-store.json).
 

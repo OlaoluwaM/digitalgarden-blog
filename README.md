@@ -80,7 +80,7 @@ Plugin changes during `npm run dev` need a restart with `npm run dev -- --force`
 | `src/site/img/user/` | Note images (written by the Obsidian plugin)              |
 | `src/pages/`         | Routes: notes, Home, 404, `/random/`, feed, robots        |
 | `src/components/`    | Page chrome: navigation, search, note header, footer      |
-| `src/plugins/`       | Markdown plugins (wikilinks, callouts, highlights, …)     |
+| `src/plugins/`       | Markdown plugins ([pipeline](docs/markdown-pipeline.md))  |
 | `src/styles/`        | Design tokens and styles ([README](src/styles/README.md)) |
 | `src/scripts/`       | Client scripts (search, file tree, copy buttons)          |
 | `scripts/`           | Wikilink index and callout sync                           |

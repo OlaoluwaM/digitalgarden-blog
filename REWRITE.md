@@ -17,8 +17,8 @@ In this order.
 11. [x] Update the publishing instructions. Include: embed only published notes (the publisher inlines an unpublished note's text).
 12. [ ] Perf review with subagent
 13. [ ] The rest of the cutover, in this order:
-    - [ ] Document each Markdown plugin and the Eleventy behavior it replaces.
-    - [ ] Run the tests and a warning-free build.
+    - [x] Document each Markdown plugin and the Eleventy behavior it replaces ([pipeline](docs/markdown-pipeline.md)).
+    - [x] Run the tests and a warning-free build. The one warning left, `data store cleared (force)`, is expected: `build` passes `--force` on purpose.
     - [ ] Complete the vault tasks in [TODO.md](TODO.md), then test a publisher round trip.
     - [ ] When `astro-rewrite` merges into `main`, switch the Vercel project's framework preset from Eleventy to Astro. Not before: `main`'s `vercel.json` names no framework, so the preset governs production's Eleventy builds until then (this branch's `vercel.json` already says Astro).
 
