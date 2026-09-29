@@ -43,10 +43,8 @@ const classes = ["lucide", `lucide-${name}`, "svg-icon", className]
   aria-hidden="true"
   class={classes}
 >
-  {
-    node.map(([Tag, attributes]) => {
-      const ElementTag = Tag;
-      return <ElementTag {...attributes} />;
-    })
-  }
+  {node.map(([Tag, attributes]) => {
+    const ElementTag = Tag;
+    return <ElementTag {...attributes} />;
+  })}
 </svg>

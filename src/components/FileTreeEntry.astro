@@ -52,58 +52,56 @@ const wrapperClass = nested
 ---
 
 <div class={wrapperClass}>
-  {
-    node.type === "folder" ? (
-      <details class="folder inner-folder ml-3 py-1" data-folder-path={path}>
-        <summary class="foldername-wrapper align-icon my-1 ml-0.5 inline-flex cursor-pointer list-none items-center justify-evenly text-sm/relaxed">
-          <Icon
-            name="chevron-down"
-            class={`folder-chevron-open ${chevronClass}`}
-          />
-          <Icon
-            name="chevron-right"
-            class={`folder-chevron-closed ${chevronClass}`}
-          />
-          <span class="foldername">{node.name}</span>
-        </summary>
-        {node.children.map(child => (
-          <FileTreeEntry
-            node={child}
-            depth={depth + 1}
-            activePathname={activePathname}
-            parentPath={path}
-          />
-        ))}
-      </details>
-    ) : (
-      <div
+  {node.type === "folder" ? (
+    <details class="folder inner-folder ml-3 py-1" data-folder-path={path}>
+      <summary class="foldername-wrapper align-icon my-1 ml-0.5 inline-flex cursor-pointer list-none items-center justify-evenly text-sm/relaxed">
+        <Icon
+          name="chevron-down"
+          class={`folder-chevron-open ${chevronClass}`}
+        />
+        <Icon
+          name="chevron-right"
+          class={`folder-chevron-closed ${chevronClass}`}
+        />
+        <span class="foldername">{node.name}</span>
+      </summary>
+      {node.children.map(child => (
+        <FileTreeEntry
+          node={child}
+          depth={depth + 1}
+          activePathname={activePathname}
+          parentPath={path}
+        />
+      ))}
+    </details>
+  ) : (
+    <div
+      class:list={[
+        "notelink",
+        active && "active-note",
+        "relative flex items-center py-1 pr-2 pl-3 text-sm/relaxed hover:bg-white/5",
+        // Nested notes carry a 2px left rule (colored when active) over
+        // the folder's depth line; root notes have none and are indented
+        // past the folder chevrons.
+        nested
+          ? [
+              "-ml-px border-l-2",
+              active ? "border-l-gray-200" : "border-l-transparent",
+            ]
+          : "ml-5.5 border-l-0",
+      ]}
+    >
+      <a
+        data-note-icon=""
+        style="text-decoration:none"
         class:list={[
-          "notelink",
-          active && "active-note",
-          "relative flex items-center py-1 pr-2 pl-3 text-sm/relaxed hover:bg-white/5",
-          // Nested notes carry a 2px left rule (colored when active) over
-          // the folder's depth line; root notes have none and are indented
-          // past the folder chevrons.
-          nested
-            ? [
-                "-ml-px border-l-2",
-                active ? "border-l-gray-200" : "border-l-transparent",
-              ]
-            : "ml-5.5 border-l-0",
+          "filename hover:underline!",
+          active ? "text-gray-50" : "text-gray-200 hover:text-gray-100",
         ]}
+        href={node.href}
       >
-        <a
-          data-note-icon=""
-          style="text-decoration:none"
-          class:list={[
-            "filename hover:underline!",
-            active ? "text-gray-50" : "text-gray-200 hover:text-gray-100",
-          ]}
-          href={node.href}
-        >
-          {node.title}{" "}
-        </a>
-      </div>
-    )
-  }
+        {node.title}{" "}
+      </a>
+    </div>
+  )}
 </div>
