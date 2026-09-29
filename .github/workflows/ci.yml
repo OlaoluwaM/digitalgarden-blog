@@ -1,0 +1,42 @@
+# Run the checks and tests (`npm test`: typecheck, lint, format check, then
+# every suite) and the production build on pull requests and on pushes to
+# main.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+# A newer push to main or to a pull request supersedes its running check.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      # Actions are pinned to commits; Dependabot updates them.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      # `postinstall` applies the dependency patches.
+      - run: npm ci
+
+      # The layout and browser suites drive Chromium through Playwright.
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - run: npm test
+
+      # Regenerates the wikilink index and builds the published notes.
+      - run: npm run build

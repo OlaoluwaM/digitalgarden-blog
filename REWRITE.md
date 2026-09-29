@@ -13,7 +13,7 @@ In this order.
 7. [x] Label task-list checkboxes, e.g. wrap each item's text in a `<label>`; axe flags them in the dev style guide's Markdown sample.
 8. [x] Render `mermaid` and `plantuml` fences as inline SVG at build time through Kroki (kroki.io): exclude both from Shiki, cache by content hash, and fail the build when Kroki fails. Record the decision in an ADR.
 9. [x] Style the publisher's transclusions as source cards (design B in the [designs](https://claude.ai/artifact/6Uq4RNhfRueyUJSmAB2r8P): a bordered card with a "From *note title*" header and the link icon on the right); turn the embed title into a label so each page keeps one `h1`; test wikilinks and heading IDs inside embeds.
-10. [ ] Add a GitHub Actions workflow that runs `npm test` and the build on every push and pull request.
+10. [ ] Add a GitHub Actions workflow that runs `npm test` and the build on pull requests and on pushes to `main`.
 11. [ ] Update the publishing instructions. Include: embed only published notes (the publisher inlines an unpublished note's text).
 12. [ ] Snapshot tests?
 13. [ ] Perf review with subagent

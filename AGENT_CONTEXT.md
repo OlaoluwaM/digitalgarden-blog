@@ -1135,3 +1135,13 @@ approval before committing and starting the next.
   test/transclusions.test.ts, test/block-ids.test.ts,
   test/layout/transclusions.test.ts, markup from
   test/support/publisher-embed.ts.
+- Item 10 (CI, written, not yet run on GitHub): `.github/workflows/ci.yml`
+  runs on pull requests and pushes to `main` (Olaolu's choice), cancelling
+  a superseded run on either; ubuntu-24.04, Node from `.nvmrc`, `npm ci`,
+  `npx playwright install --with-deps chromium`, `npm test`, `npm run
+  build`; read-only permissions; actions pinned by SHA. Dependabot groups
+  npm minor+patch into one weekly PR and now updates actions too; it reads
+  its config from `main` only, so none of this applies before the merge.
+  Unit tests pass with `TZ=UTC`. Leave item 10 unticked until a run passes
+  (needs the branch pushed and a PR into `main`; Olaolu hasn't approved
+  either yet).
