@@ -1,0 +1,43 @@
+---
+// T4 (phase 1): the home page Recent Posts section.
+import type { Post } from "../content/posts.ts";
+import { formatNoteDate } from "../lib/dates.ts";
+import { metaDescription } from "../lib/metadata.ts";
+
+interface Props {
+  posts: Post[];
+}
+
+const { posts } = Astro.props;
+---
+
+{
+  posts.length > 0 && (
+    <section class="recent-notes mt-8">
+      <h2 class="font-serif font-normal text-4xl mt-17 mb-7">Recent Posts</h2>
+      <ul class="my-7 grid list-none gap-7 p-0">
+        {posts.map(post => (
+          <li>
+            <a
+              href={post.data.pluginProps.permalink}
+              class="internal-link text-gray-200 no-underline hover:text-gray-100 hover:underline"
+            >
+              {post.data.rawNoteProps.title}
+            </a>
+            {metaDescription(post.data.rawNoteProps.description) && (
+              <p class="m-0 mt-1 text-sm text-gray-300">
+                {metaDescription(post.data.rawNoteProps.description)}
+              </p>
+            )}
+            <time
+              class="human-date recent-note-date mt-1.5 block text-xs text-gray-300 not-italic"
+              datetime={post.data.rawNoteProps.published}
+            >
+              {formatNoteDate(post.data.rawNoteProps.published)}
+            </time>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}

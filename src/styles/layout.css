@@ -1,0 +1,58 @@
+/*
+ * The page frame (ADR 0003 phase 2): where the note column sits beside the
+ * desktop file tree. The margin arithmetic needs calc(), min(), and max(),
+ * which read better here than as arbitrary-value utilities.
+ */
+@layer components {
+  main.content {
+    position: relative;
+    max-width: var(--container-content);
+    margin-block: 0;
+    margin-right: auto;
+    /* Never under the file tree (its minimum width plus the 80px gap before
+       the column); otherwise centered in the viewport, shifted left to leave
+       room on the right for the Digital Garden's 350px side panel (unused
+       here) plus the gap and 20px. */
+    margin-left: max(
+      var(--container-sidebar-min) + --spacing(20),
+      min(
+        (100vw - var(--container-content)) / 2,
+        100vw - var(--container-content) - --spacing(87.5) - --spacing(20) -
+          --spacing(5)
+      )
+    );
+    padding-top: --spacing(22);
+    padding-bottom: --spacing(15);
+    color: var(--color-gray-50);
+    /* Note text on phones: live's reading size, between the sm and base
+       steps. Lines there are already short (about 42 characters). */
+    font-size: 1.03rem;
+    line-height: var(--leading-normal);
+
+    /* From md up, larger text keeps lines near 80 characters, and longer
+       lines get more leading (docs/typography-refinements.md). */
+    @variant md {
+      font-size: var(--text-lg);
+      line-height: var(--leading-relaxed);
+    }
+
+    /* Between lg and xl the file tree keeps its 250px width and the column
+       sits 270px from the left (the tree and a 20px gap). It fills the
+       rest, 30px short of the right edge, up to the reading width; live let
+       it grow to 931px at 1280px, about 120 characters a line. */
+    @variant max-xl {
+      max-width: min(calc(100vw - --spacing(75)), var(--container-content));
+      margin-left: --spacing(67.5);
+    }
+
+    /* Below lg the file tree is hidden: center the column. */
+    @variant max-lg {
+      max-width: var(--container-content);
+      margin-inline: auto;
+    }
+
+    @variant max-md {
+      padding-top: --spacing(19);
+    }
+  }
+}

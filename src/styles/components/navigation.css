@@ -1,0 +1,53 @@
+/*
+ * Sidebar, navbar, file tree, search button (NavShell, FileTreeEntry,
+ * NavSearchButton). Rules that utilities cannot express.
+ */
+@layer components {
+  /* The desktop file tree fills the space left of the note column, less the
+     80px gap before it, but never narrows below its minimum; below xl it
+     keeps the minimum. calc() and max() read better here than as an
+     arbitrary value, as in layout.css. */
+  .filetree-wrapper {
+    width: max(
+      (100vw - var(--container-content)) / 2 - --spacing(20),
+      var(--container-sidebar-min)
+    );
+
+    @variant max-xl {
+      width: var(--container-sidebar-min);
+    }
+
+    /* Opened over the page on phones and tablets: as wide as the desktop
+       sidebar can be, but leaving part of the page to tap. */
+    @variant max-lg {
+      width: min(var(--container-sidebar), 85vw);
+    }
+  }
+
+  /* The note list scrolls under the search button. Its top edge fades, so
+     scrolled rows fade out instead of ending in a hard cut; the padding
+     keeps the first row clear of the fade at rest. */
+  .filetree-sidebar > .folder {
+    padding-top: --spacing(2);
+    mask-image: linear-gradient(
+      to bottom,
+      transparent,
+      var(--color-black) --spacing(2)
+    );
+  }
+
+  /* Folders are native <details>. Safari draws its disclosure triangle with
+     this pseudo-element even when `list-style` is none; only the Lucide
+     chevrons should show. No utility variant exists for it. */
+  .foldername-wrapper::-webkit-details-marker {
+    display: none;
+  }
+
+  /* Show the chevron that matches the folder's own state. A `group-open:`
+     utility would also match an open ancestor folder, so nested folders need
+     the child combinator. */
+  .inner-folder:not([open]) > summary .folder-chevron-open,
+  .inner-folder[open] > summary .folder-chevron-closed {
+    display: none;
+  }
+}

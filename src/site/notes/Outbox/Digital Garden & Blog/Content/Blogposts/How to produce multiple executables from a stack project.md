@@ -1,5 +1,5 @@
 ---
-{"dg-publish":true,"dg-path":" Posts/How to produce multiple executables from a stack project.md","dg-permalink":"/posts/how-to-produce-multiple-executables-from-a-stack-project","permalink":"/posts/how-to-produce-multiple-executables-from-a-stack-project/","metatags":{"description":"To produce an executable"},"tags":["software-engineering","haskell"],"created":"2026-03-20T15:36","updated":"2026-08-12T13:49","dg-note-properties":{"tags":["software-engineering","haskell"],"created":"2026-03-20T15:36","updated":"2026-08-12T13:49"}}
+{"dg-publish":true,"dg-path":" Posts/How to produce multiple executables from a stack project.md","dg-permalink":"/posts/how-to-produce-multiple-executables-from-a-stack-project","permalink":"/posts/how-to-produce-multiple-executables-from-a-stack-project/","metatags":{"description":"To produce an executable"},"tags":["software-engineering","haskell"],"created":"2026-03-20T15:36","updated":"2026-08-12T13:49","dg-note-properties":{"tags":["software-engineering","haskell"],"created":"2026-03-20T15:36","updated":"2026-08-12T13:49","title":"How to produce multiple executables from a stack project","description":"To produce an executable","published":"2026-03-20T15:36","last_updated":"2026-08-12T13:49"}}
 ---
 
 

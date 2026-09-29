@@ -1,0 +1,10 @@
+/*
+ * 404 page (src/pages/404.astro). Rules that utilities cannot express.
+ */
+@layer components {
+  /* The browser's default paragraph margin, which Preflight removes. It is
+     1em of the text, so it cannot be a spacing utility. */
+  main.centered p {
+    margin-block: 1em;
+  }
+}

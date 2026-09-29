@@ -1,0 +1,28 @@
+---
+import { render } from "astro:content";
+import {
+  getHomePost,
+  getPublishedPosts,
+  getRecentArticles,
+} from "../content/posts";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { metaDescription } from "../lib/metadata";
+import SiteNavigation from "../components/SiteNavigation.astro";
+import RecentPosts from "../components/RecentPosts.astro";
+
+const posts = await getPublishedPosts();
+// getHomePost throws unless exactly one published garden entry exists, which fails the build.
+const home = getHomePost(posts);
+const { Content: HomePageContent } = await render(home);
+const recentPosts = getRecentArticles(posts);
+---
+
+<BaseLayout
+  title={home.data.rawNoteProps.title}
+  description={metaDescription(home.data.rawNoteProps.description)}
+  type="website"
+>
+  <SiteNavigation slot="navigation" />
+  <HomePageContent />
+  <RecentPosts posts={recentPosts} />
+</BaseLayout>

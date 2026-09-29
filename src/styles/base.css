@@ -1,0 +1,81 @@
+/*
+ * Element defaults (ADR 0003 phase 2), in the `base` layer after Tailwind's
+ * Preflight reset.
+ */
+@layer base {
+  *,
+  ::before,
+  ::after {
+    box-sizing: border-box;
+  }
+
+  html,
+  body {
+    height: 100%;
+  }
+
+  /* Obsidian's root and body settings, which live pages inherit. The page
+     scrollbar follows the reader's color scheme (html); everything inside
+     the body is dark. */
+  html {
+    color-scheme: light dark;
+  }
+
+  body {
+    position: relative;
+    margin: 0;
+    /* The page gutter on every width (Obsidian's --file-margins). */
+    padding: --spacing(8);
+    /* Propagates to the viewport: no sideways page scroll. */
+    overflow-x: hidden;
+    background-color: var(--color-gray-950);
+    color: var(--color-gray-50);
+    font-family: var(--font-sans);
+    font-size: var(--text-base);
+    line-height: var(--text-base--line-height);
+    font-kerning: normal;
+    text-rendering: optimizeLegibility;
+    color-scheme: dark;
+    -webkit-tap-highlight-color: transparent;
+    /* Long words and URLs wrap instead of widening the column. */
+    overflow-wrap: break-word;
+    user-select: text;
+    tab-size: 4;
+  }
+
+  ::selection {
+    background-color: --alpha(var(--color-gray-200) / 30%);
+  }
+
+  /* Keyboard focus only; mouse clicks show no ring. */
+  :focus {
+    outline: none;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-gray-200);
+    outline-offset: --spacing(1);
+  }
+
+  img {
+    max-width: 100%;
+  }
+
+  /* Instrument Serif has one weight. Bold inside a heading would otherwise
+     be synthesized; live rendered the regular glyphs. */
+  :is(h1, h2, h3, h4, h5, h6) {
+    font-synthesis-weight: none;
+  }
+
+  /* Readers who ask for reduced motion get no transitions or animations
+     anywhere. `!important` beats every normal declaration in any layer. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      transition-duration: 0s !important;
+      animation-duration: 0s !important;
+      animation-iteration-count: 1 !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}

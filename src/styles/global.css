@@ -1,0 +1,43 @@
+/*
+ * Stylesheet entry (ADR 0003). The first statement fixes the cascade layer
+ * order: a later layer wins regardless of specificity, and unlayered CSS
+ * beats every layer. Tailwind's Preflight reset opens the `base` layer, and
+ * base.css adds the site's element defaults after it.
+ */
+@layer theme, base, components, utilities;
+
+@import "tailwindcss/theme.css" layer(theme);
+@import "./tokens.css";
+@import "./fonts.css";
+@import "tailwindcss/preflight.css" layer(base);
+@import "./base.css";
+@import "./layout.css";
+/* Rendered Markdown (a hand-written stylesheet: Markdown output carries no
+   utility classes). */
+@import "./content/typography.css";
+@import "./content/code.css";
+@import "./content/callouts.css";
+@import "./content/transclusions.css";
+/* Chrome: utilities in the templates; these hold what utilities cannot. */
+@import "./components/header.css";
+@import "./components/footer.css";
+@import "./components/recent-posts.css";
+@import "./components/backlinks.css";
+@import "./components/not-found.css";
+@import "./components/navigation.css";
+@import "./components/search.css";
+@import "./components/table-of-contents.css";
+@import "./utilities.css";
+/*
+ * Generate utilities only from the Astro templates and client scripts. The
+ * default scans the whole repository, including note text and the Eleventy
+ * templates, and turns ordinary words ("table", "hidden", "collapse") into
+ * utilities that would restyle any element with a matching class.
+ */
+@import "tailwindcss/utilities.css" layer(utilities) source(none);
+@source "../components";
+@source "../layouts";
+@source "../pages";
+@source "../scripts";
+/* The dev-only style guide's template, not its Markdown sample. */
+@source "../style-guide/*.astro";

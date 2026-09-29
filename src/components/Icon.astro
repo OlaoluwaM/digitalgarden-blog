@@ -1,0 +1,52 @@
+---
+import * as lucide from "lucide";
+import type { IconNode } from "lucide";
+
+// Render a Lucide icon at build time with the same attributes and classes
+// that `lucide.createIcons({ attrs: { class: ["svg-icon"] } })` produced in the
+// browser on the Eleventy site, so existing CSS selectors keep matching.
+interface Props {
+  /** Lucide icon name in kebab case, as used by `data-lucide`. */
+  name: string;
+  class?: string;
+}
+
+const { name, class: className } = Astro.props;
+const exportName = name
+  .split("-")
+  .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+  .join("");
+const node = (lucide as unknown as Record<string, IconNode | undefined>)[
+  exportName
+];
+
+if (!Array.isArray(node)) {
+  throw new Error(`Unknown Lucide icon "${name}".`);
+}
+
+const classes = ["lucide", `lucide-${name}`, "svg-icon", className]
+  .filter(Boolean)
+  .join(" ");
+---
+
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  data-lucide={name}
+  aria-hidden="true"
+  class={classes}
+>
+  {
+    node.map(([Tag, attributes]) => {
+      const ElementTag = Tag;
+      return <ElementTag {...attributes} />;
+    })
+  }
+</svg>

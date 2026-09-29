@@ -1,0 +1,129 @@
+---
+// T3: the presentational half of `SiteNavigation` — desktop sidebar, mobile
+// navbar, and file tree — split out so it can be component-tested with a
+// hand-built `tree` fixture instead of a real content collection.
+//
+// Why the split: Astro's experimental Container API cannot resolve
+// `astro:content` collections in this project's `vitest.astro.config.mts`
+// setup (`getCollection("posts")` reports the collection as empty even right
+// after a real `astro build` populated it in-process) — see
+// `test/components/site-navigation.test.ts`'s header comment. `SiteNavigation`
+// stays the thin, untested data-fetching wrapper (`getPublishedPosts()` +
+// `buildFileTree()`, exercised by `npm run build` and by
+// `test/file-tree.test.ts` and `test/posts.test.ts`); everything about the
+// actual markup lives here, fully covered without touching real content.
+//
+// Rebuilds Eleventy's `filetree.njk` (root) / `filetreeNavbar.njk` (mobile)
+// without Alpine.js:
+//   - the outer `x-data="{isDesktop, showFilesMobile}"` div, and the two
+//     `x-show.important` wrappers that swapped the navbar and the sidebar at
+//     1000px, are gone. The same swap is a media query now (`lg:hidden` on
+//     `.navbar`, `max-lg:hidden` on `.filetree-wrapper`).
+//   - below lg, the file tree is a popover the hamburger opens with
+//     `popovertarget`, so it works without JavaScript: the browser opens and
+//     closes it (a tap outside, Escape), dims the page with its backdrop
+//     (live's `.fullpage-overlay`), and gives the hamburger its expanded
+//     state. scripts/mobileNavigation.ts adds focus and closing on widening.
+//     From lg up the same element shows in place, never opened.
+//   - the file tree itself is `FileTreeEntry`, recursing over
+//     `buildFileTree`'s output; folders are native `<details>`/`<summary>`
+//     instead of an `x-data` `isOpen` flag.
+import type { FileTreeNode } from "../content/file-tree.ts";
+import { site } from "../lib/site.ts";
+import FileTreeEntry from "./FileTreeEntry.astro";
+import NavSearchButton from "./NavSearchButton.astro";
+import SearchDialog from "./SearchDialog.astro";
+import Icon from "./Icon.astro";
+
+interface Props {
+  tree: readonly FileTreeNode[];
+  activePathname: string;
+}
+
+const { tree, activePathname } = Astro.props;
+// Styling notes (ADR 0003 phase 2): the navigation is chrome, so it is
+// hidden when printing. The hamburger icon's lines are stretched
+// 1.5x horizontally to read better on phones (user/custom.scss), and the
+// button keeps the transition Obsidian gave every button, so its focus ring
+// eases in as it did live. The sidebar's width arithmetic lives in
+// styles/components/navigation.css. The file tree is a popover, and
+// browsers give popovers their own colors, scrolling, and position;
+// `text-inherit` and `overflow-visible` undo the ones no utility here
+// already sets, so the tree looks the same opened or in place. The site
+// name keeps live's 2rem (and, in the sidebar, 1.1 line height): it is the
+// brand mark, between the heading steps (test/design-system.test.ts).
+---
+
+<nav
+  aria-label="Site"
+  class="navbar fixed inset-x-0 top-0 z-3 flex w-full items-center justify-between bg-gray-800 px-8 py-1.5 lg:hidden print:hidden"
+>
+  <div
+    class="navbar-inner flex grow cursor-pointer items-center gap-8 max-md:gap-2"
+  >
+    <button
+      type="button"
+      class="hamburger-btn flex h-8 cursor-pointer appearance-none items-center justify-center rounded-full border-none bg-transparent p-0 text-inherit transition-all duration-300 ease-overshoot select-none motion-reduce:transition-none"
+      aria-label="Toggle navigation"
+      popovertarget="filetree"
+    >
+      <Icon
+        name="menu"
+        class="pointer-events-none h-4 w-6 *:origin-center *:scale-x-150"
+      />
+    </button>
+    <a
+      href="/"
+      style="text-decoration:none"
+      class="grow text-left text-gray-200 hover:text-gray-100"
+    >
+      {
+        /* The site name is not a heading: each page's one h1 is its own
+           title. It keeps the look it had as an h1 on the live site. */
+      }
+      <span
+        class="site-name-header m-0 block font-serif text-[2rem] leading-none font-normal text-pretty text-inherit max-md:text-2xl"
+      >
+        {site.name}
+      </span>
+    </a>
+  </div>
+  <NavSearchButton placement="navbar" />
+</nav>
+
+<div
+  id="filetree"
+  popover="auto"
+  class="filetree-wrapper fixed top-0 left-0 z-10 flex h-full min-w-sidebar-min justify-end overflow-visible bg-gray-800 text-inherit backdrop:bg-black/50 max-xl:justify-start max-lg:hidden max-lg:open:flex print:hidden"
+>
+  <nav
+    aria-label="Notes"
+    class="filetree-sidebar m-0 flex h-full w-auto max-w-sidebar min-w-sidebar-min grow flex-col overflow-hidden px-5 py-2.5 text-gray-100"
+  >
+    <a
+      href="/"
+      style="text-decoration:none"
+      class="text-gray-200 hover:text-gray-100"
+    >
+      <span
+        class="mx-auto my-7 block w-site-name shrink-0 text-center font-serif text-[2rem] leading-[1.1] font-normal text-pretty text-inherit"
+      >
+        {site.name}
+      </span>
+    </a>
+    <NavSearchButton placement="sidebar" />
+    <div class="folder flex-1 overflow-auto [scrollbar-width:thin]">
+      {
+        tree.map(node => (
+          <FileTreeEntry
+            node={node}
+            depth={0}
+            activePathname={activePathname}
+          />
+        ))
+      }
+    </div>
+  </nav>
+</div>
+
+<SearchDialog />

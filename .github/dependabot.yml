@@ -1,16 +1,21 @@
-# To get started with Dependabot version updates, you'll need to specify which
-# package ecosystems to update and where the package manifests are located.
-# Please see the documentation for all configuration options:
-# https://docs.github.com/github/administering-a-repository/configuration-options-for-dependency-updates
+# Dependabot reads this file from the default branch (main).
+# Options: https://docs.github.com/code-security/dependabot/working-with-dependabot/dependabot-options-reference
 
 version: 2
 updates:
-  - package-ecosystem: "npm" # See documentation for possible values
-    directory: "/" # Location of package manifests
+  - package-ecosystem: "npm"
+    directory: "/"
     schedule:
       interval: "weekly"
-    ignore:
-      - dependency-name: "@sindresorhus/slugify"
-        # For slugify, ignore all updates.
-      - dependency-name: "@11ty/eleventy-plugin-rss"
-        versions: [ "^1.2.0" ]
+    # One pull request a week for all minor and patch updates. Each major
+    # version still gets its own, since those are the ones that break. An
+    # Astro update fails CI until patches/ is updated for it; that is the
+    # reminder to do so.
+    groups:
+      minor-and-patch:
+        update-types: ["minor", "patch"]
+  # Keep the pinned actions in .github/workflows current.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"

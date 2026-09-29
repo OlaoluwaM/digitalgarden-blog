@@ -1,0 +1,56 @@
+---
+import { render } from "astro:content";
+import { getPublishedArticles, getPublishedPosts } from "../content/posts";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { metaDescription } from "../lib/metadata";
+import SiteNavigation from "../components/SiteNavigation.astro";
+import NoteHeader from "../components/NoteHeader.astro";
+import PostFooter from "../components/PostFooter.astro";
+import Backlinks from "../components/Backlinks.astro";
+import { buildBacklinks } from "../content/backlinks";
+import {
+  contentsEntries,
+  embeddedHeadingPositions,
+} from "../content/table-of-contents";
+import { isHiddenPost } from "../content/hidden";
+
+// This is required for dynamic routes: https://docs.astro.build/en/guides/routing/#static-ssg-mode
+export async function getStaticPaths() {
+  const posts = await getPublishedPosts();
+  const publishedArticles = getPublishedArticles(posts);
+  const backlinks = buildBacklinks(posts);
+  return publishedArticles.map(p => ({
+    // We derive the slug from the permalink. We remove any leading or trailing slashes to ensure that the slug is valid.
+    // We use "permalink" instead of "dg-permalink" because even though the latter informs the former, there is still some processing the digital-garden plugin does to the permalink before it is ready for use. "dg-permalink" is the raw value from the frontmatter, while "permalink" is the processed value that is ready for use in the URL.
+    params: { slug: p.data.pluginProps.permalink.replace(/^\/|\/$/g, "") },
+    props: {
+      post: p,
+      backlinks: backlinks.get(p.data.pluginProps.permalink) ?? [],
+    },
+  }));
+}
+
+const { post, backlinks } = Astro.props;
+const {
+  Content: PostContent,
+  headings,
+  remarkPluginFrontmatter,
+} = await render(post);
+const contents = contentsEntries(
+  headings,
+  embeddedHeadingPositions(remarkPluginFrontmatter)
+);
+---
+
+<BaseLayout
+  title={post.data.rawNoteProps.title}
+  description={metaDescription(post.data.rawNoteProps.description)}
+  type="article"
+  noindex={isHiddenPost(post)}
+>
+  <SiteNavigation slot="navigation" />
+  <NoteHeader post={post} contents={contents} />
+  <PostContent />
+  <Backlinks posts={backlinks} />
+  <PostFooter />
+</BaseLayout>

@@ -1,0 +1,77 @@
+---
+// The notes that link to this one (content/backlinks.ts), under
+// "Mentioned in", after the note and before the sign-off: design A in
+// https://claude.ai/artifact/1Aha5NVWfW9jz99bpeDby2. Each is listed as
+// Recent Posts lists notes, title then description. The three newest show;
+// the rest wait behind a native disclosure, so a much-linked note doesn't
+// end in a wall of links, and it works without JavaScript. With no
+// backlinks it renders nothing.
+import type { Post } from "../content/posts.ts";
+import { metaDescription } from "../lib/metadata.ts";
+import Icon from "./Icon.astro";
+
+interface Props {
+  posts: Post[];
+}
+
+const SHOWN = 3;
+
+const { posts } = Astro.props;
+const shown = posts.slice(0, SHOWN);
+const more = posts.slice(SHOWN);
+const linkClass =
+  "internal-link text-gray-200 no-underline hover:text-gray-100 hover:underline";
+---
+
+{
+  posts.length > 0 && (
+    <section class="backlinks mt-12" aria-labelledby="backlinks-heading">
+      <h2
+        id="backlinks-heading"
+        class="m-0 text-xs font-normal tracking-wider text-gray-300 uppercase"
+      >
+        Mentioned in
+      </h2>
+      <ul class="m-0 mt-4 grid list-none gap-4 p-0">
+        {shown.map(post => (
+          <li>
+            <a href={post.data.pluginProps.permalink} class={linkClass}>
+              {post.data.rawNoteProps.title}
+            </a>
+            {metaDescription(post.data.rawNoteProps.description) && (
+              <p class="m-0 mt-1 text-sm text-gray-300">
+                {metaDescription(post.data.rawNoteProps.description)}
+              </p>
+            )}
+          </li>
+        ))}
+      </ul>
+      {more.length > 0 && (
+        <details class="group mt-4">
+          <summary class="flex w-fit cursor-pointer list-none items-center gap-1 text-sm text-gray-200 hover:text-gray-100">
+            <span class="group-open:hidden">Show {more.length} more</span>
+            <span class="hidden group-open:inline">Show fewer</span>
+            <Icon
+              name="chevron-down"
+              class="size-3.5 transition-transform group-open:rotate-180 motion-reduce:transition-none"
+            />
+          </summary>
+          <ul class="m-0 mt-4 grid list-none gap-4 p-0">
+            {more.map(post => (
+              <li>
+                <a href={post.data.pluginProps.permalink} class={linkClass}>
+                  {post.data.rawNoteProps.title}
+                </a>
+                {metaDescription(post.data.rawNoteProps.description) && (
+                  <p class="m-0 mt-1 text-sm text-gray-300">
+                    {metaDescription(post.data.rawNoteProps.description)}
+                  </p>
+                )}
+              </li>
+            ))}
+          </ul>
+        </details>
+      )}
+    </section>
+  )
+}

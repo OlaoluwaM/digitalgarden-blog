@@ -1,0 +1,66 @@
+exports[`head snapshots > matches the reviewed head for index.html 1`] = `
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Home</title>
+<link rel="canonical" href="https://thunk.blog/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Home">
+<meta property="og:url" content="https://thunk.blog/">
+<meta property="og:site_name" content="Thunks &amp; Thoughts">
+<meta property="og:locale" content="en">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="alternate" type="application/rss+xml" title="Thunks &amp; Thoughts" href="https://thunk.blog/feed.xml">
+<link rel="stylesheet" href="/_astro/<asset>.css">
+</head>
+`;
+
+exports[`head snapshots > matches the reviewed head for posts/be-deliberate/index.html 1`] = `
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Be deliberate</title>
+<meta name="description" content="Be deliberate">
+<link rel="canonical" href="https://thunk.blog/posts/be-deliberate/">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Be deliberate">
+<meta property="og:description" content="Be deliberate">
+<meta property="og:url" content="https://thunk.blog/posts/be-deliberate/">
+<meta property="og:site_name" content="Thunks &amp; Thoughts">
+<meta property="og:locale" content="en">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="alternate" type="application/rss+xml" title="Thunks &amp; Thoughts" href="https://thunk.blog/feed.xml">
+<link rel="stylesheet" href="/_astro/<asset>.css">
+</head>
+`;
+
+exports[`head snapshots > matches the reviewed head for posts/on-maths-and-engineering/index.html 1`] = `
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>On maths and engineering</title>
+<meta name="description" content="Computer science is applied maths or some such">
+<link rel="canonical" href="https://thunk.blog/posts/on-maths-and-engineering/">
+<meta property="og:type" content="article">
+<meta property="og:title" content="On maths and engineering">
+<meta property="og:description" content="Computer science is applied maths or some such">
+<meta property="og:url" content="https://thunk.blog/posts/on-maths-and-engineering/">
+<meta property="og:site_name" content="Thunks &amp; Thoughts">
+<meta property="og:locale" content="en">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="alternate" type="application/rss+xml" title="Thunks &amp; Thoughts" href="https://thunk.blog/feed.xml">
+<link rel="stylesheet" href="/_astro/<asset>.css">
+</head>
+`;

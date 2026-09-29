@@ -1,0 +1,443 @@
+/*
+ * Rendered Markdown: text, headings, links, lists, tables, quotes, rules,
+ * media, footnotes, math. Values reproduce the phase 1 look (Obsidian's
+ * `.markdown-rendered` rules, the vendored theme, and custom.scss), on the
+ * token scales. Like Tailwind Typography, sizes relative to the text stay
+ * in em here, with their source named beside them.
+ *
+ * `@scope` limits these rules to the Markdown in the note column and in the
+ * search preview (a note's `main.content`): the note header, the post
+ * footer, Recent Posts, and the backlinks list sit in `main.content` too
+ * but style themselves.
+ * Diagrams (plugins/mdast/diagrams.ts) are left out as well: Kroki's SVG
+ * carries its own stylesheet, and Mermaid's labels are HTML paragraphs the
+ * rules here would space out.
+ * The 404 page's `main.content` holds no Markdown, and its body lacks the
+ * `markdown-rendered` class, as on live. Scoped selectors add no
+ * specificity, so `p` stays (0,0,1) and class-based component rules
+ * (callouts) still win over it.
+ */
+@layer components {
+  @scope (.markdown-rendered :is(main.content, .preview-body)) to (header, footer, .recent-notes, .backlinks, .diagram) {
+    /* Inherited text behavior (Obsidian sets both on .markdown-rendered). */
+    :scope {
+      overflow-wrap: break-word;
+      tab-size: 4;
+    }
+
+    /* Block rhythm. These margins use :where() (zero specificity) so the
+       edge rules below can override them by source order, and so component
+       stylesheets can set the edges of their own content. Paragraphs, lists,
+       tables, and headings: Obsidian's --p-spacing. Quotes: 16px. Rules:
+       Obsidian's `hr { margin: 2rem 0 }`. */
+    :where(p, ul, ol, .table-wrapper, h1, h2, h3, h4, h5, h6) {
+      margin-block: --spacing(7);
+    }
+    :where(blockquote) {
+      margin-block: --spacing(4);
+    }
+    :where(hr) {
+      margin-block: --spacing(8);
+    }
+    /* custom.scss `.content h2` / `.content h3` margin-top. */
+    :where(h2) {
+      margin-block-start: 1.75em;
+    }
+    :where(h3) {
+      margin-block-start: 1.5em;
+    }
+    /* Obsidian's --heading-spacing: a heading after a block. */
+    :where(:is(p, pre, .table-wrapper, ul, ol) + :is(h1, h2, h3, h4, h5, h6)) {
+      margin-block-start: 2em;
+    }
+    :where(:is(ul, ol) :is(ul, ol)) {
+      margin-block: 0;
+    }
+    :where(:is(ul, ol) li p:first-of-type) {
+      margin-block-start: 0;
+    }
+    :where(:is(ul, ol) li p:last-of-type) {
+      margin-block-end: 0;
+    }
+    :where(blockquote > :first-child) {
+      margin-block-start: 0;
+    }
+    :where(blockquote > :last-child) {
+      margin-block-end: 0;
+    }
+
+    /* Paragraphs and inline text */
+    p {
+      unicode-bidi: plaintext;
+    }
+    /* Avoid a lone word on the last line and even out the ragged edge.
+       Browsers without it wrap as before. */
+    :is(p, li) {
+      text-wrap: pretty;
+    }
+    :is(strong, b) {
+      font-weight: var(--font-weight-bold);
+    }
+    mark {
+      padding: --spacing(0.5) --spacing(1);
+      border-radius: var(--radius-lg);
+      background-color: --alpha(var(--color-yellow-400) / 40%);
+      color: var(--color-gray-50);
+      font-weight: var(--font-weight-medium);
+      box-decoration-break: clone;
+    }
+
+    /* Headings: Major Third scale in Instrument Serif. Weight 400: the
+       self-hosted face has one weight, and live rendered its regular glyphs. */
+    :is(h1, h2, h3, h4, h5, h6) {
+      font-family: var(--font-serif);
+      font-weight: var(--font-weight-normal);
+      text-wrap: pretty;
+    }
+    /* A link to a heading or a block (the table of contents, a wikilink
+       fragment, a block embed's link) stops it below the fixed navbar, and
+       short of the top above it. */
+    :is(h1, h2, h3, h4, h5, h6, [id]) {
+      scroll-margin-top: --spacing(20);
+
+      @variant lg {
+        scroll-margin-top: --spacing(8);
+      }
+    }
+    h1 {
+      font-size: var(--text-5xl);
+      line-height: var(--text-5xl--line-height);
+      letter-spacing: var(--text-5xl--letter-spacing);
+    }
+    h2 {
+      font-size: var(--text-4xl);
+      line-height: var(--text-4xl--line-height);
+      letter-spacing: var(--text-4xl--letter-spacing);
+    }
+    h3 {
+      font-size: var(--text-3xl);
+      line-height: var(--text-3xl--line-height);
+      letter-spacing: var(--text-3xl--letter-spacing);
+    }
+    h4 {
+      font-size: var(--text-2xl);
+      line-height: var(--text-2xl--line-height);
+    }
+    h5 {
+      font-size: var(--text-xl);
+      line-height: var(--text-xl--line-height);
+    }
+    h6 {
+      font-size: var(--text-lg);
+      line-height: var(--text-lg--line-height);
+      text-transform: uppercase;
+      /* Capitals need extra spacing to read evenly. */
+      letter-spacing: var(--tracking-wider);
+    }
+
+    /* Links: gray, underlined on hover. Unresolved wikilinks are dimmed. */
+    /* Links keep the regular weight (even in table headers and highlights)
+       unless they sit in bold text. */
+    /* The faint underline all links in sentences share (utilities.css). */
+    a:is(.internal-link, .external-link) {
+      @apply link-underline;
+      color: var(--color-gray-200);
+      font-weight: var(--font-weight-normal);
+      cursor: pointer;
+      transition: opacity var(--default-transition-duration)
+        var(--default-transition-timing-function);
+
+      &:hover {
+        color: var(--color-gray-100);
+      }
+    }
+    :is(b, strong) a:is(.internal-link, .external-link) {
+      font-weight: var(--font-weight-bold);
+    }
+    mark .internal-link {
+      color: var(--color-gray-50);
+    }
+    /* Obsidian's --link-unresolved-opacity. */
+    a.internal-link.is-unresolved {
+      opacity: 0.7;
+
+      &:hover {
+        opacity: 1;
+      }
+    }
+    /* The outgoing-arrow icon after external links
+       (digital-garden-base.scss, custom.scss --dg-external-link-icon-size). */
+    a.external-link {
+      padding-inline-end: --spacing(4);
+      background-image: url("/img/outgoing.svg");
+      background-position: right --spacing(1);
+      background-size: 0.8125em;
+      background-repeat: no-repeat;
+    }
+
+    /* Lists (Obsidian's selectors, kept as is). Top-level items indent by
+       3ch; nested items of the same list type by Obsidian's --list-indent
+       (2.25em); each item is padded by its --list-spacing. */
+    :is(ul, ol) {
+      padding-inline-start: 0;
+    }
+    ul {
+      list-style-type: disc;
+    }
+    ol {
+      list-style-type: decimal;
+    }
+    :is(ul, ol) > li {
+      position: relative;
+      margin-inline-start: 3ch;
+      padding-block: 0.175em;
+
+      &::marker {
+        color: var(--color-gray-400);
+      }
+    }
+    :is(ul ul, ol ol) > li {
+      margin-inline-start: 2.25em;
+    }
+
+    /* Task lists: a plain box when open, a filled box with a check mark
+       when done. (The live theme masked the whole box into a check mark,
+       so open tasks showed nothing; see docs/design-changes.md.) */
+    ul > li.task-list-item {
+      list-style: none;
+    }
+    .task-list-item input[type="checkbox"] {
+      position: relative;
+      flex-shrink: 0;
+      width: --spacing(4);
+      height: --spacing(4);
+      margin: 0;
+      margin-inline-end: --spacing(1.5);
+      padding: 0;
+      vertical-align: -0.125em;
+      /* Faint rather than decoration gray: a control's edge needs 3:1. */
+      border: 1px solid var(--color-gray-300);
+      border-radius: var(--radius-sm);
+      appearance: none;
+
+      &:checked {
+        border-color: var(--color-gray-50);
+        background-color: var(--color-gray-50);
+
+        &::after {
+          content: "";
+          position: absolute;
+          inset: 0;
+          background-color: var(--color-gray-950);
+          mask-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='none' viewBox='0 0 20 20'%3e%3cpath fill='black' d='m12.998 6.084-4.17 6.7-1.982-2.56c-.244-.322-.46-.41-.742-.41a.788.788 0 0 0-.782.801c0 .225.088.44.235.635l2.45 3.008c.255.342.528.478.86.478.332 0 .615-.156.82-.478l4.59-7.227c.118-.205.245-.43.245-.644 0-.46-.4-.752-.83-.752-.255 0-.508.156-.694.449Z'/%3e%3c/svg%3e");
+          mask-position: center;
+          mask-size: 100% 100%;
+          mask-repeat: no-repeat;
+        }
+      }
+    }
+
+    /* Blockquotes: a raised box with a 2px rounded rule inset on the left
+       (Obsidian's --blockquote-border-thickness). */
+    blockquote {
+      position: relative;
+      margin-inline: 0;
+      padding: --spacing(4);
+      padding-inline-start: calc(--spacing(8) + 2px);
+      border-radius: var(--radius-lg);
+      corner-shape: var(--corner-shape-soft);
+      background-color: var(--color-gray-900);
+      font-size: var(--text-base);
+
+      &::before {
+        content: "";
+        position: absolute;
+        top: --spacing(4);
+        bottom: --spacing(4);
+        inset-inline-start: --spacing(4);
+        width: 2px;
+        border-radius: var(--radius-lg);
+        background-color: var(--color-gray-400);
+        pointer-events: none;
+      }
+    }
+
+    /* Horizontal rules (Obsidian's --hr-thickness). */
+    hr {
+      width: 100%;
+      margin-inline: 0;
+      border: none;
+      border-top: 2px solid var(--color-gray-700);
+    }
+
+    /* Tables: at least full width, 1px cell borders (transparent in the
+       header), top-aligned cells. Alignment from Markdown arrives as inline
+       text-align and overrides the start default. Cell text and minimum
+       column width: Obsidian's --table-text-size and
+       --table-column-min-width.
+       A table wider than the column scrolls in its wrapper
+       (plugins/hast/tableWrapper.ts) instead of being squeezed, so it takes
+       its natural width and cells stop at 30ch, wrapping between words. A
+       word or code span breaks only when it alone is wider than that. Live
+       squeezed wide tables, breaking words mid-letter, and clipped the rest
+       on phones. */
+    /* A wrapper that scrolls fades out at the edge with more table to
+       scroll to: the edge fade below, shared with diagrams. */
+    .table-wrapper {
+      overflow-x: auto;
+    }
+    table {
+      width: max-content;
+      min-width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      line-height: var(--leading-tight);
+    }
+    :is(th, td) {
+      min-width: 6ch;
+      max-width: 30ch;
+      padding: --spacing(2);
+      border: 1px solid var(--color-gray-700);
+      font-size: 0.933em;
+      text-align: start;
+      white-space: break-spaces;
+      overflow-wrap: anywhere;
+      vertical-align: top;
+    }
+    th {
+      border-color: transparent;
+      font-weight: var(--font-weight-bold);
+      line-height: var(--leading-tight);
+    }
+
+    /* Images: rounded corners; an image alone in a paragraph is centered
+       (custom.scss). Astro's images carry width and height attributes, so
+       height: auto keeps a narrowed image in proportion. */
+    img {
+      border-radius: var(--radius-lg);
+      corner-shape: var(--corner-shape-soft);
+      image-rendering: -webkit-optimize-contrast;
+    }
+    img[data-astro-image] {
+      height: auto;
+    }
+    p > :is(img, picture):only-child,
+    p > picture:only-child img {
+      display: block;
+      margin-inline: auto;
+    }
+
+    /* Footnotes: smaller text (Obsidian's --footnote-size); the list,
+       references, and back-links use the list and link rules above. */
+    .footnotes {
+      font-size: 0.875em;
+    }
+    /* The pipeline labels the footnotes list with an h2 meant for screen
+       readers only (live never defined the class, so it showed). */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+      border-width: 0;
+    }
+
+    /* Math: MathJax inlines its own layout (display blocks are centered with
+       a 1em margin, and each SVG carries its vertical-align). Preflight makes
+       every svg a block; formulas must stay in the line of text. */
+    mjx-container > svg {
+      display: inline;
+    }
+  }
+
+  /* The edge fades' widths over the scroll (see below). */
+  @keyframes edge-fade {
+    from {
+      --fade-start: 0;
+      --fade-end: --spacing(10);
+    }
+    10% {
+      --fade-start: --spacing(10);
+    }
+    90% {
+      --fade-end: --spacing(10);
+    }
+    to {
+      --fade-start: --spacing(10);
+      --fade-end: 0;
+    }
+  }
+
+  /* Diagrams: outside the scope above, so their figure is placed here. It
+     keeps the blocks' rhythm. The SVG shrinks to fit the column in
+     proportion, but not below 70% of its drawn width (`--diagram-width`,
+     from plugins/mdast/diagrams.ts), where its labels would get too small
+     to read; past that the figure scrolls sideways. */
+  .markdown-rendered :is(main.content, .preview-body) .diagram {
+    /* The plugin sets the drawn width inline; without one, fill the column. */
+    --diagram-width: 100%;
+    margin: --spacing(7) 0;
+    overflow-x: auto;
+
+    & svg {
+      display: block;
+      width: max(
+        min(100%, var(--diagram-width)),
+        calc(var(--diagram-width) * 0.7)
+      );
+      max-width: none;
+      height: auto;
+      margin-inline: auto;
+    }
+  }
+
+  /* A table or diagram that scrolls fades out at the edge with more to
+     scroll to, and the fade clears at each end. The fade is a mask, so it
+     shows on any background (a table in a tinted callout) and over a
+     diagram's filled shapes. A scroll-driven animation moves each fade with
+     the scroll position; a box that doesn't scroll has no active timeline,
+     so nothing fades. Browsers without scroll-driven animations (Firefox)
+     show no fade. Outside the scope above, which stops at diagrams. */
+  .markdown-rendered
+    :is(main.content, .preview-body)
+    :is(.table-wrapper, .diagram) {
+    @supports (animation-timeline: scroll()) {
+      mask-image: linear-gradient(
+        to right,
+        transparent,
+        var(--color-black) var(--fade-start),
+        var(--color-black) calc(100% - var(--fade-end)),
+        transparent
+      );
+      /* Longhands: the minifier folds `animation` and the timeline into one
+         shorthand, which browsers reject. */
+      animation-name: edge-fade;
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-timeline: scroll(self inline);
+
+      /* The mask would clip the focus ring drawn around the box. */
+      &:focus-visible {
+        mask-image: none;
+      }
+    }
+  }
+}
+
+/* The edge fades' widths, animated with the scroll position
+   (the `edge-fade` keyframes above). `@property` sits outside
+   layers. */
+@property --fade-start {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0;
+}
+@property --fade-end {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0;
+}

@@ -1,0 +1,51 @@
+---
+// T3: the search trigger shown in both the mobile navbar and the sidebar
+// (Eleventy's `src/site/_includes/components/searchButton.njk`). Eleventy
+// rendered a `div[role=button]` with `onclick`/`onkeydown` handlers; here
+// it's a real `<button>`, which gets the same semantics (focusable,
+// activates on click and Enter/Space, announced as a button) for free.
+// Both copies point at the one SearchDialog; the search script opens it.
+//
+// Styling (ADR 0003 phase 2): the box is the same in both places; the
+// placement sets how it sits in its parent. The button's `color` is
+// inherited, so it is the sidebar's muted gray there and the body text color
+// in the navbar, as on the live site.
+import Icon from "./Icon.astro";
+import Key from "./Key.astro";
+
+interface Props {
+  placement: "navbar" | "sidebar";
+}
+
+const { placement } = Astro.props;
+const navbar = placement === "navbar";
+---
+
+<button
+  type="button"
+  class:list={[
+    // Search needs JavaScript; without it the button would do nothing.
+    "search-button align-icon noscript:hidden",
+    "my-2.5 flex h-9 cursor-pointer appearance-none items-center justify-evenly gap-2 rounded-lg border border-gray-700 bg-gray-950 px-2.5 py-0 text-left font-sans text-sm font-normal whitespace-nowrap text-inherit transition-none select-none hover:border-gray-100",
+    navbar
+      ? "mx-0 max-md:min-w-9 md:w-46"
+      : "mx-0 w-full shrink-0 max-xl:mr-2.5 max-md:mx-0.5",
+  ]}
+  aria-label="Search"
+  aria-haspopup="dialog"
+  aria-controls="globalsearch"
+>
+  <span class="search-icon flex items-center">
+    <Icon name="search" class="pointer-events-none size-3 opacity-70" />
+  </span>
+  <span
+    class:list={[
+      "search-text flex-1",
+      navbar && "flex justify-center max-md:hidden",
+    ]}>Search</span
+  >
+  <span
+    class="search-keys rounded-sm bg-white/8 px-1 py-0.5 text-[0.75em] leading-relaxed text-gray-300 max-md:hidden"
+    ><Key class="search-key-modifier">Ctrl</Key>&nbsp;+&nbsp;<Key>K</Key></span
+  >
+</button>

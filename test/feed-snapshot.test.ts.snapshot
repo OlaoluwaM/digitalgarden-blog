@@ -1,0 +1,35 @@
+exports[`feed snapshot > matches the reviewed feed 1`] = `
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+<title>Thunks &amp; Thoughts</title>
+<description>Thunks &amp; Thoughts on engineering, life, and all that good stuff</description>
+<link>https://thunk.blog/</link>
+<language>en</language>
+<atom:link href="https://thunk.blog/feed.xml" rel="self" type="application/rss+xml"/>
+<item>
+<title>Newer post</title>
+<link>https://thunk.blog/posts/newer/</link>
+<guid isPermaLink="true">https://thunk.blog/posts/newer/</guid>
+<description>Newer post (fixture).</description>
+<pubDate>Sun, 15 Mar 2026 23:05:00 GMT</pubDate>
+<content:encoded>&lt;p&gt;An image:&lt;/p&gt;
+&lt;p&gt;&lt;img alt=&quot;The icon&quot; loading=&quot;lazy&quot; decoding=&quot;async&quot; sizes=&quot;(min-width: 192px) 192px, 100vw&quot; data-astro-image=&quot;constrained&quot; data-astro-image-pos=&quot;center&quot; width=&quot;192&quot; height=&quot;192&quot; src=&quot;https://thunk.blog/_astro/icon.BO84JIWz_Z192FfP.webp&quot; srcset=&quot;https://thunk.blog/_astro/icon.BO84JIWz_Z192FfP.webp 192w&quot;&gt;&lt;/p&gt;
+</content:encoded>
+<category>linux</category>
+<category>software-engineering</category>
+</item>
+<item>
+<title>Older post</title>
+<link>https://thunk.blog/posts/older/</link>
+<guid isPermaLink="true">https://thunk.blog/posts/older/</guid>
+<description>Older post (fixture).</description>
+<pubDate>Sun, 01 Feb 2026 15:30:00 GMT</pubDate>
+<content:encoded>&lt;h2 id=&quot;setup&quot;&gt;Setup&lt;/h2&gt;
+&lt;p&gt;Text with a &lt;a href=&quot;https://thunk.blog/posts/newer/&quot; class=&quot;internal-link&quot;&gt;relative link&lt;/a&gt; and a &lt;a href=&quot;#setup&quot; class=&quot;internal-link&quot;&gt;heading link&lt;/a&gt;.&lt;/p&gt;
+</content:encoded>
+<category>haskell</category>
+</item>
+</channel>
+</rss>
+`;

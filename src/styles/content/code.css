@@ -1,0 +1,154 @@
+/*
+ * Rendered Markdown: inline code and Shiki code blocks (line numbers, language label, copy button).
+ *
+ * Sources: Obsidian's `.markdown-rendered code` and `pre` rules (resolved
+ * from the live theme's computed styles), src/site/styles/user/
+ * code-blocks.scss, and custom.scss (`code[class*="language-"]`). Shiki
+ * writes each block's background and text color as inline styles
+ * (the `dark-plus` theme, with the background swapped for
+ * `--color-gray-900` in astro.config.ts); these rules never set them on the
+ * `pre`. They apply in the note column and in the search preview.
+ */
+@layer components {
+  /* Inline code, at Obsidian's --code-size (0.8em of the text around it).
+     Code blocks reset the box below. */
+  :is(.content, .preview-body) code {
+    padding: --spacing(1) --spacing(1.5);
+    border: 1px solid var(--color-gray-700);
+    border-radius: var(--radius-md);
+    corner-shape: var(--corner-shape-soft);
+    background-color: var(--color-gray-900);
+    color: var(--color-slate-300);
+    font-family: var(--font-mono);
+    font-size: 0.8em;
+    /* Keeps a code span on one line. */
+    white-space: nowrap;
+    /* Obsidian's: if a span ever breaks, each piece gets the full box. */
+    box-decoration-break: clone;
+  }
+
+  /* In a table cell, which stops at 30ch, a code span wraps instead of
+     running past the cell's edge. */
+  :is(.content, .preview-body) :is(th, td) code {
+    white-space: normal;
+  }
+
+  /* Code blocks. The language label and copy button inherit the block's
+     font. (Live left the `pre` on the browser's generic monospace, which is
+     Courier on some systems; see docs/design-changes.md.) */
+  :is(.content, .preview-body) pre.astro-code {
+    position: relative;
+    /* The browser's default block margin, which Preflight removes. */
+    margin-block: 1em;
+    font-family: var(--font-mono);
+    min-height: --spacing(9.5);
+    /* The wide left padding holds the line numbers. */
+    padding: --spacing(4) --spacing(4) --spacing(4) --spacing(9);
+    border: 1px solid var(--color-gray-700);
+    border-radius: var(--radius-lg);
+    corner-shape: var(--corner-shape-soft);
+    overflow-x: auto;
+    /* Long lines wrap instead of scrolling. */
+    white-space: pre-wrap;
+    tab-size: 4;
+  }
+
+  :is(.content, .preview-body) pre.astro-code > code {
+    padding: 0;
+    border: 0;
+    background: none;
+    line-height: var(--leading-relaxed);
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    word-break: normal;
+    word-spacing: normal;
+    text-align: left;
+    hyphens: none;
+    direction: ltr;
+  }
+
+  /* Every Shiki block carries a `language-*` class. */
+  :is(.content, .preview-body) code[class*="language-"] {
+    font-weight: var(--font-weight-semibold);
+  }
+
+  /* Line numbers: Shiki's transformer writes `data-line` on each line. The
+     number sits in the block's left padding. */
+  :is(.content, .preview-body) pre.astro-code .line[data-line]::before {
+    content: attr(data-line);
+    display: inline-block;
+    width: --spacing(8);
+    margin-right: --spacing(2);
+    margin-left: --spacing(-10);
+    text-align: right;
+    opacity: 0.3;
+  }
+
+  /* Language label, top right. It gives way to the copy button. */
+  :is(.content, .preview-body) pre.astro-code[data-language]::before {
+    content: attr(data-language);
+    position: absolute;
+    top: --spacing(2);
+    right: --spacing(3);
+    font-size: var(--text-xs);
+    line-height: var(--text-xs--line-height);
+    text-transform: capitalize;
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  /* Copy button (src/scripts/copyCode.ts adds it). Hidden until the block is
+     hovered or holds focus, so it stays reachable by keyboard: tabbing into
+     the focusable `pre` or onto the button shows it. */
+  :is(.content, .preview-body) pre.astro-code .copy-code-btn {
+    position: absolute;
+    top: --spacing(1.5);
+    right: --spacing(2);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    /* Obsidian's --input-height. */
+    height: --spacing(8);
+    padding: --spacing(1) --spacing(2);
+    border: 0;
+    border-radius: var(--radius-sm);
+    /* The site's hover fill, a step stronger on hover. */
+    background: --alpha(var(--color-white) / 5%);
+    box-shadow: inset 0 0 0 1px var(--color-gray-700);
+    color: var(--color-gray-100);
+    font-family: inherit;
+    font-size: var(--text-xs);
+    font-weight: var(--font-weight-medium);
+    line-height: var(--text-xs--line-height);
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--default-transition-duration)
+      var(--default-transition-timing-function);
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+    }
+
+    &:hover {
+      background: --alpha(var(--color-white) / 10%);
+      /* Obsidian's --input-shadow-hover. */
+      box-shadow: inset 0 0 0 1px var(--color-gray-600);
+    }
+  }
+
+  :is(.content, .preview-body)
+    pre.astro-code:is(:hover, :focus-within)
+    .copy-code-btn,
+  :is(.content, .preview-body) pre.astro-code .copy-code-btn:focus-visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  :is(.content, .preview-body)
+    pre.astro-code[data-language]:is(:hover, :focus-within)::before {
+    opacity: 0;
+  }
+}

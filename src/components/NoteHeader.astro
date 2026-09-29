@@ -1,0 +1,54 @@
+---
+// T2 (phase 1): note title, tags, and timestamps.
+import type { Post } from "../content/posts.ts";
+import type { ContentsEntry } from "../content/table-of-contents.ts";
+import Icon from "./Icon.astro";
+import TableOfContents from "./TableOfContents.astro";
+import Tag from "./Tag.astro";
+import { formatNoteDate } from "../lib/dates.ts";
+
+interface Props {
+  post: Post;
+  /** The note's sections; none renders no table of contents. */
+  contents?: ContentsEntry[];
+}
+
+const { post, contents = [] } = Astro.props;
+const { title, tags, published, last_updated } = post.data.rawNoteProps;
+---
+
+<header>
+  <h1 class="font-serif font-normal text-5xl mt-7 mb-11">
+    {title}
+  </h1>
+  <div class="header-meta">
+    <div class="header-tags flex flex-wrap gap-2">
+      {tags.map((tag: string) => <Tag tag={tag} />)}
+    </div>
+    <div
+      class="timestamps mt-5 flex gap-2.5 text-sm text-gray-100 tabular-nums"
+    >
+      <div
+        title="Created at"
+        aria-label="Created at"
+        class="flex items-center gap-1"
+      >
+        <Icon name="calendar-plus" class="size-4" />{" "}
+        <time class="human-date" datetime={published}>
+          {formatNoteDate(published)}
+        </time>
+      </div>
+      <div
+        title="Updated at"
+        aria-label="Updated at"
+        class="flex items-center gap-1"
+      >
+        <Icon name="calendar-clock" class="size-4" />{" "}
+        <time class="human-date" datetime={last_updated}>
+          {formatNoteDate(last_updated)}
+        </time>
+      </div>
+    </div>
+  </div>
+  <TableOfContents entries={contents} />
+</header>

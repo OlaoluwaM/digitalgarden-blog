@@ -1,0 +1,313 @@
+/**
+ * Component tests for the site navigation (T3) — the desktop sidebar,
+ * mobile navbar, and file tree, rebuilt without Alpine.js per the live
+ * markup recorded from https://thunk.blog.
+ *
+ * These render `NavShell.astro` (the presentational half of
+ * `SiteNavigation.astro`) with a hand-built `tree` fixture, not
+ * `SiteNavigation.astro` itself. `SiteNavigation` calls `getPublishedPosts()`
+ * (`astro:content`), and this project's Container API + `vitest.astro.config.mts`
+ * setup cannot resolve that: `getCollection("posts")` reports the collection
+ * as empty even immediately after a real `astro build` populated it in the
+ * same worktree. Since every other component test here (`icon.test.ts`) and
+ * every existing content test (`posts.test.ts`, `search-index.test.ts`)
+ * either avoids `astro:content` entirely or substitutes it, this is that
+ * same pattern: test the markup deterministically against a fixture, and
+ * leave the real `getPublishedPosts()` + `buildFileTree()` wiring to
+ * `npm run build` (confirmed to render all 14 live posts correctly)
+ * and to `test/file-tree.test.ts` (the tree builder's own unit tests).
+ *
+ * Why this level: the markup (classes, nesting, which note is marked
+ * active) is what `src/styles/components/navigation.css`, the layout tests,
+ * and the upcoming mobile-navigation script select against. Visual parity
+ * (sidebar width, colors, the 1000px breakpoint) is checked separately with
+ * a real browser, not here.
+ */
+import { experimental_AstroContainer as AstroContainer } from "astro/container";
+import { parse, type HTMLElement } from "node-html-parser";
+import { beforeAll, describe, expect, it } from "vitest";
+import NavShell from "../../src/components/NavShell.astro";
+import type { FileTreeNode } from "../../src/content/file-tree.ts";
+
+let container: AstroContainer;
+
+beforeAll(async () => {
+  container = await AstroContainer.create();
+});
+
+// Mirrors the live site's actual shape: a " Posts" folder (leading space,
+// exactly as it is in the real dg-path) holding two notes, plus the garden
+// entry ("Home") at the root. `file-tree.test.ts` covers building this
+// shape from posts; here it only needs to exist so the markup can be
+// checked against it.
+const fixtureTree: readonly FileTreeNode[] = [
+  {
+    type: "folder",
+    name: " Posts",
+    children: [
+      {
+        type: "file",
+        title: "Implementing Redis INFO in Haskell",
+        href: "/posts/implementing-redis-info-in-haskell/",
+      },
+      {
+        type: "file",
+        title: "Be deliberate",
+        href: "/posts/be-deliberate/",
+      },
+    ],
+  },
+  { type: "file", title: "Home", href: "/" },
+];
+
+async function renderNav(activePathname: string): Promise<HTMLElement> {
+  const html = await container.renderToString(NavShell, {
+    props: { tree: fixtureTree, activePathname },
+  });
+  return parse(html);
+}
+
+describe("structure", () => {
+  // Why: these are the load-bearing classes and nesting the navigation
+  // styles, layout tests, and scripts target. If the shape drifts here,
+  // styling or behavior silently breaks.
+  it("renders the mobile navbar with a hamburger and site name", async () => {
+    const root = await renderNav("/");
+    const navbar = root.querySelector(".navbar");
+    expect(navbar).not.toBeNull();
+    expect(navbar!.querySelector(".navbar-inner")).not.toBeNull();
+
+    const hamburger = navbar!.querySelector("button.hamburger-btn");
+    expect(hamburger).not.toBeNull();
+    expect(hamburger!.getAttribute("aria-label")).toBe("Toggle navigation");
+
+    // The site name links home but is not a heading: each page's one h1
+    // is its own title.
+    const name = navbar!.querySelector("a > span.site-name-header");
+    expect(name?.text.trim()).toBe("Thunks & Thoughts");
+    expect(navbar!.querySelector("h1")).toBeNull();
+  });
+
+  it("renders the desktop sidebar with the filetree wrapper and site name", async () => {
+    const root = await renderNav("/");
+    const wrapper = root.querySelector(".filetree-wrapper");
+    expect(wrapper).not.toBeNull();
+
+    const sidebar = wrapper!.querySelector("nav.filetree-sidebar");
+    expect(sidebar).not.toBeNull();
+    // Eleventy renders the sidebar's site name without the navbar's
+    // `site-name-header` class; kept for parity with its markup. Like the
+    // navbar's, it is not a heading.
+    const name = sidebar!.querySelector(":scope > a > span");
+    expect(name?.classList.contains("site-name-header")).toBe(false);
+    expect(name?.text.trim()).toBe("Thunks & Thoughts");
+    expect(sidebar!.querySelector("h1")).toBeNull();
+  });
+
+  // Why: below lg the file tree is a popover the hamburger opens through
+  // `popovertarget`, so it opens and closes without JavaScript (live needed
+  // Alpine). The browser then handles Escape, a tap outside, the dimmed
+  // backdrop, and the hamburger's expanded state for screen readers, so
+  // the markup carries no `aria-expanded` of its own to fall out of step.
+  it("makes the file tree a popover the hamburger opens", async () => {
+    const root = await renderNav("/");
+    const hamburger = root.querySelector("button.hamburger-btn")!;
+    const target = hamburger.getAttribute("popovertarget");
+    expect(target).toBeTruthy();
+    expect(hamburger.hasAttribute("aria-expanded")).toBe(false);
+    const tree = root.querySelector(`#${target}`);
+    expect(tree?.classList.contains("filetree-wrapper")).toBe(true);
+    expect(tree?.getAttribute("popover")).toBe("auto");
+    expect(root.querySelector(".fullpage-overlay")).toBeNull();
+  });
+
+  // Why: mirrors Eleventy's root `<div class="folder" x-data="{isOpen:
+  // true}">` — always open, so it is a plain container with no toggle.
+  it("wraps the file tree in a root .folder with no toggle affordance", async () => {
+    const root = await renderNav("/");
+    const rootFolder = root.querySelector(".filetree-sidebar > .folder");
+    expect(rootFolder).not.toBeNull();
+    expect(rootFolder!.tagName).toBe("DIV");
+  });
+});
+
+describe("search buttons", () => {
+  // Why: Eleventy used a `div[role=button]` with onclick/onkeydown; a real
+  // `<button>` gets focus and keyboard activation for free and needs no
+  // hand-rolled keydown handler. Both the navbar and sidebar copies must be
+  // real buttons with an accessible name, even while search itself is inert.
+  it("renders both search triggers as real buttons with an accessible name", async () => {
+    const root = await renderNav("/");
+    const buttons = root.querySelectorAll("button.search-button");
+    expect(buttons).toHaveLength(2);
+    for (const button of buttons) {
+      expect(button.tagName).toBe("BUTTON");
+      expect(button.getAttribute("type")).toBe("button");
+      expect(button.getAttribute("aria-label")).toBe("Search");
+      expect(button.querySelector(".search-icon svg")).not.toBeNull();
+      expect(button.querySelector(".search-text")?.text).toBe("Search");
+    }
+  });
+
+  // Why: both buttons open the one search dialog. `aria-haspopup` tells
+  // screen readers that a dialog opens, and `aria-controls` names it, so
+  // the search script can find the dialog from either button.
+  it("points both search buttons at the one search dialog", async () => {
+    const root = await renderNav("/");
+    expect(root.querySelectorAll("dialog#globalsearch")).toHaveLength(1);
+    for (const button of root.querySelectorAll("button.search-button")) {
+      expect(button.getAttribute("aria-haspopup")).toBe("dialog");
+      expect(button.getAttribute("aria-controls")).toBe("globalsearch");
+    }
+  });
+
+  // Why: Macs show ⌘ instead of Ctrl. The live script rewrote the whole
+  // hint with innerHTML; a hook on the modifier key lets the script change
+  // only that key's text.
+  it("marks the modifier key so the script can show ⌘ on Macs", async () => {
+    const root = await renderNav("/");
+    const modifiers = root.querySelectorAll(
+      ".search-keys .search-key-modifier"
+    );
+    expect(modifiers.map(key => key.text)).toEqual(["Ctrl", "Ctrl"]);
+  });
+
+  // Why: the shortcut names keys to press, which is what <kbd> means;
+  // live used <code>, which reads as program text. The dialog's hints
+  // already use <kbd>, and both draw them with the one Key component.
+  it("marks the shortcut's keys as keyboard input", async () => {
+    const root = await renderNav("/");
+    for (const hint of root.querySelectorAll(".search-keys")) {
+      expect(hint.querySelectorAll("kbd").map(key => key.text)).toEqual([
+        "Ctrl",
+        "K",
+      ]);
+      expect(hint.querySelectorAll("code")).toHaveLength(0);
+    }
+  });
+});
+
+describe("folders", () => {
+  // Why: the live " Posts" folder starts collapsed until a visitor clicks
+  // it (Alpine's `$persist(false)` default). A native <details> without an
+  // `open` attribute reproduces that default with no JS at all.
+  it("renders folders as closed <details> by default", async () => {
+    const root = await renderNav("/");
+    const details = root.querySelectorAll("details.folder.inner-folder");
+    expect(details.length).toBeGreaterThan(0);
+    for (const el of details) {
+      expect(el.hasAttribute("open")).toBe(false);
+    }
+  });
+
+  // Why: the folder-state script remembers each folder under its path,
+  // built as live's `menuItem` macro built it (the root folder's name, then
+  // "/" and each nested folder's name). Live's Alpine `$persist` stored the
+  // state under `_x_` plus that path, so returning visitors keep theirs.
+  it("gives each folder its path, as live keyed its saved state", async () => {
+    const html = await container.renderToString(NavShell, {
+      props: {
+        tree: [
+          {
+            type: "folder",
+            name: " Posts",
+            children: [
+              {
+                type: "folder",
+                name: "Series",
+                children: [{ type: "file", title: "Part 1", href: "/p1/" }],
+              },
+            ],
+          },
+        ],
+        activePathname: "/",
+      },
+    });
+    const paths = parse(html)
+      .querySelectorAll("details.inner-folder")
+      .map(folder => folder.getAttribute("data-folder-path"));
+    expect(paths).toEqual([" Posts", " Posts/Series"]);
+  });
+
+  it("names the folder after its raw dg-path segment, leading space included", async () => {
+    const root = await renderNav("/");
+    const names = root.querySelectorAll(".foldername").map(el => el.text);
+    expect(names).toContain(" Posts");
+  });
+
+  // Why: the summary is the clickable disclosure control; it must carry
+  // Eleventy's classes so `_navigation.scss` and the base theme's
+  // `.foldername-wrapper` rules still apply.
+  it("uses a summary with the foldername-wrapper classes as the folder's header", async () => {
+    const root = await renderNav("/");
+    const summary = root.querySelector("details.folder.inner-folder > summary");
+    expect(summary?.classList.contains("foldername-wrapper")).toBe(true);
+    expect(summary?.classList.contains("align-icon")).toBe(true);
+    expect(summary!.querySelectorAll("svg.lucide-chevron-down")).toHaveLength(
+      1
+    );
+    expect(summary!.querySelectorAll("svg.lucide-chevron-right")).toHaveLength(
+      1
+    );
+  });
+});
+
+describe("notes", () => {
+  // Why: pins the tree's title/href pass-through so a rendering bug (wrong
+  // prop wired up, swapped title/href) is caught here rather than only
+  // showing up as a visual glitch later.
+  it("links a note by its href and title", async () => {
+    const root = await renderNav("/");
+    const links = root.querySelectorAll("a.filename");
+    const link = links.find(
+      a => a.getAttribute("href") === "/posts/be-deliberate/"
+    );
+    expect(link).toBeDefined();
+    expect(link!.text.trim()).toBe("Be deliberate");
+    expect(link!.getAttribute("data-note-icon")).toBe("");
+  });
+
+  it("links the garden entry (Home) to /", async () => {
+    const root = await renderNav("/");
+    const links = root.querySelectorAll("a.filename");
+    const home = links.find(a => a.text.trim() === "Home");
+    expect(home).toBeDefined();
+    expect(home!.getAttribute("href")).toBe("/");
+  });
+
+  // Why: only the note matching the current page should carry
+  // `active-note`; a stale or over-eager match would highlight the wrong
+  // (or every) entry.
+  it("marks only the current page's note as active", async () => {
+    const root = await renderNav("/posts/be-deliberate/");
+    const active = root.querySelectorAll(".notelink.active-note");
+    expect(active).toHaveLength(1);
+    expect(active[0]!.querySelector("a.filename")!.getAttribute("href")).toBe(
+      "/posts/be-deliberate/"
+    );
+  });
+
+  it("marks no note active when the current page matches none of them", async () => {
+    const root = await renderNav("/not-a-real-page/");
+    expect(root.querySelectorAll(".notelink.active-note")).toHaveLength(0);
+  });
+
+  it("marks the home note active on /", async () => {
+    const root = await renderNav("/");
+    const active = root.querySelectorAll(".notelink.active-note");
+    expect(active).toHaveLength(1);
+    expect(active[0]!.querySelector("a.filename")!.text.trim()).toBe("Home");
+  });
+});
+
+describe("no Alpine left behind", () => {
+  // Why: the whole point of T3 is to drop Alpine.js; any surviving
+  // `x-*`/`@click`/`$persist` binding would be dead weight at best and a
+  // console error at worst, since Alpine is not loaded.
+  it("contains no Alpine directives or its persist plugin", async () => {
+    const html = await container.renderToString(NavShell, {
+      props: { tree: fixtureTree, activePathname: "/" },
+    });
+    expect(html).not.toMatch(/x-data|x-show|x-init|x-on|@click|\$persist/);
+  });
+});

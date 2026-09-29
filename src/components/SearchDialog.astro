@@ -1,0 +1,141 @@
+---
+// The search dialog (Eleventy's `searchContainer.njk`), rendered once by
+// NavShell. Its markup is a contract with the search scripts, which fill
+// the results and preview and set the state; the static text lives here.
+// scripts/search.ts searches as the field changes and writes the results,
+// the no-results query, and the state; searchDialog.ts opens, closes, and
+// moves the selection; searchPreview.ts fills the preview.
+//
+// - Open with `showModal()` and close with `close()`. The dialog keeps focus
+//   inside, makes the page inert, closes on Escape, and focuses `#term`
+//   (`autofocus`). It covers the viewport, so a click outside the box has
+//   the dialog itself as its target.
+// - `#term` is a combobox: the script keeps `aria-expanded` (results shown)
+//   and `aria-activedescendant` (the selected result's id) current. It is
+//   a text field that asks phones for a search keyboard: a search field
+//   clears itself on Escape instead of letting the dialog close.
+// - `#search-layout[data-state]` decides what shows: `idle` (a message),
+//   `results` (the list and, from md up, the preview), `empty` (the
+//   no-results message, with the query written as text into
+//   `.no-results-query`).
+// - `#search-results` is a listbox. Each result the script appends:
+//     <a class="searchresult" id="search-result-N" role="option"
+//        aria-selected="true|false" tabindex="-1" href="/note/">
+//       <span class="result-title">…</span>
+//       <span class="result-tags"><span class="tag">#tag</span>…</span>
+//       <span class="result-excerpt">…</span>
+//     </a>
+//   Matches inside any text: <mark class="search-highlight">…</mark>.
+// - `.preview-placeholder` shows while `#preview-content` is empty. A preview:
+//     <div class="preview-title">…</div>
+//     <div class="preview-tags"><button type="button" class="tag">#tag</button>…</div>
+//     <div class="preview-body"><!-- a note's main.content --></div>
+//   The body is styled like a note; its header and footer are hidden.
+//
+// Everything the script builds is styled by class in
+// styles/components/search.css, so the script carries no styling.
+import Icon from "./Icon.astro";
+import Key from "./Key.astro";
+
+// The three messages (before a search, no results, no preview yet) share
+// one look. `display` stays off these classes: search.css and the
+// placeholder's `peer-empty:` decide when each shows.
+const messageClass =
+  "flex-col items-center px-5 py-10 text-center text-sm text-gray-100";
+const messageIconClass = "mb-4 size-12 opacity-30";
+const hints = [
+  ["Enter", "to select"],
+  ["⇅", "to navigate"],
+  ["ESC", "to close"],
+] as const;
+---
+
+<dialog
+  id="globalsearch"
+  class="search-container size-full max-h-none max-w-none items-start justify-center overflow-y-auto overscroll-contain bg-transparent pt-20 text-inherit backdrop:bg-black/50 open:flex print:hidden"
+  aria-label="Search"
+>
+  <div
+    class="search-box flex w-6xl max-w-9/10 flex-col rounded-xl bg-gray-950 p-4 shadow-2xl max-md:w-19/20 max-md:max-w-19/20 max-md:p-3"
+  >
+    <div class="search-header shrink-0 border-b border-gray-700 pb-3">
+      {/* showModal() focuses the dialog's autofocus control (HTML spec). */}
+      {/* eslint-disable astro/jsx-a11y/no-autofocus */}
+      <input
+        id="term"
+        type="text"
+        inputmode="search"
+        enterkeyhint="search"
+        class="h-8 w-full rounded-lg border border-gray-700 bg-gray-800 px-4 text-sm text-gray-50 placeholder:text-gray-300"
+        placeholder="Start typing..."
+        aria-label="Search notes"
+        role="combobox"
+        aria-autocomplete="list"
+        aria-expanded="false"
+        aria-controls="search-results"
+        autocomplete="off"
+        spellcheck="false"
+        autofocus
+      />
+      {/* eslint-enable astro/jsx-a11y/no-autofocus */}
+    </div>
+    <div
+      id="search-layout"
+      class="search-layout mt-3 flex min-h-0 flex-1 overflow-hidden"
+      data-state="idle"
+    >
+      <div
+        class="search-results-panel max-h-[60vh] shrink-0 overflow-y-auto overscroll-contain"
+      >
+        <div class="search-idle">
+          <div class:list={["flex", messageClass]}>
+            <Icon name="search" class={messageIconClass} />
+            <p class="m-0">Type to search the notes</p>
+          </div>
+        </div>
+        <div id="search-results" role="listbox" aria-label="Results"></div>
+        <div class="no-results">
+          <div class:list={["flex", messageClass]}>
+            <Icon name="zoom-out" class={messageIconClass} />
+            <p class="m-0">
+              No results for “<span class="no-results-query"></span>”
+            </p>
+          </div>
+        </div>
+      </div>
+      <div
+        id="search-preview"
+        class="search-preview-panel max-h-[60vh] grow overflow-y-auto overscroll-contain pl-4"
+      >
+        <!-- The placeholder shows while the preview is empty; it follows the
+             preview so `peer-empty:` can see it. -->
+        <div
+          id="preview-content"
+          class="preview-content peer p-2 text-base empty:hidden"
+        >
+        </div>
+        <div
+          class:list={[
+            "preview-placeholder hidden peer-empty:flex",
+            messageClass,
+          ]}
+        >
+          <Icon name="file-text" class={messageIconClass} />
+          <p class="m-0">Select a result to preview</p>
+        </div>
+      </div>
+    </div>
+    <!-- Keyboard hints, hidden below md like the search button's. -->
+    <footer
+      class="search-box-footer mt-3 flex shrink-0 justify-end gap-4 border-t border-gray-700 pt-3 max-md:hidden"
+    >
+      {
+        hints.map(([key, action]) => (
+          <span class="navigation-hint text-xs text-gray-100">
+            <Key>{key}</Key>&nbsp;{action}
+          </span>
+        ))
+      }
+    </footer>
+  </div>
+</dialog>

@@ -1,0 +1,24 @@
+---
+// T4 (phase 1): standalone 404 page, not using BaseLayout
+import "../styles/global.css";
+import { site } from "../lib/site.ts";
+import SiteHead from "../components/SiteHead.astro";
+---
+
+<!doctype html>
+<html lang={site.lang}>
+  <head>
+    <SiteHead title="Nothing here" />
+  </head>
+  <body>
+    <main class="content centered">
+      <h1 class="font-serif font-normal text-5xl mt-7 mb-7">
+        There is nothing here
+      </h1>
+      <p>If you got here from a link, this note is probably not made public</p>
+      <a class="link-underline text-gray-200 hover:text-gray-100" href="/"
+        >Go back home</a
+      >
+    </main>
+  </body>
+</html>
