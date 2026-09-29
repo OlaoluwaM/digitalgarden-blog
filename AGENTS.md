@@ -21,13 +21,15 @@ requires before you change external state.
 
 ## Astro rewrite context
 
-Before working on the Astro rewrite, read [AGENT_CONTEXT.md](AGENT_CONTEXT.md).
-Then inspect the working tree and relevant implementation; context can drift.
+Before working on the Astro rewrite, read the documents below. Then inspect
+the working tree and relevant implementation; context can drift.
 
 - [TODO.md](TODO.md): open work: the steps at and after the merge,
   deferred site features, performance, and upstream follow-ups.
-- [AGENT_CONTEXT.md](AGENT_CONTEXT.md): agent continuity, open decisions,
-  known gaps, and verification evidence.
+- [docs/design-changes.md](docs/design-changes.md): every intended
+  difference from the live site, with its reason and evidence.
+- [docs/markdown-pipeline.md](docs/markdown-pipeline.md): each Markdown
+  plugin and the Eleventy behavior it replaces.
 - `docs/adrs/`: accepted architecture decisions.
 
 Keep human checklists lean: short actions, no handoffs or design discussion.

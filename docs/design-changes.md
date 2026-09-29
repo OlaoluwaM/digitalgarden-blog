@@ -16,7 +16,8 @@ Entry format:
 ```
 
 Earlier Markdown-stage differences (link classes, math, search index fields,
-callout collapsibility) are recorded in `AGENT_CONTEXT.md`.
+callout collapsibility) were recorded in `AGENT_CONTEXT.md`, removed on
+2026-09-29; read it with `git show 9a29fd8:AGENT_CONTEXT.md`.
 
 ## 2026-09-26: Phase 1 parity shell
 
