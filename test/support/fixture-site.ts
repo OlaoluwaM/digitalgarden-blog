@@ -50,6 +50,10 @@ export interface FixtureNote {
    * `gardenEntry` tag the publisher adds for `dg-home`.
    */
   untagged?: "omitted" | "empty";
+  /** The note's tags (default none); ignored for `untagged` and Home. */
+  tags?: string[];
+  /** Publication date and time (default `2026-01-01T00:00`). */
+  published?: string;
 }
 
 export async function createFixtureProject(
@@ -121,13 +125,22 @@ export default {
     notesDirectory,
     writeNote: async (
       relativePath,
-      { title, permalink, body, home = false, hide = false, untagged }
+      {
+        title,
+        permalink,
+        body,
+        home = false,
+        hide = false,
+        untagged,
+        tags = [],
+        published = "2026-01-01T00:00",
+      }
     ) => {
       const path = join(notesDirectory, relativePath);
       await mkdir(dirname(path), { recursive: true });
       const noTags =
         untagged === undefined
-          ? { tags: [] }
+          ? { tags }
           : untagged === "empty"
             ? { tags: null }
             : {};
@@ -142,8 +155,8 @@ export default {
           title,
           description: `${title} (fixture).`,
           ...noTags,
-          published: "2026-01-01T00:00",
-          last_updated: "2026-01-01T00:00",
+          published,
+          last_updated: published,
         },
       };
       await writeFile(

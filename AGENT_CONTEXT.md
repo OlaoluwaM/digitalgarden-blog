@@ -1212,4 +1212,13 @@ approval before committing and starting the next.
   (TODO.md, "At the merge"): until then main has no workflow and production would
   wait forever. A superseded run cancelled by concurrency leaves its
   commit pending, so only the newest commit on main goes live.
+- Snapshot tests (2026-09-29, Olaolu chose output snapshots over visual
+  ones, which he dropped): test/markdown-snapshot.test.ts renders a note
+  with every Markdown feature through the site's processor (fake Kroki,
+  publisher-form wikilinks to Home and Dotfiles Reorg) and snapshots the
+  HTML plus headings/embeddedHeadings; test/feed-snapshot.test.ts builds a
+  fixture site and snapshots feed.xml one element per line. Both stable
+  across runs and under TZ=UTC (MathJax IDs are deterministic within one
+  test process). Fixture notes now take `tags` and `published`. Update
+  with `node --test --test-update-snapshots <file>` after reading the diff.
 

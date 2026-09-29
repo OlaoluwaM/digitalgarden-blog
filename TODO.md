@@ -17,10 +17,6 @@
 - [ ] Publish from Obsidian and check the round trip: the build passes, and the only page changes are Home's description and the nested "package" list in NixOS part 1.
 - [ ] Optional: switch the Vercel project's Framework Preset from Eleventy to Astro. `vercel.json` already sets Astro for every deployment, so this only tidies the dashboard. Never before the merge: until then the preset builds the live Eleventy site.
 
-## After sign-off
-
-- [ ] Add visual snapshot tests of the overall UI and key features: pages at phone and desktop widths, the search dialog, the mobile file tree, callouts, code blocks.
-
 ## Site features
 
 - [ ] Add a "collapse all folders" button to the file tree once the vault has more than one folder ([mockups](https://claude.ai/artifact/VnPJxBcZ2LEPgo6ZtNjpD8); leaning toward a square button beside the search button).
