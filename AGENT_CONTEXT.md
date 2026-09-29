@@ -10,13 +10,12 @@ public URLs, and the existing desktop/mobile design. The Eleventy code was
 removed on 2026-09-28; the live site (still the Eleventy build on `main`)
 is the parity reference until cutover. Astro builds into `dist`.
 Exception agreed on 2026-09-17: original `/img/user/*` URLs need not remain available.
-Vault publishing remains paused pending the tasks in [TODO.md](TODO.md).
+Vault publishing waits for the merge: the plugin commits to `main`
+([TODO.md](TODO.md)).
 
 - [AGENTS.md](AGENTS.md): session requirements and working conventions.
-- [REWRITE.md](REWRITE.md): human implementation checklist. Markup/CSS comes
-  before search and the remaining client behavior; cutover is last. Keep
-  agent discussion here.
-- [TODO.md](TODO.md): vault tasks and upstream follow-ups.
+- [TODO.md](TODO.md): open work: the steps at and after the merge,
+  deferred site features, performance, and upstream follow-ups.
 - `docs/adrs/`: accepted decisions; proposals below do not supersede them.
 
 ## Current implementation
@@ -635,7 +634,7 @@ Eleventy's markdown-it options. Olaolu put all resulting items in scope.
   and Commit Mono (code). Headings currently render from the vendored
   theme's base64 Instrument Serif; the self-hosted face declares weight 400
   only, so removing the theme risks synthesized bold.
-- Analytics are deferred until after markup (their own REWRITE.md section).
+- Analytics are deferred until after markup (their own checklist section).
   The live site has them, so they must land before cutover.
 
 ### Phase 1 parity shell (2026-09-26)
@@ -1014,7 +1013,8 @@ Keep these outside the migration checklist:
 
 ## Remaining work handed over (2026-09-28)
 
-Olaolu handed Claude the items in REWRITE.md's "Remaining Work" section, in
+Olaolu handed Claude the remaining rewrite items (then a checklist, since
+folded into TODO.md), in
 the listed order. After each item: stop, show the result, and wait for his
 approval before committing and starting the next.
 - Item 1 (Astro upgrade): Astro 7.3.5 and `@astrojs/markdown-satteri`
@@ -1084,7 +1084,7 @@ approval before committing and starting the next.
   cells `max-width: 30ch` with `overflow-wrap: anywhere` (no ellipsis), and
   code in cells wraps. Keyboard access reuses `scrollRegions.ts` (tab stop,
   `role="group"`, "Table, scrollable" only while overflowing) instead of the
-  static `tabindex`/`role="region"` REWRITE.md first described. Edge
+  static `tabindex`/`role="region"` the checklist first described. Edge
   shadows (Lea Verou's local/scroll backgrounds, gray-950 covers; none in
   callouts); the layout test samples pixels with the table hidden. Not
   built: a sticky first column.
@@ -1209,7 +1209,7 @@ approval before committing and starting the next.
   step from the job's step results; it works on push and pull_request
   events (uses `context.sha`), needs `statuses: write` and `actions: read`.
   Olaolu adds the Deployment Check only after the merge
-  (REWRITE.md 13): until then main has no workflow and production would
+  (TODO.md, "At the merge"): until then main has no workflow and production would
   wait forever. A superseded run cancelled by concurrency leaves its
   commit pending, so only the newest commit on main goes live.
 
