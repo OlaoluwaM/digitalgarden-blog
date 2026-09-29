@@ -9,6 +9,7 @@
 // import and is erased before this file ever runs.
 import type { Post } from "./posts.ts";
 import { isHomePost } from "./home.ts";
+import { isHiddenPost } from "./hidden.ts";
 
 export interface FileTreeFolderNode {
   readonly type: "folder";
@@ -26,7 +27,9 @@ export interface FileTreeFileNode {
 export type FileTreeNode = FileTreeFolderNode | FileTreeFileNode;
 
 /**
- * Build the sidebar/file-tree structure from published posts. Folder
+ * Build the sidebar/file-tree structure from published posts, leaving out
+ * hidden ones (`dg-hide`, published as `hide`), as Eleventy's file tree
+ * did; they stay published and reachable everywhere else. Folder
  * structure comes from each post's `dg-path` (e.g. " Posts/Be deliberate.md"
  * yields a " Posts" folder containing a "Be deliberate" file). The display
  * title is `rawNoteProps.title`; the href is `/` for the garden entry
@@ -36,6 +39,7 @@ export function buildFileTree(posts: readonly Post[]): readonly FileTreeNode[] {
   const root = new Map<string, BuildEntry>();
 
   for (const post of posts) {
+    if (isHiddenPost(post)) continue;
     const segments = post.data.pluginProps["dg-path"].split("/");
     insert(root, segments, post);
   }

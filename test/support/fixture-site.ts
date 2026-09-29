@@ -42,6 +42,8 @@ export interface FixtureNote {
   body: string;
   /** Marks Home, which every build needs exactly one of. */
   home?: boolean;
+  /** `dg-hide: true` in the vault, which the publisher writes as `hide`. */
+  hide?: boolean;
 }
 
 export async function createFixtureProject(
@@ -113,7 +115,7 @@ export default {
     notesDirectory,
     writeNote: async (
       relativePath,
-      { title, permalink, body, home = false }
+      { title, permalink, body, home = false, hide = false }
     ) => {
       const path = join(notesDirectory, relativePath);
       await mkdir(dirname(path), { recursive: true });
@@ -123,6 +125,7 @@ export default {
         "dg-path": relativePath,
         "dg-permalink": permalink,
         permalink,
+        ...(hide ? { hide: true } : {}),
         "dg-note-properties": {
           title,
           description: `${title} (fixture).`,
@@ -138,6 +141,27 @@ export default {
     },
     cleanup: () => rm(project, { recursive: true, force: true }),
   };
+}
+
+/**
+ * Regenerate the project's wikilink index from its own notes, as
+ * `npm run build` does first. Fixture builds otherwise keep the copy of the
+ * real site's index, which tests that link to real notes rely on.
+ */
+export async function generateFixtureIndex(project: string) {
+  const logPath = join(project, "generate.log");
+  const log = await open(logPath, "w");
+  try {
+    const child = spawn(
+      process.execPath,
+      [join(repository, "scripts/generate-wikilink-index.ts")],
+      { cwd: project, stdio: ["ignore", log.fd, log.fd], timeout: 15_000 }
+    );
+    const [status] = (await once(child, "close")) as [number | null];
+    assert.equal(status, 0, await readFile(logPath, "utf8"));
+  } finally {
+    await log.close();
+  }
 }
 
 /** Build the project with `astro build --force` into its `dist/`. */

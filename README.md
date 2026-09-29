@@ -9,6 +9,36 @@ plugin, which commits them to `src/site/notes/` and their images to
 `src/site/img/user/`. Astro renders them with wikilinks, callouts, math,
 highlighted code, and search.
 
+## Publishing a note
+
+The vault's `Blogpost` template carries these properties; the content schema
+([`src/content.config.ts`](src/content.config.ts)) enforces them, and the build
+fails naming the note when one is missing, empty, or malformed.
+
+| Property       | Holds                                                                   |
+| -------------- | ----------------------------------------------------------------------- |
+| `dg-publish`   | `true` to publish                                                       |
+| `dg-permalink` | The URL, `/posts/<slug>` (always set; never left to the plugin)         |
+| `title`        | The displayed title (file names avoid `?` and `#`)                      |
+| `description`  | The summary for search engines and link previews                        |
+| `tags`         | Tags; `gardenEntry` marks Home, which exactly one note has              |
+| `published`    | Publication date and time, e.g. `2026-09-29T14:30`                      |
+| `last_updated` | Last update, in the same form                                           |
+| `dg-hide`      | Optional; `true` makes the post reachable only by a direct link (below) |
+
+In the note:
+
+- Embed (`![[Note]]`) only published notes: the plugin inlines an embedded
+  note's text even when that note is unpublished. `![[Note|Title]]` heads
+  the embed with that title; without one it reads "From _note title_".
+- Links and embeds to a block (`^block-id`) and to a heading work.
+- ` ```mermaid ` and ` ```plantuml ` blocks render through Kroki (below).
+- A new custom callout type needs `npm run sync-callouts` (below).
+
+A hidden post (`dg-hide: true`) is built at its URL but listed nowhere: not
+in the file tree, Recent Posts, search, the feed, the sitemap, or
+`/random/`. Its page carries `<meta name="robots" content="noindex">`.
+
 ## Setup
 
 Requires **Node 24.x**.

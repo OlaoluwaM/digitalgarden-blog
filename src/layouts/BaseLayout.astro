@@ -16,9 +16,11 @@ interface Props {
   description?: string | undefined;
   /** Open Graph type: posts are articles, Home is the website itself. */
   type: "website" | "article";
+  /** Ask search engines not to index the page (a hidden post). */
+  noindex?: boolean;
 }
 
-const { title, description, type } = Astro.props;
+const { title, description, type, noindex = false } = Astro.props;
 const canonical = canonicalUrl(Astro.url.pathname);
 ---
 
@@ -27,6 +29,7 @@ const canonical = canonicalUrl(Astro.url.pathname);
   <head>
     <SiteHead title={title}>
       {description && <meta name="description" content={description} />}
+      {noindex && <meta name="robots" content="noindex" />}
       <link rel="canonical" href={canonical} />
       <meta property="og:type" content={type} />
       <meta property="og:title" content={title} />

@@ -8,14 +8,20 @@ import type { APIRoute } from "astro";
 import { experimental_AstroContainer as AstroContainer } from "astro/container";
 import { render } from "astro:content";
 import { parse } from "node-html-parser";
-import { getPublishedArticles, getPublishedPosts } from "../content/posts";
+import {
+  getListedPosts,
+  getPublishedArticles,
+  getPublishedPosts,
+} from "../content/posts";
 import { noteInstant } from "../lib/dates";
 import { metaDescription } from "../lib/metadata";
 import { site } from "../lib/site";
 
 export const GET = (async () => {
   const container = await AstroContainer.create();
-  const articles = getPublishedArticles(await getPublishedPosts());
+  const articles = getPublishedArticles(
+    getListedPosts(await getPublishedPosts())
+  );
   const items = await Promise.all(
     articles.map(async post => {
       const { title, description, tags, published } = post.data.rawNoteProps;

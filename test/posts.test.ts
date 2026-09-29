@@ -66,7 +66,7 @@ function post(id: string, options: PostOptions = {}): Post {
         "dg-publish": options.publish ?? true,
         "dg-path": `${id}.md`,
         "dg-permalink": permalink,
-        "dg-hide": options.hide ?? false,
+        hide: options.hide ?? false,
         tags: options.tags ?? [],
         permalink,
       },
@@ -118,7 +118,7 @@ describe("getPublishedPosts", () => {
     assert.deepEqual(await getPublishedPosts(), []);
   });
 
-  it("retains published posts marked dg-hide", async () => {
+  it("retains published posts marked hidden (dg-hide)", async () => {
     const hidden = post("hidden", { hide: true });
     getCollection.mock.mockImplementation(async () => [hidden]);
     assert.deepEqual(await getPublishedPosts(), [hidden]);
@@ -287,6 +287,22 @@ describe("getRecentArticles", () => {
       });
     }
   }
+
+  // Why: a hidden post (`dg-hide`) is published but not listed; Recent
+  // Posts is a listing, so it takes the next newest instead.
+  it("leaves out hidden posts", () => {
+    const posts = [
+      post("hidden", { hide: true, published: "2026-03-01" }),
+      post("newest", { published: "2026-02-01" }),
+      post("second", { published: "2026-01-01" }),
+      post("third", { published: "2025-12-01" }),
+    ];
+    assert.deepEqual(ids(getRecentArticles(posts)), [
+      "newest",
+      "second",
+      "third",
+    ]);
+  });
 
   it("ignores the excluded home's publication date", () => {
     const entry = post("home", {

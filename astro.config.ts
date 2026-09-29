@@ -4,7 +4,11 @@ import { defineConfig } from "astro/config";
 import { satteri } from "@astrojs/markdown-satteri";
 import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
-import { noteTitles, wikilinkIndex } from "./src/generated/wikilink-index.ts";
+import {
+  hiddenUrls,
+  noteTitles,
+  wikilinkIndex,
+} from "./src/generated/wikilink-index.ts";
 import { mkmdastWikilinksPlugin } from "./src/plugins/mdast/wikilinks.ts";
 import { mkmdastAdmonitionCalloutPlugin } from "./src/plugins/mdast/admonitions.ts";
 import { hastAdmonitionCalloutPlugin } from "./src/plugins/hast/callout.ts";
@@ -48,10 +52,14 @@ export default defineConfig({
   integrations: [
     styleGuide,
     // /sitemap-index.xml and /sitemap-0.xml; robots.txt names the index.
-    // /random/ only redirects, so it is left out. The site has no news,
-    // images, video, or translations to annotate.
+    // /random/ only redirects, and hidden posts (`dg-hide`) open only from
+    // a direct link, so both are left out. The site has no news, images,
+    // video, or translations to annotate.
     sitemap({
-      filter: page => new URL(page).pathname !== "/random/",
+      filter: page => {
+        const { pathname } = new URL(page);
+        return pathname !== "/random/" && !hiddenUrls.includes(pathname);
+      },
       namespaces: { news: false, xhtml: false, image: false, video: false },
     }),
   ],

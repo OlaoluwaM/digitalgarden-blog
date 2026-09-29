@@ -930,3 +930,23 @@ https://claude.ai/artifact/AezzrntfR1ZLK4WXrF4x9n.
   `test/layout/transclusions.test.ts` (a fixture site: the header band at
   390px and 1440px, a block link's landing, the table of contents without
   embedded headings, one `h1` in the note, and axe).
+
+## 2026-09-29: `dg-hide` makes a post reachable only by a direct link
+
+- **Change:** a post whose vault note sets `dg-hide: true` is built at its
+  URL but listed nowhere: not in the file tree (as on live), nor in Recent
+  Posts, search, the feed, the sitemap, or `/random/` (all of which live
+  still listed it). Its page carries `<meta name="robots"
+  content="noindex">`. Links other notes make to it still work.
+  The Astro schema had declared `dg-hide`, but the Digital Garden plugin
+  publishes it as `hide`, so the flag never arrived and hidden posts were
+  listed. No published note sets it yet.
+- **Why:** Olaolu: a hidden post should be accessible only through a
+  direct link, not discoverable. Live only left it out of the file tree.
+- **Evidence:** `test/file-tree.test.ts` (hidden posts and emptied folders
+  left out), `test/posts.test.ts` (Recent Posts takes the next newest),
+  `test/wikilink-index.test.ts` (the generator lists hidden URLs for the
+  sitemap), and `test/hidden-posts.test.ts` (a fixture build: the hidden
+  post is built, `noindex`, and in none of the listings; fails with the
+  old `dg-hide` key).
+

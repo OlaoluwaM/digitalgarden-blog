@@ -2,13 +2,18 @@
 // /random/: sends the visitor to a random published note. Standalone, like
 // the 404 page: it shows nothing but a fallback without JavaScript, so it
 // needs neither the navigation nor the page scripts. Home is not a note to
-// land on at random, so the list holds articles only.
+// land on at random, so the list holds articles only, and hidden ones only
+// open from a direct link.
 import "../styles/global.css";
-import { getPublishedArticles, getPublishedPosts } from "../content/posts";
+import {
+  getListedPosts,
+  getPublishedArticles,
+  getPublishedPosts,
+} from "../content/posts";
 import { site } from "../lib/site.ts";
 import SiteHead from "../components/SiteHead.astro";
 
-const urls = getPublishedArticles(await getPublishedPosts())
+const urls = getPublishedArticles(getListedPosts(await getPublishedPosts()))
   .map(post => post.data.pluginProps.permalink)
   .sort();
 ---

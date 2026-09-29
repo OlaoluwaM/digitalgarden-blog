@@ -65,6 +65,16 @@ with Eleventy; there is no single filtering or ordering rule for every route.
   interpretation was discussed with Olaolu; do not describe it as date parity.
 - `getPublishedPosts()` currently filters only `dg-publish`. Preserve that
   behavior: `dg-hide` is file-tree metadata, not a global exclusion rule.
+  The publisher writes it as top-level `hide: true`; the schema key is
+  `hide` (it was `dg-hide`, which the publisher never writes, so the flag
+  was silently dropped). Olaolu: a hidden post is reachable only by a
+  direct link. `isHiddenPost` (src/content/hidden.ts) drives
+  `buildFileTree` and `getListedPosts` (posts.ts), which Recent Posts, the
+  search index, the feed, and `/random/` use; the sitemap filter reads
+  `hiddenUrls` from the generated wikilink index; hidden pages get
+  `noindex` via BaseLayout. `getPublishedPosts()` still returns hidden
+  posts, so their pages build. Fixture tests that need the index to match
+  their notes call `generateFixtureIndex` (item 11).
 - `src/site/feed.njk` reverses the note collection and excludes `/`.
   `src/site/_includes/layouts/random.njk` includes the published home note;
   the Astro `/random/` (`src/pages/random.astro`, no tilde, old URL not
@@ -1142,6 +1152,17 @@ approval before committing and starting the next.
   build`; read-only permissions; actions pinned by SHA. Dependabot groups
   npm minor+patch into one weekly PR and now updates actions too; it reads
   its config from `main` only, so none of this applies before the merge.
-  Unit tests pass with `TZ=UTC`. Leave item 10 unticked until a run passes
-  (needs the branch pushed and a PR into `main`; Olaolu hasn't approved
-  either yet).
+  Unit tests pass with `TZ=UTC`. Olaolu had item 10 ticked on commit; the
+  first GitHub run is still pending (needs the branch pushed and a PR into
+  `main`, not yet approved).
+- Item 11 (publishing instructions): they live in the vault template
+  `Extras/Templates/Blogpost.md` (Olaolu's reminders, inside the
+  `%% :::hidden … ::: %%` block the publisher's custom filter strips).
+  With his approval: properties now `dg-publish`, `dg-permalink`, `title`,
+  `description`, `tags`, `published`, `last_updated`, `dg-hide`
+  (`dg-metatags` dropped: the site reads `description`); two `[!ai-text]`
+  callouts correct his bullets and add the site's rules (embeds, block
+  links, Kroki, sync-callouts). The README's "Publishing a note" section
+  is the repo-side list the template links to (the link resolves once the
+  README is on `main`). He chose to build `dg-hide` rather than drop it.
+

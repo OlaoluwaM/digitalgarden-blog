@@ -120,3 +120,5 @@ export const noteTitles: NoteTitles = Object.fromEntries([
   ],
   ["Outbox/Digital Garden & Blog/Home", "Home"],
 ]);
+
+export const hiddenUrls: readonly string[] = [];

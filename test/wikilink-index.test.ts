@@ -101,17 +101,34 @@ async function readIndex(outputFile: string): Promise<Record<string, string>> {
   return module.wikilinkIndex;
 }
 
-// Like readIndex, for the titles exported beside the index.
-async function readTitles(outputFile: string): Promise<Record<string, string>> {
+// Like readIndex, for the exports beside the index.
+async function readGenerated(outputFile: string) {
   const source = await readFile(outputFile, "utf8");
   const javascript = stripTypeScriptTypes(source);
-  const module = (await import(
+  return (await import(
     `data:text/javascript;base64,${Buffer.from(javascript).toString("base64")}`
-  )) as { noteTitles: Record<string, string> };
-  return module.noteTitles;
+  )) as { noteTitles: Record<string, string>; hiddenUrls: string[] };
+}
+
+async function readTitles(outputFile: string) {
+  return (await readGenerated(outputFile)).noteTitles;
 }
 
 describe("wikilink index generator", () => {
+  // Why: the sitemap leaves out hidden notes (`dg-hide`, published as
+  // `hide: true`) and reads which they are from this list at config time.
+  it("lists hidden notes' URLs", async t => {
+    const project = await fixture(t, {
+      "Hidden.md": note({ permalink: "/posts/hidden/", hide: true }),
+      "Shown.md": note({ permalink: "/posts/shown/" }),
+      "Not hidden.md": note({ permalink: "/posts/not-hidden/", hide: false }),
+    });
+    const result = await project.run();
+    assert.equal(result.status, 0, result.output);
+    assert.deepEqual((await readGenerated(project.outputFile)).hiddenUrls, [
+      "/posts/hidden/",
+    ]);
+  });
   // Why: the transclusion plugin names an embed's source note by its title,
   // which the publisher writes under dg-note-properties. A note without one
   // is still indexed, with no title entry.

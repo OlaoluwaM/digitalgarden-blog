@@ -20,6 +20,7 @@ interface PostOptions {
   permalink?: string;
   published?: string;
   topLevelTags?: string[];
+  hide?: boolean;
 }
 
 function post({
@@ -28,6 +29,7 @@ function post({
   permalink = "/posts/" + title.toLowerCase().replace(/\s+/g, "-") + "/",
   published = "2026-01-01T00:00",
   topLevelTags = [],
+  hide,
 }: PostOptions) {
   return {
     data: {
@@ -35,6 +37,7 @@ function post({
         "dg-path": dgPath,
         permalink,
         tags: topLevelTags,
+        ...(hide === undefined ? {} : { hide }),
       },
       rawNoteProps: {
         title,
@@ -172,6 +175,29 @@ describe("titles and hrefs", () => {
     );
     const leaf = file(result[0]!);
     assert.equal(leaf.href, "/");
+  });
+});
+
+describe("hidden posts", () => {
+  // Why: `dg-hide` publishes a note without listing it, as Eleventy's file
+  // tree did (it skipped notes with `hide`). A folder whose notes are all
+  // hidden disappears with them.
+  it("leaves out hidden posts, and folders left empty", () => {
+    const result = tree(
+      post({ dgPath: " Posts/Shown.md" }),
+      post({ dgPath: " Posts/Hidden.md", hide: true }),
+      post({ dgPath: "Drafts/Secret.md", hide: true }),
+      post({ dgPath: "Hidden root.md", hide: true }),
+      post({ dgPath: "Home.md", hide: false })
+    );
+    assert.deepEqual(result, [
+      {
+        type: "folder",
+        name: " Posts",
+        children: [{ type: "file", title: "Shown", href: "/posts/shown/" }],
+      },
+      { type: "file", title: "Home", href: "/posts/home/" },
+    ]);
   });
 });
 

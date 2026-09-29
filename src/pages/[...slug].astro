@@ -10,6 +10,7 @@ import {
   contentsEntries,
   embeddedHeadingPositions,
 } from "../content/table-of-contents";
+import { isHiddenPost } from "../content/hidden";
 
 // This is required for dynamic routes: https://docs.astro.build/en/guides/routing/#static-ssg-mode
 export async function getStaticPaths() {
@@ -39,6 +40,7 @@ const contents = contentsEntries(
   title={post.data.rawNoteProps.title}
   description={metaDescription(post.data.rawNoteProps.description)}
   type="article"
+  noindex={isHiddenPost(post)}
 >
   <SiteNavigation slot="navigation" />
   <NoteHeader post={post} contents={contents} />

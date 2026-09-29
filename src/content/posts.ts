@@ -1,6 +1,7 @@
 import { getCollection, type CollectionEntry } from "astro:content";
 import { assertUniquePermalinks } from "./permalinks.ts";
 import { isHomePost } from "./home.ts";
+import { isHiddenPost } from "./hidden.ts";
 
 export type Post = CollectionEntry<"posts">;
 
@@ -41,11 +42,17 @@ export function getPublishedArticles(posts: Post[]): Post[] {
   return posts.filter(p => !isHomePost(p));
 }
 
+// Listed posts are the ones a visitor can discover: every published post
+// except hidden ones (`dg-hide`), which only a direct link reaches.
+export function getListedPosts(posts: Post[]): Post[] {
+  return posts.filter(p => !isHiddenPost(p));
+}
+
 export function getRecentArticles(
   posts: Post[],
   limit: number = DEFAULT_LIMIT
 ): Post[] {
-  const articles = getPublishedArticles(posts);
+  const articles = getPublishedArticles(getListedPosts(posts));
   // Validate every article, even when there are too few entries to sort.
   const datedArticles = articles.map(article => ({
     article,
