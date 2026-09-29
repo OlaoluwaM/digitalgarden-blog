@@ -48,6 +48,7 @@ In the order they run (`src/plugins/hast/`).
 | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
 | `callout.ts`        | Turns `> [!type] Title` blockquotes into callouts: title, Lucide icon (`callout-icons.ts`, from `npm run sync-callouts`), fold state. | The `callout-block` HTML transform (`transformCalloutBlockquotes`). | `callout.test.ts`, `callout-icons.test.ts`, `sync-callouts.test.ts` |
 | `linkClasses.ts`    | Gives links with a scheme (`https:`, `mailto:`) `external-link` and `target="_blank"`, and other links `internal-link`.               | The `link_open` renderer rule.                                      | `link-classes.test.ts`                                              |
+| `imageSizes.ts`     | Moves an Obsidian size (`\|300`, `\|300x200`) from the end of an image's alt text to `width` and `height`; Astro resizes the image.   | The `image` renderer rule, which set only `width="300px"`.          | `image-sizes.test.ts`, `images-build.test.ts`                       |
 | `tableWrapper.ts`   | Wraps each table in `div.table-wrapper`, which scrolls a wide table sideways.                                                         | The `table` HTML transform, which added the same wrapper.           | `table-wrapper.test.ts`, `layout/tables.test.ts`                    |
 | `taskListLabels.ts` | Wraps each task-list checkbox and its text in a `<label>`, so the checkbox has a name.                                                | Nothing: `markdown-it-task-checkbox` left the boxes unnamed.        | `task-list-labels.test.ts`, `layout/task-lists.test.ts`             |
 
@@ -76,5 +77,4 @@ No published note used these when the Eleventy site was removed.
 - Body hashtags (`taggify`): `#tag` in the text became a tag-search link.
 - ` ```gist ` fences (GitHub gist scripts) and ` ```transclusion ` fences.
 - Obsidian Bases, Dataview output, canvases, and Excalidraw drawings.
-- Image sizes from `![[image.png|300]]`.
 - `markdown-it-attrs` beyond block IDs (`{.class}` and other attributes).

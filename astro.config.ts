@@ -13,6 +13,7 @@ import { mkmdastWikilinksPlugin } from "./src/plugins/mdast/wikilinks.ts";
 import { mkmdastAdmonitionCalloutPlugin } from "./src/plugins/mdast/admonitions.ts";
 import { hastAdmonitionCalloutPlugin } from "./src/plugins/hast/callout.ts";
 import { hastLinkClassesPlugin } from "./src/plugins/hast/linkClasses.ts";
+import { hastImageSizesPlugin } from "./src/plugins/hast/imageSizes.ts";
 import { hastTableWrapperPlugin } from "./src/plugins/hast/tableWrapper.ts";
 import { hastTaskListLabelsPlugin } from "./src/plugins/hast/taskListLabels.ts";
 import { mkmdastDigitalGardenImagesPlugin } from "./src/plugins/mdast/images.ts";
@@ -98,6 +99,9 @@ export default defineConfig({
       hastPlugins: [
         hastAdmonitionCalloutPlugin,
         hastLinkClassesPlugin,
+        // Any position: Sätteri runs Astro's image marker after all of
+        // these, and the marker passes the size on to getImage().
+        hastImageSizesPlugin,
         hastTableWrapperPlugin,
         hastTaskListLabelsPlugin,
       ],

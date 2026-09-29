@@ -968,3 +968,18 @@ https://claude.ai/artifact/AezzrntfR1ZLK4WXrF4x9n.
   screenshots of Home, a post, and the 404 page at 390, 900, and 1440px,
   and the phone file tree, are pixel-identical before and after.
 
+## 2026-09-29: Obsidian image sizes
+
+- **Change:** an image sized in Obsidian (`![[photo.png|300]]`,
+  `![Photo|300](photo.png)`) is built at that width with a proportional
+  height, as live drew it. Three details differ from live: the alt text
+  no longer ends in the size (live's was `photo.png|300`); the `width`
+  attribute is a valid number, not `300px`; and a `|300x200` size is used,
+  cropping the image to 300 by 200, where live ignored it. The file is
+  also resized to the requested width. No published note uses a size yet.
+- **Why:** a screen reader read the size as part of the alt text, and
+  Obsidian itself honors both size forms.
+- **Evidence:** `test/image-sizes.test.ts` (which suffixes count as a size,
+  and what reaches `getImage()`) and `test/images-build.test.ts` (a
+  400 x 200 image comes out 300 x 150 for `|300` and 300 x 100 for
+  `|300x100`, with the alt text `photo.png`).

@@ -5,6 +5,7 @@ import { createServer } from "node:http";
 import { dirname, join } from "node:path";
 import { it, type TestContext } from "node:test";
 import { parse } from "node-html-parser";
+import sharp from "sharp";
 import {
   buildFixture as build,
   createFixtureProject,
@@ -182,6 +183,37 @@ for (const [name, filename, imageUrl] of [
     assert.match(source, /\.webp$/);
     assert.equal(bytes.toString("ascii", 0, 4), "RIFF");
     assert.equal(bytes.toString("ascii", 8, 12), "WEBP");
+  });
+}
+
+// Why: an Obsidian size (`![[photo.png|300]]`, published as
+// `![photo.png\|300](…)`) must reach Astro's image service, so the file
+// readers download is resized, not only the box it is drawn in. With only
+// a width, the height must follow the image's 2:1 aspect ratio; with both,
+// Astro crops to them. The size must leave the alt text.
+for (const [size, width, height] of [
+  ["300", 300, 150],
+  ["300x100", 300, 100],
+] as const) {
+  it(`builds a local image sized |${size} at ${width} x ${height}`, async t => {
+    const { project, imageDirectory, writeNote } = await fixture(t);
+    await sharp({
+      create: { width: 400, height: 200, channels: 3, background: "#c00" },
+    })
+      .png()
+      .toFile(join(imageDirectory, "Extras/Assets/photo.png"));
+    await writeNote(
+      `![photo.png\\|${size}](/img/user/Extras/Assets/photo.png)`
+    );
+
+    const result = await build(project);
+    assert.equal(result.status, 0, result.output);
+    const { image, bytes } = await emittedImage(project, "photo.png");
+    assert.equal(image.getAttribute("width"), String(width));
+    assert.equal(image.getAttribute("height"), String(height));
+    const emitted = await sharp(bytes).metadata();
+    assert.equal(emitted.width, width);
+    assert.equal(emitted.height, height);
   });
 }
 
