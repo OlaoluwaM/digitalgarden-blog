@@ -1173,4 +1173,18 @@ approval before committing and starting the next.
   `[WARN] [content] data store cleared (force)`, which Olaolu accepted as
   expected (keep `--force`; don't swap it for deleting
   node_modules/.astro/data-store.json).
+- Item 13c, vault half (2026-09-29, Olaolu reviewed the plan first; Obsidian
+  closed so `update-time-on-edit` couldn't restamp `last_updated`): the 13
+  posts and Home under `Outbox/Digital Garden & Blog/` now carry
+  `dg-publish`, `dg-permalink`, `title`, `description`, `tags`, `published`
+  (from `created`), `last_updated` (from `updated`), in the template's
+  order; `dg-metatags`, empty `dg-hide`, `created`, and `updated` removed.
+  Every value matches the live repo copies except Home's description,
+  now "Home" (was the placeholder). Home has no `tags`: the schema's
+  `tagsSchema` reads a missing or null tags property as `[]`
+  (test/note-tags.test.ts). Renamed `Endianness, WOOT!?` and `Numbers?
+  Numerals? Oh Boy` (no vault links pointed at them); NixOS part 1's
+  "package" sub-list lost one tab per line and now nests. Drafts and
+  `On Creating Content.md` untouched. Backup of the prior Outbox in the
+  session scratchpad. Still to do: a publisher round trip.
 

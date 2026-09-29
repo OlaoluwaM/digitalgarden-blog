@@ -44,6 +44,12 @@ export interface FixtureNote {
   home?: boolean;
   /** `dg-hide: true` in the vault, which the publisher writes as `hide`. */
   hide?: boolean;
+  /**
+   * A note with no tags: its tags property left out ("omitted") or left
+   * empty, which YAML reads as null ("empty"). Home keeps the top-level
+   * `gardenEntry` tag the publisher adds for `dg-home`.
+   */
+  untagged?: "omitted" | "empty";
 }
 
 export async function createFixtureProject(
@@ -115,13 +121,19 @@ export default {
     notesDirectory,
     writeNote: async (
       relativePath,
-      { title, permalink, body, home = false, hide = false }
+      { title, permalink, body, home = false, hide = false, untagged }
     ) => {
       const path = join(notesDirectory, relativePath);
       await mkdir(dirname(path), { recursive: true });
+      const noTags =
+        untagged === undefined
+          ? { tags: [] }
+          : untagged === "empty"
+            ? { tags: null }
+            : {};
       const frontmatter = {
         "dg-publish": true,
-        tags: home ? ["gardenEntry"] : [],
+        ...(home ? { tags: ["gardenEntry"] } : noTags),
         "dg-path": relativePath,
         "dg-permalink": permalink,
         permalink,
@@ -129,7 +141,7 @@ export default {
         "dg-note-properties": {
           title,
           description: `${title} (fixture).`,
-          tags: [],
+          ...noTags,
           published: "2026-01-01T00:00",
           last_updated: "2026-01-01T00:00",
         },
