@@ -200,11 +200,17 @@ describe("the stylesheet bundle (ADR 0003)", () => {
       });
     const collisions = new Set<string>();
     // The standalone pages are hand-written chrome, not rendered Markdown:
-    // they carry utility classes the way header/footer/Recent Posts do.
+    // they carry utility classes the way header/footer/Recent Posts and
+    // the backlinks list do.
     for (const page of site.pages.filter(isNote)) {
       const main = documents.get(page)!.querySelector("main");
       for (const element of main?.querySelectorAll("*") ?? []) {
-        if (element.closest("header, footer, section.recent-notes")) continue;
+        if (
+          element.closest(
+            "header, footer, section.recent-notes, section.backlinks"
+          )
+        )
+          continue;
         for (const name of element.classList.values())
           if (utilities.has(name)) collisions.add(`${page}: .${name}`);
       }

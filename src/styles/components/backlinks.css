@@ -1,0 +1,12 @@
+/*
+ * The "Mentioned in" list at the end of a note (Backlinks.astro). Rules
+ * that utilities cannot express.
+ */
+@layer components {
+  /* "Show N more" draws its own chevron. Safari draws its disclosure
+     triangle with this pseudo-element even when `list-style` is none, and
+     no utility variant targets it. */
+  .backlinks summary::-webkit-details-marker {
+    display: none;
+  }
+}

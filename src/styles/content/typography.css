@@ -7,7 +7,8 @@
  *
  * `@scope` limits these rules to the Markdown in the note column and in the
  * search preview (a note's `main.content`): the note header, the post
- * footer, and Recent Posts sit in `main.content` too but style themselves.
+ * footer, Recent Posts, and the backlinks list sit in `main.content` too
+ * but style themselves.
  * Diagrams (plugins/mdast/diagrams.ts) are left out as well: Kroki's SVG
  * carries its own stylesheet, and Mermaid's labels are HTML paragraphs the
  * rules here would space out.
@@ -17,7 +18,7 @@
  * (callouts) still win over it.
  */
 @layer components {
-  @scope (.markdown-rendered :is(main.content, .preview-body)) to (header, footer, .recent-notes, .diagram) {
+  @scope (.markdown-rendered :is(main.content, .preview-body)) to (header, footer, .recent-notes, .backlinks, .diagram) {
     /* Inherited text behavior (Obsidian sets both on .markdown-rendered). */
     :scope {
       overflow-wrap: break-word;

@@ -22,6 +22,7 @@
 @import "./components/header.css";
 @import "./components/footer.css";
 @import "./components/recent-posts.css";
+@import "./components/backlinks.css";
 @import "./components/not-found.css";
 @import "./components/navigation.css";
 @import "./components/search.css";

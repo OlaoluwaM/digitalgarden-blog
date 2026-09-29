@@ -1619,7 +1619,9 @@ describe("note typography", () => {
         };
         return {
           paragraph: style(".markdown-rendered main.content > p"),
-          item: style(".markdown-rendered main.content li"),
+          // The item added above: the note may already hold list items
+          // outside the Markdown, such as the backlinks list.
+          item: getComputedStyle(list.firstElementChild!).textWrapStyle,
         };
       });
       assert.deepEqual(wrap, { paragraph: "pretty", item: "pretty" });

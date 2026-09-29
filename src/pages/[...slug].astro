@@ -6,6 +6,8 @@ import { metaDescription } from "../lib/metadata";
 import SiteNavigation from "../components/SiteNavigation.astro";
 import NoteHeader from "../components/NoteHeader.astro";
 import PostFooter from "../components/PostFooter.astro";
+import Backlinks from "../components/Backlinks.astro";
+import { buildBacklinks } from "../content/backlinks";
 import {
   contentsEntries,
   embeddedHeadingPositions,
@@ -16,15 +18,19 @@ import { isHiddenPost } from "../content/hidden";
 export async function getStaticPaths() {
   const posts = await getPublishedPosts();
   const publishedArticles = getPublishedArticles(posts);
+  const backlinks = buildBacklinks(posts);
   return publishedArticles.map(p => ({
     // We derive the slug from the permalink. We remove any leading or trailing slashes to ensure that the slug is valid.
     // We use "permalink" instead of "dg-permalink" because even though the latter informs the former, there is still some processing the digital-garden plugin does to the permalink before it is ready for use. "dg-permalink" is the raw value from the frontmatter, while "permalink" is the processed value that is ready for use in the URL.
     params: { slug: p.data.pluginProps.permalink.replace(/^\/|\/$/g, "") },
-    props: { post: p },
+    props: {
+      post: p,
+      backlinks: backlinks.get(p.data.pluginProps.permalink) ?? [],
+    },
   }));
 }
 
-const { post } = Astro.props;
+const { post, backlinks } = Astro.props;
 const {
   Content: PostContent,
   headings,
@@ -45,5 +51,6 @@ const contents = contentsEntries(
   <SiteNavigation slot="navigation" />
   <NoteHeader post={post} contents={contents} />
   <PostContent />
+  <Backlinks posts={backlinks} />
   <PostFooter />
 </BaseLayout>

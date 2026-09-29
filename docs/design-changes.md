@@ -1004,3 +1004,26 @@ https://claude.ai/artifact/AezzrntfR1ZLK4WXrF4x9n.
   sizes, distinct ids) and `test/layout/excalidraw.test.ts` (a 900px
   drawing fits at 1440px and scrolls at 70% on a phone, with a tab stop,
   a name, the edge fade, and axe).
+
+## 2026-09-29: Notes list the notes that mention them
+
+- **Change:** a note that other notes link to ends with a "Mentioned in"
+  list, between its last line and the sign-off
+  (`components/Backlinks.astro`; design A in
+  https://claude.ai/artifact/1Aha5NVWfW9jz99bpeDby2). Each entry is the
+  linking note's title and description, as in Recent Posts, newest first.
+  The three newest show; the rest wait behind "Show N more", a native
+  disclosure. Mentions come from each note's rendered links
+  (`content/backlinks.ts`): wikilinks, Markdown links, and an embed's link
+  to its source note, but not links inside embedded text. Home, hidden
+  posts, and the note itself are never listed, and a note nobody mentions
+  shows nothing. Live had backlinks turned off. Today five notes show a
+  list: NixOS part 2 lists parts 1 and 3.
+- **Why:** readers can't otherwise see which notes point to the one
+  they're reading.
+- **Evidence:** `test/backlinks.test.ts` (which links count, and the
+  order), `test/components/backlinks.test.ts` (the heading, the entries,
+  three then "Show more"), and `test/layout/backlinks.test.ts` (a fixture
+  site: placement before the sign-off, no Markdown list indent, "Show
+  more" without JavaScript, nothing on an unmentioned note, and axe);
+  screenshots in https://claude.ai/artifact/YNEXAzL6Z2TBJnjnRtYsQA.
