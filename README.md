@@ -153,7 +153,8 @@ to `main` (including the Digital Garden plugin's commits) is built at once
 but goes live on thunk.blog only when the CI workflow
 ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) passes: its job
 sets the commit status `Vercel - digitalgarden-blog: CI`, which the Vercel project requires
-under Settings > Deployment Checks.
+under Settings > Deployment Checks
+([ADR 0007](docs/adrs/0007-gate-production-deploys-on-ci-through-vercel-deployment-checks.md)).
 
 Do not merge the Digital Garden plugin's "Update template" pull requests:
 they would restore the Eleventy site this repository replaced.

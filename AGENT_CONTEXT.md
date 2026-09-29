@@ -1199,7 +1199,7 @@ approval before committing and starting the next.
   across expressions). Deferred to TODO.md: CLS 0.13–0.14 on Home and the
   image post (root cause unknown), the Commit Mono weight for the Ctrl K
   hint, and the Maths note's 500/600 weights.
-- Production gating (2026-09-29, Olaolu chose Vercel Deployment Checks,
+- Production gating (ADR 0007; 2026-09-29, Olaolu chose Vercel Deployment Checks,
   which his plan has, over deploying from CI with a token): Vercel still
   builds every push; previews are unaffected. The CI job's first step,
   `vercel/repository-dispatch/actions/status@v1` (pinned to 30f760c), sets
