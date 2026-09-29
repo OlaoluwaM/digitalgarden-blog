@@ -24,6 +24,7 @@ import {
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { buildEnv } from "./build-env.ts";
 
 const repository = fileURLToPath(new URL("../../", import.meta.url));
 
@@ -201,7 +202,7 @@ export async function buildFixture(project: string) {
       ["build", "--force"],
       {
         cwd: project,
-        env: { ...process.env, ASTRO_TELEMETRY_DISABLED: "1", NO_COLOR: "1" },
+        env: buildEnv({ ASTRO_TELEMETRY_DISABLED: "1", NO_COLOR: "1" }),
         stdio: ["ignore", log.fd, log.fd],
         timeout: 30_000,
       }

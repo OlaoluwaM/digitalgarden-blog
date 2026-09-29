@@ -24,6 +24,7 @@ import { spawn } from "node:child_process";
 import { mkdtemp, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import { join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
+import { buildEnv } from "./build-env.ts";
 
 const repository = fileURLToPath(new URL("../../", import.meta.url));
 
@@ -92,7 +93,7 @@ function runAstroBuild(outDir: string, config: string): Promise<string> {
         "--config",
         relative(repository, config),
       ],
-      { cwd: repository, stdio: ["ignore", "pipe", "pipe"] }
+      { cwd: repository, env: buildEnv(), stdio: ["ignore", "pipe", "pipe"] }
     );
     let log = "";
     child.stdout.on("data", (chunk: Buffer) => (log += chunk.toString()));
