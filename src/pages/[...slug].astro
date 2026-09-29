@@ -6,7 +6,10 @@ import { metaDescription } from "../lib/metadata";
 import SiteNavigation from "../components/SiteNavigation.astro";
 import NoteHeader from "../components/NoteHeader.astro";
 import PostFooter from "../components/PostFooter.astro";
-import { contentsEntries } from "../content/table-of-contents";
+import {
+  contentsEntries,
+  embeddedHeadingPositions,
+} from "../content/table-of-contents";
 
 // This is required for dynamic routes: https://docs.astro.build/en/guides/routing/#static-ssg-mode
 export async function getStaticPaths() {
@@ -21,7 +24,15 @@ export async function getStaticPaths() {
 }
 
 const { post } = Astro.props;
-const { Content: PostContent, headings } = await render(post);
+const {
+  Content: PostContent,
+  headings,
+  remarkPluginFrontmatter,
+} = await render(post);
+const contents = contentsEntries(
+  headings,
+  embeddedHeadingPositions(remarkPluginFrontmatter)
+);
 ---
 
 <BaseLayout
@@ -30,7 +41,7 @@ const { Content: PostContent, headings } = await render(post);
   type="article"
 >
   <SiteNavigation slot="navigation" />
-  <NoteHeader post={post} contents={contentsEntries(headings)} />
+  <NoteHeader post={post} contents={contents} />
   <PostContent />
   <PostFooter />
 </BaseLayout>

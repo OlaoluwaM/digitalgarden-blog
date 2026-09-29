@@ -1,0 +1,82 @@
+/*
+ * Rendered Markdown: transclusions, another note (or a section of it)
+ * shown inside the note, drawn as a source card: a bordered box whose
+ * header names the source note, with a link to it on the right. Bordered,
+ * where blockquotes are filled and callouts tinted, so borrowed text is not
+ * mistaken for either.
+ *
+ * Markup: the Digital Garden plugin's, adjusted by
+ * src/plugins/mdast/transclusions.ts (the header is a paragraph, and the
+ * link exists only when the source note is published). The embedded text
+ * uses the ordinary content styles.
+ */
+@layer components {
+  .transclusion {
+    position: relative;
+    margin-block: --spacing(7);
+    border: 1px solid var(--color-gray-700);
+    border-radius: var(--radius-lg);
+    corner-shape: var(--corner-shape-soft);
+  }
+
+  .markdown-embed {
+    padding: --spacing(5);
+
+    /* The header's own margins pull it over the padding. */
+    & > :first-child:not(.markdown-embed-title),
+    & > .markdown-embed-title + * {
+      margin-block-start: 0;
+    }
+    & > :last-child {
+      margin-block-end: 0;
+    }
+  }
+
+  /* The header spans the card's full width, over its top padding. The end
+     padding keeps the title clear of the link. */
+  .markdown-embed-title {
+    margin: calc(--spacing(5) * -1);
+    margin-block-end: --spacing(5);
+    padding: --spacing(2.5) --spacing(13) --spacing(2.5) --spacing(5);
+    border-block-end: 1px solid var(--color-gray-700);
+    border-start-start-radius: inherit;
+    border-start-end-radius: inherit;
+    background-color: var(--color-gray-900);
+    color: var(--color-gray-100);
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    font-weight: var(--font-weight-semibold);
+    line-height: var(--text-sm--line-height);
+
+    & > p {
+      margin: 0;
+    }
+  }
+  /* "From" in an untitled embed's header, quieter than the note's name. */
+  .markdown-embed-from {
+    color: var(--color-gray-300);
+    font-weight: var(--font-weight-normal);
+  }
+
+  .markdown-embed-link {
+    position: absolute;
+    top: --spacing(1);
+    inset-inline-end: --spacing(2);
+    display: grid;
+    place-items: center;
+    width: --spacing(8);
+    height: --spacing(8);
+    border-radius: var(--radius-md);
+    color: var(--color-gray-300);
+
+    &:hover {
+      background-color: --alpha(var(--color-white) / 5%);
+      color: var(--color-gray-50);
+    }
+
+    & svg {
+      width: --spacing(4);
+      height: --spacing(4);
+    }
+  }
+}

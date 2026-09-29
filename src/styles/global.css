@@ -17,6 +17,7 @@
 @import "./content/typography.css";
 @import "./content/code.css";
 @import "./content/callouts.css";
+@import "./content/transclusions.css";
 /* Chrome: utilities in the templates; these hold what utilities cannot. */
 @import "./components/header.css";
 @import "./components/footer.css";

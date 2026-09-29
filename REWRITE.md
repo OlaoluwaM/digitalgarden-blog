@@ -12,13 +12,15 @@ In this order.
 6. [x] Wrap each Markdown table in a scroll container ([demo](https://claude.ai/artifact/UeSoSyzgiyiULm27QqsCGg)): a hast plugin adds `div.table-wrapper` with `tabindex="0"`, `role="region"`, and a label; inside it the table is `width: max-content` with `word-break: normal` and cells capped at `max-width: 30ch`. Today a 5+ column table is clipped on phones.
 7. [x] Label task-list checkboxes, e.g. wrap each item's text in a `<label>`; axe flags them in the dev style guide's Markdown sample.
 8. [x] Render `mermaid` and `plantuml` fences as inline SVG at build time through Kroki (kroki.io): exclude both from Shiki, cache by content hash, and fail the build when Kroki fails. Record the decision in an ADR.
-9. [ ] Style the publisher's transclusions as source cards (design B in the [designs](https://claude.ai/artifact/6Uq4RNhfRueyUJSmAB2r8P): a bordered card with a "From *note title*" header and the link icon on the right); turn the embed title into a label so each page keeps one `h1`; test wikilinks and heading IDs inside embeds.
+9. [x] Style the publisher's transclusions as source cards (design B in the [designs](https://claude.ai/artifact/6Uq4RNhfRueyUJSmAB2r8P): a bordered card with a "From *note title*" header and the link icon on the right); turn the embed title into a label so each page keeps one `h1`; test wikilinks and heading IDs inside embeds.
 10. [ ] Add a GitHub Actions workflow that runs `npm test` and the build on every push and pull request.
 11. [ ] Update the publishing instructions. Include: embed only published notes (the publisher inlines an unpublished note's text).
-12. [ ] The rest of the cutover, in this order:
+12. [ ] Snapshot tests?
+13. [ ] Perf review with subagent
+14. [ ] The rest of the cutover, in this order:
     - [ ] Document each Markdown plugin and the Eleventy behavior it replaces.
-    - [ ] Complete the vault tasks in [TODO.md](TODO.md), then test a publisher round trip.
     - [ ] Run the tests and a warning-free build.
+    - [ ] Complete the vault tasks in [TODO.md](TODO.md), then test a publisher round trip.
     - [ ] When `astro-rewrite` merges into `main`, switch the Vercel project's framework preset from Eleventy to Astro. Not before: `main`'s `vercel.json` names no framework, so the preset governs production's Eleventy builds until then (this branch's `vercel.json` already says Astro).
 
 ## Completed

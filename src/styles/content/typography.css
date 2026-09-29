@@ -92,8 +92,11 @@
       font-family: var(--font-serif);
       font-weight: var(--font-weight-normal);
       text-wrap: pretty;
-      /* A link to a heading (the table of contents, a wikilink fragment)
-         stops it below the fixed navbar, and short of the top above it. */
+    }
+    /* A link to a heading or a block (the table of contents, a wikilink
+       fragment, a block embed's link) stops it below the fixed navbar, and
+       short of the top above it. */
+    :is(h1, h2, h3, h4, h5, h6, [id]) {
       scroll-margin-top: --spacing(20);
 
       @variant lg {

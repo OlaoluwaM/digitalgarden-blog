@@ -9,6 +9,9 @@
  * predev and prebuild hooks. This script runs once and exits;
  * it doesn't watch for later note changes. Rerun it when the index needs updating.
  *
+ * The same file also maps each target to its note's title, so the
+ * transclusion plugin can name an embed's source note.
+ *
  * Read notes from src/site/notes and write src/generated/wikilink-index.ts.
  * Edit the notes or this generator when the mapping needs to change. Manual
  * changes to the generated file will be overwritten on the next successful run.
@@ -31,13 +34,17 @@ import { format, resolveConfig } from "prettier";
 
 import { permalinkSchema } from "../src/content/permalinks.ts";
 
-// Frontmatter is the metadata block at the start of a note. Check the two
-// fields this script uses: a valid permalink and an optional list of tags.
+// Frontmatter is the metadata block at the start of a note. Check the three
+// fields this script uses: a valid permalink, an optional list of tags, and
+// the optional title the publisher writes under dg-note-properties.
 // Reuse the content collection's permalink rules so both accept the same paths.
 // A missing tags field becomes []; a supplied value must be an array of strings.
+// The content collection requires the title; here a note without one is
+// indexed and simply has no title entry.
 const frontmatterSchema = z.object({
   permalink: permalinkSchema,
   tags: z.array(z.string()).default([]),
+  "dg-note-properties": z.object({ title: z.string() }).optional(),
 });
 
 /**
@@ -72,7 +79,7 @@ async function generateWikilinkIndex(): Promise<void> {
   // Duplicate published page routes are checked separately in posts.ts.
   const entriesByTarget = new Map<
     string,
-    { sourceFile: string; permalink: string }
+    { sourceFile: string; permalink: string; title: string | undefined }
   >();
 
   for (const file of files) {
@@ -114,6 +121,7 @@ async function generateWikilinkIndex(): Promise<void> {
       entriesByTarget.set(target, {
         sourceFile: file,
         permalink: tags.includes("gardenEntry") ? "/" : permalink,
+        title: result.data["dg-note-properties"]?.title,
       });
     } catch (error) {
       // Include the filename in read, parsing, and validation errors so you can
@@ -125,12 +133,18 @@ async function generateWikilinkIndex(): Promise<void> {
 
   // Sort targets by their UTF-8 bytes, matching the Bash script's LC_ALL=C sort.
   // This avoids language-specific sorting rules changing the generated diff.
-  // Once sorted, discard source filenames and keep [target, destination] pairs.
-  const entries = [...entriesByTarget]
-    .sort(([left], [right]) =>
-      Buffer.compare(Buffer.from(left), Buffer.from(right))
-    )
-    .map(([target, entry]) => [target, entry.permalink]);
+  // Once sorted, discard source filenames and keep [target, destination] and
+  // [target, title] pairs; a note without a title has no title pair.
+  const sortedEntries = [...entriesByTarget].sort(([left], [right]) =>
+    Buffer.compare(Buffer.from(left), Buffer.from(right))
+  );
+  const entries = sortedEntries.map(([target, entry]) => [
+    target,
+    entry.permalink,
+  ]);
+  const titles = sortedEntries.flatMap(([target, entry]) =>
+    entry.title === undefined ? [] : [[target, entry.title]]
+  );
 
   // JSON.stringify escapes quotes and backslashes in names before they become
   // TypeScript source. Object.fromEntries turns the pairs into the lookup object.
@@ -146,6 +160,12 @@ export interface WikilinkIndex {
 }
 
 export const wikilinkIndex: WikilinkIndex = Object.fromEntries(${JSON.stringify(entries)});
+
+export interface NoteTitles {
+  [wikilinkTarget: string]: string | undefined;
+}
+
+export const noteTitles: NoteTitles = Object.fromEntries(${JSON.stringify(titles)});
 `;
   // Use the repository's Prettier settings so a generated file follows the same
   // formatting as handwritten TypeScript. Finish this before touching the output:

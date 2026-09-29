@@ -8,7 +8,10 @@
  */
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { contentsEntries } from "../src/content/table-of-contents.ts";
+import {
+  contentsEntries,
+  embeddedHeadingPositions,
+} from "../src/content/table-of-contents.ts";
 
 const heading = (depth: number, text: string, slug = text.toLowerCase()) => ({
   depth,
@@ -51,6 +54,42 @@ describe("contentsEntries", () => {
       contentsEntries([heading(2, "One"), heading(2, "Two"), heading(3, "3")])
         .length,
       3
+    );
+  });
+
+  // Why: an embedded note's headings are that note's sections. They are
+  // left out, and don't count toward the three: a note with one section
+  // and an embed of two gets no table of contents.
+  it("leaves out embedded headings, before counting", () => {
+    const headings = [
+      heading(2, "Own"),
+      heading(2, "Embedded"),
+      heading(3, "Embedded detail"),
+      heading(2, "Also own"),
+      heading(2, "Last"),
+    ];
+    assert.deepEqual(
+      contentsEntries(headings, new Set([1, 2])).map(entry => entry.text),
+      ["Own", "Also own", "Last"]
+    );
+    assert.deepEqual(
+      contentsEntries(headings.slice(0, 4), new Set([1, 2])),
+      []
+    );
+  });
+
+  // Why: the positions arrive through Astro's untyped
+  // remarkPluginFrontmatter; anything but a list of positions is a bug in
+  // the pipeline and should fail the build, not drop the wrong headings.
+  it("reads recorded positions and rejects anything else", () => {
+    assert.deepEqual(embeddedHeadingPositions({}), new Set());
+    assert.deepEqual(
+      embeddedHeadingPositions({ embeddedHeadings: [2, 3] }),
+      new Set([2, 3])
+    );
+    assert.throws(
+      () => embeddedHeadingPositions({ embeddedHeadings: ["2"] }),
+      /embeddedHeadings must be a list of heading positions, not \["2"\]/
     );
   });
 

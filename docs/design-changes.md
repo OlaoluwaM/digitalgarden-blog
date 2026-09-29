@@ -890,3 +890,43 @@ https://claude.ai/artifact/AezzrntfR1ZLK4WXrF4x9n.
   `test/browser/scrollRegions.test.ts`, and `test/layout/diagrams.test.ts`
   (a fixture site against a local fake Kroki: sizing and scrolling, style
   isolation, distinct ids, axe, and a failed build on a rejected diagram).
+
+## 2026-09-29: Transclusions are source cards
+
+- **Change:** an embedded note (`![[Note]]`, `![[Note#Heading]]`), which
+  the Digital Garden plugin inlines when it publishes, renders as a
+  bordered card whose header names the source note, with a link to it on
+  the right ([designs](https://claude.ai/artifact/6Uq4RNhfRueyUJSmAB2r8P),
+  B). `plugins/mdast/transclusions.ts` adjusts the publisher's markup:
+  - The `![[Note|Title]]` title, a `#` heading, becomes the header's text,
+    so the note keeps one `h1` and the title stays out of the table of
+    contents.
+  - An untitled embed of a published note gets the header "From *note
+    title*", the title its page shows (the publisher writes a header only
+    for a title). An unpublished note's embed has no link and no header.
+  - The link is named "Open *note title*" (was "Open link"), and a section
+    embed's link points at the heading's ID on the site (the publisher's
+    `#My-Heading` matched none).
+
+  Block IDs (`^block-id`) get their anchors (`plugins/mdast/blockIds.ts`):
+  the publisher writes each as `{ #block-id}`, and the ID now goes on the
+  paragraph, list item, list, quote, or table it marks, so a block embed's
+  link and a `[[Note#^block-id]]` wikilink land on the block, below the
+  navbar like a heading link. Before, the marker showed as text and
+  nothing had the ID.
+
+  An embedded note's headings stay on the page, with their IDs, but the
+  table of contents lists only the note's own sections, and counts only
+  those toward its three-section minimum.
+
+  Live styled embeds with the Digital Garden theme's rules. No published
+  note embeds another yet.
+- **Why:** Olaolu chose the source card: borrowed text reads as borrowed,
+  unlike a blockquote (filled) or a callout (tinted).
+- **Evidence:** `test/transclusions.test.ts` (the publisher's markup
+  through the site's processor: the label, the header, the link's name and
+  fragment, wikilinks and unique heading IDs inside embeds),
+  `test/block-ids.test.ts`, `test/table-of-contents.test.ts`, and
+  `test/layout/transclusions.test.ts` (a fixture site: the header band at
+  390px and 1440px, a block link's landing, the table of contents without
+  embedded headings, one `h1` in the note, and axe).

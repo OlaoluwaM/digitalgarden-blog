@@ -101,7 +101,39 @@ async function readIndex(outputFile: string): Promise<Record<string, string>> {
   return module.wikilinkIndex;
 }
 
+// Like readIndex, for the titles exported beside the index.
+async function readTitles(outputFile: string): Promise<Record<string, string>> {
+  const source = await readFile(outputFile, "utf8");
+  const javascript = stripTypeScriptTypes(source);
+  const module = (await import(
+    `data:text/javascript;base64,${Buffer.from(javascript).toString("base64")}`
+  )) as { noteTitles: Record<string, string> };
+  return module.noteTitles;
+}
+
 describe("wikilink index generator", () => {
+  // Why: the transclusion plugin names an embed's source note by its title,
+  // which the publisher writes under dg-note-properties. A note without one
+  // is still indexed, with no title entry.
+  it("maps targets to their notes' titles", async t => {
+    const project = await fixture(t, {
+      "Guides/My Note.md": note({
+        permalink: "/posts/my-note/",
+        "dg-note-properties": { title: "My note, retitled" },
+      }),
+      "Untitled.md": note({ permalink: "/posts/untitled/" }),
+    });
+    const result = await project.run();
+    assert.equal(result.status, 0, result.output);
+    assert.deepEqual(await readTitles(project.outputFile), {
+      "Guides/My Note": "My note, retitled",
+    });
+    assert.equal(
+      (await readIndex(project.outputFile))["Untitled"],
+      "/posts/untitled/"
+    );
+  });
+
   it("parses JSON and YAML frontmatter in nested Markdown and MDX files", async t => {
     const project = await fixture(t, {
       "Folder/JSON.md": note({ permalink: "/posts/json/", tags: [] }),

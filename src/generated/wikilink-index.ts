@@ -60,3 +60,63 @@ export const wikilinkIndex: WikilinkIndex = Object.fromEntries([
   ],
   ["Outbox/Digital Garden & Blog/Home", "/"],
 ]);
+
+export interface NoteTitles {
+  [wikilinkTarget: string]: string | undefined;
+}
+
+export const noteTitles: NoteTitles = Object.fromEntries([
+  [
+    "Outbox/Digital Garden & Blog/Content/Blogposts/Be deliberate",
+    "Be deliberate",
+  ],
+  [
+    "Outbox/Digital Garden & Blog/Content/Blogposts/Docker Compose variable interpolation...weirdness",
+    "Docker Compose variable interpolation...weirdness",
+  ],
+  [
+    "Outbox/Digital Garden & Blog/Content/Blogposts/Dotfiles Reorg",
+    "Dotfiles Reorg: A Journey",
+  ],
+  [
+    "Outbox/Digital Garden & Blog/Content/Blogposts/Endianness, WOOT!",
+    "Endianness, WOOT!?",
+  ],
+  [
+    "Outbox/Digital Garden & Blog/Content/Blogposts/How to produce multiple executables from a stack project",
+    "How to produce multiple executables from a stack project",
+  ],
+  [
+    "Outbox/Digital Garden & Blog/Content/Blogposts/IO in Haskell, an epiphany",
+    "IO in Haskell, an epiphany",
+  ],
+  [
+    "Outbox/Digital Garden & Blog/Content/Blogposts/Implementing Redis INFO in Haskell",
+    "Implementing Redis INFO in Haskell",
+  ],
+  [
+    "Outbox/Digital Garden & Blog/Content/Blogposts/NixOS, the journey continues (part 2)",
+    "NixOS: The journey continues (part 2)",
+  ],
+  [
+    "Outbox/Digital Garden & Blog/Content/Blogposts/NixOS, the last milestone (part 3)",
+    "NixOS: The last milestone (part 3)",
+  ],
+  [
+    "Outbox/Digital Garden & Blog/Content/Blogposts/NixOS, the start of something new (part 1)",
+    "NixOS: The start of something new (part 1)",
+  ],
+  [
+    "Outbox/Digital Garden & Blog/Content/Blogposts/Numbers Numerals Oh Boy",
+    "Numbers? Numerals? Oh Boy",
+  ],
+  [
+    "Outbox/Digital Garden & Blog/Content/Blogposts/On maths and engineering",
+    "On maths and engineering",
+  ],
+  [
+    "Outbox/Digital Garden & Blog/Content/Blogposts/Yes - Cabal custom scripts do have uses",
+    "Yes, Cabal custom scripts do have uses",
+  ],
+  ["Outbox/Digital Garden & Blog/Home", "Home"],
+]);

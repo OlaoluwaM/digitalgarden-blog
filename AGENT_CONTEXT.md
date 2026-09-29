@@ -1000,7 +1000,7 @@ Keep these outside the migration checklist:
   `div.transclusion > a.markdown-embed-link + div.markdown-embed` with a
   `#` title in `.markdown-embed-title`, even for unpublished notes (it only
   omits the link). Designs: https://claude.ai/artifact/6Uq4RNhfRueyUJSmAB2r8P
-  Olaolu chose B, the source card; not built yet.
+  Olaolu chose B, the source card; built as item 9 below.
 
 ## Remaining work handed over (2026-09-28)
 
@@ -1098,3 +1098,40 @@ approval before committing and starting the next.
   shorthand browsers reject. The content @scope stops at `.diagram` (Mermaid labels are
   HTML `<p>`). Tests use test/support/fake-kroki.ts with real Kroki SVGs in
   test/fixtures/kroki; nothing in `npm test` calls kroki.io.
+- Item 9 (transclusions): `mkmdastTransclusionsPlugin(wikilinkIndex)`
+  (after the wikilinks plugin) works on the publisher's flat mdast: html
+  `<div class="transclusion …"><a …><div class="markdown-embed">`, then
+  optionally html `<div class="markdown-embed-title">` + heading + html
+  `</div>`, then the embedded Markdown, then html `</div></div>`. The
+  publisher writes a title only for `![[Note|Title]]` (`{{title}}` gives
+  the file name) at any heading level; the heading becomes a paragraph
+  (dropped from `headings`); Olaolu wants such titles shown as written,
+  without "From". Untitled published embeds get
+  `<p><span class="markdown-embed-from">From </span>Title</p>`; the title is
+  the note's frontmatter title (`dg-note-properties.title`, Olaolu's call,
+  not the file name), found by the link's URL through the wikilink index
+  and `noteTitles`, which the index generator now also writes. The link's
+  `aria-label` becomes "Open Title", its svg
+  `aria-hidden`, and a fragment is re-slugged (github-slugger) from the
+  embed's first heading, since the publisher uses `slugify` (`#My-Heading`).
+  Styles: src/styles/content/transclusions.css. Headings inside embeds keep
+  unique IDs (the processor dedupes) and do appear in the host's table of
+  contents unless filtered: `mdastEmbeddedHeadingsPlugin` (registered
+  after every plugin that adds or removes headings, before highlights)
+  counts mdast headings in document order, tracking embed depth by the
+  publisher's opening block and `</div></div>`, and records the embedded
+  ones' positions in `ctx.data.astro.frontmatter.embeddedHeadings`; the
+  note page reads them from `remarkPluginFrontmatter`
+  (`embeddedHeadingPositions`), and `contentsEntries` drops them before
+  the three-section minimum. Positions, not tags or text markers: Astro's
+  headings carry only depth/slug/text, its heading-ID step runs after all
+  user plugins, and a text marker would reach the page and the slug. Block IDs:
+  `mdastBlockIdsPlugin` turns the publisher's `{ #id}` markers (a
+  paragraph's last line `text\n{ #id}`, or a paragraph of its own after
+  the block) into `hProperties.id` on the paragraph, the list item (tight
+  lists render no `<p>`), or the previous block; headings keep their own
+  ID. A marker in a callout's first paragraph (shared with the title) loses
+  its ID. `[id]` gets the headings' scroll margin. Tests:
+  test/transclusions.test.ts, test/block-ids.test.ts,
+  test/layout/transclusions.test.ts, markup from
+  test/support/publisher-embed.ts.

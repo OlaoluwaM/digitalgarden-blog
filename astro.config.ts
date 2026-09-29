@@ -4,7 +4,7 @@ import { defineConfig } from "astro/config";
 import { satteri } from "@astrojs/markdown-satteri";
 import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
-import { wikilinkIndex } from "./src/generated/wikilink-index.ts";
+import { noteTitles, wikilinkIndex } from "./src/generated/wikilink-index.ts";
 import { mkmdastWikilinksPlugin } from "./src/plugins/mdast/wikilinks.ts";
 import { mkmdastAdmonitionCalloutPlugin } from "./src/plugins/mdast/admonitions.ts";
 import { hastAdmonitionCalloutPlugin } from "./src/plugins/hast/callout.ts";
@@ -15,6 +15,11 @@ import { mkmdastDigitalGardenImagesPlugin } from "./src/plugins/mdast/images.ts"
 import { mdastMathRenderPlugin } from "./src/plugins/mdast/math.ts";
 import { mdastHighlightsPlugin } from "./src/plugins/mdast/highlights.ts";
 import { mkmdastDiagramsPlugin } from "./src/plugins/mdast/diagrams.ts";
+import {
+  mdastEmbeddedHeadingsPlugin,
+  mkmdastTransclusionsPlugin,
+} from "./src/plugins/mdast/transclusions.ts";
+import { mdastBlockIdsPlugin } from "./src/plugins/mdast/blockIds.ts";
 
 const mdastWikilinksPlugin = mkmdastWikilinksPlugin(wikilinkIndex);
 const mdastAdmonitionCalloutPlugin =
@@ -66,11 +71,15 @@ export default defineConfig({
       },
       mdastPlugins: [
         mdastWikilinksPlugin,
+        mkmdastTransclusionsPlugin(wikilinkIndex, noteTitles),
+        mdastBlockIdsPlugin,
         mdastAdmonitionCalloutPlugin,
         mdastMathRenderPlugin,
         mdastDigitalGardenImagesPlugin,
         // After the callout plugin, so diagrams inside callouts render.
         mkmdastDiagramsPlugin(),
+        // After every plugin that adds or removes headings.
+        mdastEmbeddedHeadingsPlugin,
         // Last: it rewrites paragraph text the plugins above read.
         mdastHighlightsPlugin,
       ],
