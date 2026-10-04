@@ -4,6 +4,12 @@
 version: 2
 updates:
   - package-ecosystem: "npm"
+    # https://docs.github.com/en/code-security/reference/supply-chain-security/dependabot-options-reference?versionId=free-pro-team%40latest&productId=code-security&restPage=tutorials%2Csecure-your-dependencies%2Cdependabot-quickstart#cooldown-
+    cooldown:
+      default-days: 7
+      semver-major-days: 30
+      semver-minor-days: 7
+      semver-patch-days: 7
     directory: "/"
     schedule:
       interval: "weekly"
@@ -14,8 +20,12 @@ updates:
     groups:
       minor-and-patch:
         update-types: ["minor", "patch"]
+
   # Keep the pinned actions in .github/workflows current.
+  # Tells dependabot to check for updates to GitHub Actions used in workflows. This is important because GitHub Actions can have security vulnerabilities, and keeping them up to date helps mitigate those risks.
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
+    cooldown:
+      default-days: 7
