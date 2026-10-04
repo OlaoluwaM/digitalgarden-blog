@@ -311,8 +311,8 @@ describe("page structure", () => {
 });
 
 describe("page scripts", () => {
-  // A string only FlexSearch's code (and the engine configuring it) holds.
-  const FLEXSEARCH = "latin:extra";
+  // Text used to detect FlexSearch in the built JS.
+  const FLEXSEARCH = "fastupdate";
   const staticImports = (code: string) =>
     [
       ...code.matchAll(/import(?:[\w\s{},*$]*from)?\s*["']\.\/([^"']+)["']/g),
