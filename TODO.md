@@ -1,18 +1,5 @@
 # TODO
 
-## At the merge
-
-- [ ] Once the CI workflow has run on `main` and passed, make production wait for CI:
-  1. In Vercel, open the `digitalgarden-blog` project's Settings > Build and Deployment > Deployment Checks and choose Add Check > GitHub Actions.
-  2. Under "Send workflow updates to Vercel", enter the check name `CI`. The snippet should read `name: Vercel - digitalgarden-blog: CI`, the status the workflow already sets; skip adding the snippet.
-  3. Choose Add.
-  4. Check: push a commit to `main`. Its deployment should wait until the workflow's `Vercel - digitalgarden-blog: CI` status passes, then take thunk.blog.
-
-  Not before the merge: `main` has no workflow until then, so production would wait for a status that never comes, and published notes would never go live.
-
-- [ ] Publish from Obsidian and check the round trip: the build passes, and the only page changes are Home's description and the nested "package" list in NixOS part 1.
-- [ ] Switch the Vercel project's Framework Preset from Eleventy to Astro. `vercel.json` already sets Astro for every deployment, so this only tidies the dashboard. Never before the merge: until then the preset builds the live Eleventy site.
-
 ## Site features
 
 - [ ] Add a "collapse all folders" button to the file tree once the vault has more than one folder ([mockups](https://claude.ai/artifact/VnPJxBcZ2LEPgo6ZtNjpD8); leaning toward a square button beside the search button).
@@ -27,6 +14,9 @@
 
 ## Deferred Items
 
+- Enable auto-merging of dependabot PRs (patch & minor updates only)
+  - <https://carlosbecker.com/posts/dependabot-automerge/>
+  - <https://lethain.com/dependabot-auto-merge/>
 - Local and global graph views
 - Link previews
 - Note icons.
