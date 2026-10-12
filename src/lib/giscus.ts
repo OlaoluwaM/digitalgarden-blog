@@ -70,6 +70,8 @@ export function giscusAttributes(permalink: string): Record<string, string> {
  */
 export function giscusThemeCss(tokens: Map<string, string>): string {
   const gray = (step: number) => tokenValue(tokens, `--color-gray-${step}`);
+  const mix = (step: number, percent: number) =>
+    withAlpha(`--color-gray-${step}`, gray(step), percent);
   const none = "0 0 transparent";
   const variables: Record<string, string> = {
     ...GITHUB_DARK_SYNTAX,
@@ -112,12 +114,12 @@ export function giscusThemeCss(tokens: Map<string, string>): string {
     "--color-canvas-subtle": gray(900),
     "--color-border-default": gray(700),
     "--color-border-muted": gray(800),
-    "--color-neutral-muted": withAlpha(gray(100), 20),
+    "--color-neutral-muted": mix(100, 20),
     // Links and the reaction a reader picked: the site's link grays.
     "--color-accent-fg": gray(100),
     "--color-accent-emphasis": gray(200),
-    "--color-accent-muted": withAlpha(gray(200), 40),
-    "--color-accent-subtle": withAlpha(gray(200), 10),
+    "--color-accent-muted": mix(200, 40),
+    "--color-accent-subtle": mix(200, 10),
     "--color-success-fg": "#3fb950",
     "--color-attention-fg": "#d29922",
     "--color-attention-muted": "rgb(187 128 9 / 40%)",
@@ -156,7 +158,6 @@ export function giscusThemeCss(tokens: Map<string, string>): string {
       "}",
       "",
     ]),
-    "",
     "main {",
     // The site's text stack, which leads with Instrument Sans.
     `  font-family: ${tokenValue(tokens, "--font-sans")};`,
@@ -174,8 +175,12 @@ export function giscusThemeCss(tokens: Map<string, string>): string {
   ].join("\n");
 }
 
-/** A `#rrggbb` color at `percent` opacity. */
-function withAlpha(hex: string, percent: number): string {
+/** The `#rrggbb` color of token `name` at `percent` opacity. Any other format
+ * fails the build, as a missing token does. */
+function withAlpha(name: string, hex: string, percent: number): string {
+  if (!/^#[\da-f]{6}$/i.test(hex)) {
+    throw new Error(`${name} is not a six-digit hex color: ${hex}`);
+  }
   const [r, g, b] = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16));
   return `rgb(${r} ${g} ${b} / ${percent}%)`;
 }

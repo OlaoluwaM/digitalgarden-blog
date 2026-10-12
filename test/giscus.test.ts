@@ -148,6 +148,16 @@ describe("giscusThemeCss", () => {
     assert.match(css, /font-family: "Instrument Sans"/);
   });
 
+  // Why: three variables mix a gray with transparency, which needs the
+  // gray as six-digit hex. Every other token read fails the build when the
+  // token is missing; a gray in another format must fail it too, not turn
+  // those colors into `NaN` with a green build.
+  it("fails on a gray it can't mix with transparency", () => {
+    const changed = new Map(tokens);
+    changed.set("--color-gray-200", "oklch(70% 0 0)");
+    assert.throws(() => giscusThemeCss(changed), /--color-gray-200/);
+  });
+
   // Why: comments use Markdown, so *emphasis* needs the italic face, or
   // the browser slants the upright one.
   it("loads the italic face for emphasis", () => {

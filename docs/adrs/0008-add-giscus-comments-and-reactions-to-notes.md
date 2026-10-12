@@ -124,6 +124,11 @@ own ending down. A `Comments.astro` component renders it:
 
 - Turning on Discussions, creating the category, and installing the giscus
   app are manual GitHub steps, done once.
+- The production-only switch reads `VERCEL_ENV` at build time, which Vercel
+  provides when the project exposes System Environment Variables (the
+  default). If that setting were turned off, production would show "Comments
+  only load on thunk.blog." A promoted preview is rebuilt for production,
+  so it gets comments.
 - A note's URL change orphans its thread; the old discussion stays on
   GitHub, unlinked.
 

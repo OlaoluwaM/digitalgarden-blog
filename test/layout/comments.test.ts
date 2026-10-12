@@ -251,6 +251,8 @@ describe("comments section", () => {
       await page.keyboard.press("ArrowDown");
       const preview = page.locator(".preview-body");
       await preview.getByText("A note readers can comment on.").waitFor();
+      // The preview copies the whole note, so the section is there to hide.
+      assert.equal(await preview.locator("section.comments").count(), 1);
       assert.equal(
         await preview.locator("section.comments").isVisible(),
         false

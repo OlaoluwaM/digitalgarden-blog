@@ -152,7 +152,8 @@
 
   /* The note: content/ styles it as in the note column (both scope to
      .preview-body). The preview's header already shows the title and tags,
-     so the note's own header goes, with the post footer and Recent Posts.
+     so the note's own header goes, with the post footer, Recent Posts, and
+     the comments section.
      The text and headings are smaller, and the blocks closer, to fit the
      panel. These selectors need their class: the content rules are scoped,
      and a scoped rule wins a specificity tie over an unscoped one. */
