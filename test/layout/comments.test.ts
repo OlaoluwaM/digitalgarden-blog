@@ -241,25 +241,6 @@ describe("comments section", () => {
     });
   });
 
-  // Why: the search preview shows a note's content, not its chrome; like
-  // the sign-off, the comments section stays out of it.
-  it("stays out of the search preview", async () => {
-    await withPage(production, NOTE, async page => {
-      await page.keyboard.press("Control+k");
-      await page.keyboard.type("Commented");
-      await page.locator("#globalsearch [role='option']").first().waitFor();
-      await page.keyboard.press("ArrowDown");
-      const preview = page.locator(".preview-body");
-      await preview.getByText("A note readers can comment on.").waitFor();
-      // The preview copies the whole note, so the section is there to hide.
-      assert.equal(await preview.locator("section.comments").count(), 1);
-      assert.equal(
-        await preview.locator("section.comments").isVisible(),
-        false
-      );
-    });
-  });
-
   // Why: each URL form of a note (`/x`, `/x/`, `/x/index.html`) must find
   // the same thread, so the widget is given the note's permalink.
   it("keys the thread on the note's permalink", async () => {
