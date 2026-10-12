@@ -2,25 +2,7 @@
 // the page cannot drift from it, and a sentence on what each one is for.
 // test/style-guide.test.ts fails when a token has no sentence or a sentence
 // has no token.
-import postcss from "postcss";
-
-/** The value of `name`, failing the page build if tokens.css lacks it. */
-export function tokenValue(tokens: Map<string, string>, name: string): string {
-  const value = tokens.get(name);
-  if (value === undefined) throw new Error(`tokens.css has no ${name}`);
-  return value;
-}
-
-/** Every declaration in tokens.css, in file order, without the resets. */
-export function parseTokens(source: string): Map<string, string> {
-  const tokens = new Map<string, string>();
-  postcss.parse(source).walkDecls(decl => {
-    if (!decl.prop.endsWith("*")) {
-      tokens.set(decl.prop, decl.value.replace(/\s+/g, " "));
-    }
-  });
-  return tokens;
-}
+export { parseTokens, tokenValue } from "../lib/tokens.ts";
 
 /**
  * The steps whose names start with `prefix`, without their paired values

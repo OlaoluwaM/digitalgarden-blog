@@ -1,0 +1,75 @@
+---
+// The "Comments & Discussion" section that ends an article (ADR 0008): a
+// giscus reaction bar for upvotes and the comments, stored in this repo's
+// GitHub Discussions. It comes after the sign-off, so a long thread never
+// pushes the note's own ending down.
+//
+// Three states:
+//   - production (`enabled`): giscus's script, which puts its iframe in the
+//     `.giscus` element and loads it lazily, as the reader nears it.
+//   - production without JavaScript: the message below instead, shown only
+//     when scripting is off (`noscript:`), with a link to the discussions.
+//   - anywhere else (previews, localhost): no script at all, only a note
+//     that comments load on thunk.blog. A thread is found by its permalink,
+//     which those share with production, so a comment there would land in
+//     the real discussion.
+//
+// Styling (ADR 0003): the heading matches "Mentioned in"; the message is a
+// panel like the widget's. The section is a control for the screen, so it
+// is not printed. giscus's iframe is kept dark in
+// styles/components/comments.css.
+import { giscus, giscusAttributes } from "../lib/giscus.ts";
+import Icon from "./Icon.astro";
+
+interface Props {
+  /** Load the widget: true only in Vercel's production build. */
+  enabled: boolean;
+  /** The note's permalink, which names its thread. */
+  term: string;
+}
+
+const { enabled, term } = Astro.props;
+const linkClass = "text-gray-200 underline hover:text-gray-100";
+---
+
+<section class="comments mt-12 print:hidden" aria-labelledby="comments-heading">
+  <h2
+    id="comments-heading"
+    class="m-0 text-xs font-normal tracking-wider text-gray-300 uppercase"
+  >
+    Comments &amp; Discussion
+  </h2>
+  {enabled ? (
+    <>
+      <div class="giscus mt-4 noscript:hidden" />
+      <script
+        is:inline
+        src="https://giscus.app/client.js"
+        {...giscusAttributes(term)}
+        crossorigin="anonymous"
+        async
+      />
+      <div
+        data-comments-noscript
+        class="mt-4 hidden items-start gap-3.5 rounded-lg border border-gray-700 bg-gray-900 p-5 noscript:flex"
+      >
+        <Icon
+          name="message-circle"
+          class="mt-0.5 size-5 shrink-0 text-gray-300"
+        />
+        <div>
+          <p class="m-0">Enable JavaScript to comment and react.</p>
+          <p class="m-0 mt-1.5 text-sm">
+            <a class={linkClass} href={giscus.categoryUrl}>
+              Read the discussions on GitHub
+            </a>
+          </p>
+        </div>
+      </div>
+    </>
+  ) : (
+    <p data-comments-off class="m-0 mt-4 text-sm text-gray-300">
+      Comments only load on thunk.blog.
+    </p>
+  )}
+</section>

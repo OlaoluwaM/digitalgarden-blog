@@ -13,6 +13,8 @@ import {
   embeddedHeadingPositions,
 } from "../content/table-of-contents";
 import { isHiddenPost } from "../content/hidden";
+import Comments from "../components/Comments.astro";
+import { giscusEnabled } from "../lib/giscus";
 
 // This is required for dynamic routes: https://docs.astro.build/en/guides/routing/#static-ssg-mode
 export async function getStaticPaths() {
@@ -53,4 +55,14 @@ const contents = contentsEntries(
   <PostContent />
   <Backlinks posts={backlinks} />
   <PostFooter />
+  {
+    /* A hidden note opens only from a direct link, so it gets no thread.
+       The widget loads only in Vercel's production build (ADR 0008). */
+    !isHiddenPost(post) && (
+      <Comments
+        enabled={giscusEnabled(process.env)}
+        term={post.data.pluginProps.permalink}
+      />
+    )
+  }
 </BaseLayout>

@@ -1137,3 +1137,36 @@ https://claude.ai/artifact/AezzrntfR1ZLK4WXrF4x9n.
   `test/image-sizes.test.ts` (no widths when the file can't be read; none
   on a remote image), and `test/layout/lightbox.test.ts` (a `|200` 1200px
   image opens past 400px, filling the viewport at 1440px).
+
+## 2026-10-12: Notes end with comments and reactions
+
+- **Change:** every published article ends with a "Comments & Discussion"
+  section after the sign-off (`components/Comments.astro`; ADR 0008; design
+  in https://claude.ai/artifact/5PL4WNCU8XZpMRcxq7n18G). In Vercel's
+  production build it loads giscus: a reaction bar (the upvote), the comment
+  box at the top, and the comments, oldest first, stored in this repo's
+  GitHub Discussions. A note's thread is named by its permalink, so `/x`,
+  `/x/`, and `/x/index.html` share one. Its theme, `/giscus-theme.css`, is
+  built from `tokens.css` and Instrument Sans (with its italic), and the
+  widget stays dark whatever the reader's system setting
+  (`styles/components/comments.css` keeps giscus's iframe dark against
+  giscus's own page stylesheet). Without JavaScript the section shows
+  "Enable JavaScript to comment and react" and a link to the discussions. On
+  previews and localhost it loads nothing and says "Comments only load on
+  thunk.blog." Home and hidden notes have no section; it is not printed and
+  stays out of the search preview, and its heading is set like "Mentioned
+  in". Live had no comments.
+- **Why:** readers had no way to respond to a note or upvote it.
+- **Evidence:** `test/giscus.test.ts` (the widget's settings and the
+  permalink term, production only, the theme's colors from the tokens and
+  its dark scheme, font, and italic, `giscus.json`'s origin and order, and
+  `vercel.json`'s CORS headers for the theme and fonts),
+  `test/components/comments.test.ts` (the heading, the widget in production,
+  the no-JavaScript message, nothing outside production), and
+  `test/layout/comments.test.ts` (fixture builds as production and as a
+  preview, in Chrome with giscus.app blocked: after the sign-off at 390px
+  and 1440px, none on Home or a hidden note, the message only without
+  JavaScript, nothing on a preview, not printed, the frame kept dark against
+  a stand-in for giscus's page stylesheet, the heading in the text face,
+  none in the search preview, the permalink as the term, axe in each state,
+  and the theme in the build). The iframe itself is out of the tests' reach.

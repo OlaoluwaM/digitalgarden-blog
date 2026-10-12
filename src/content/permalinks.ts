@@ -40,6 +40,7 @@ function isValidPermalink(value: string): boolean {
 export const PAGE_ROUTES: readonly string[] = [
   "/404",
   "/feed.xml",
+  "/giscus-theme.css",
   "/random",
   "/robots.txt",
   "/searchIndex.json",

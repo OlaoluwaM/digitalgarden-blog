@@ -18,7 +18,7 @@
  * (callouts) still win over it.
  */
 @layer components {
-  @scope (.markdown-rendered :is(main.content, .preview-body)) to (header, footer, .recent-notes, .backlinks, .diagram) {
+  @scope (.markdown-rendered :is(main.content, .preview-body)) to (header, footer, .recent-notes, .backlinks, .comments, .diagram) {
     /* Inherited text behavior (Obsidian sets both on .markdown-rendered). */
     :scope {
       overflow-wrap: break-word;
