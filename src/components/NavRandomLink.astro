@@ -1,0 +1,28 @@
+---
+// The "random note" link beside the search button, in both the mobile navbar
+// and the sidebar (`NavShell.astro`). It goes to `/random/`, which sends the
+// reader to a note picked at random (`pages/random.astro`). Live had no such
+// link; the page existed, but nothing pointed to it (docs/design-changes.md).
+//
+// It is a link, not a button like search: it navigates, so it is an `<a>`
+// that opens in a new tab or copies like any other link, and it works without
+// JavaScript (search is hidden then; this is not). The icon is decoration;
+// `aria-label` names the link for screen readers and `title` gives pointer
+// users a tooltip, since the link has no visible text.
+//
+// Styling (ADR 0003 phase 2): the same 36px box as the search button, so the
+// two read as a pair on one row; the row itself (the gap, who grows) is
+// NavShell's. The color is inherited, as the search button's is: the
+// sidebar's muted gray there and the body text color in the navbar. Keyboard
+// focus uses the global ring in styles/base.css.
+import Icon from "./Icon.astro";
+---
+
+<a
+  href="/random/"
+  class="my-2.5 flex size-9 shrink-0 items-center justify-center rounded-lg border border-gray-700 bg-gray-950 text-inherit hover:border-gray-100"
+  aria-label="Random note"
+  title="Random note"
+>
+  <Icon name="dices" class="pointer-events-none size-3.5 opacity-70" />
+</a>

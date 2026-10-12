@@ -89,6 +89,7 @@
     "flexsearch": "0.8.212",
     "github-slugger": "^2.0.0",
     "gray-matter": "^4.0.3",
+    "image-size": "^2.0.4",
     "juice": "12.2.0",
     "lucide": "1.50.0",
     "mathjax-full": "3.2.2",

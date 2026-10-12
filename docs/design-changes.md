@@ -1029,3 +1029,146 @@ https://claude.ai/artifact/AezzrntfR1ZLK4WXrF4x9n.
   site: placement before the sign-off, no Markdown list indent, "Show
   more" without JavaScript, nothing on an unmentioned note, and axe);
   screenshots in https://claude.ai/artifact/YNEXAzL6Z2TBJnjnRtYsQA.
+
+## 2026-10-12: Random note link beside search
+
+- **Change:** a "Random note" link sits beside the search button, in the
+  mobile navbar and in the sidebar (`components/NavRandomLink.astro`; design
+  in https://claude.ai/artifact/5PL4WNCU8XZpMRcxq7n18G). It is a 36px square
+  with the Lucide `dices` icon, drawn like the search button, 8px to its
+  right; in the sidebar the search button shrinks to share the row. It goes
+  to `/random/`, works without JavaScript, and is hidden in print. Live had
+  no such link.
+- **Why:** readers can jump to a random note; `/random/` already existed,
+  but nothing linked to it.
+- **Evidence:** `test/components/site-navigation.test.ts` (one link to
+  `/random/` per place, named "Random note", an `aria-hidden` dice icon,
+  right after the search button, not hidden without JavaScript) and
+  `test/layout/site-layout.test.ts` ("random note link": a 36px square on
+  the search button's row with an 8px gap and its border, fill, and corners
+  in the navbar at 390px and the sidebar at 1440px, at 1100px, and opened at
+  390px, inside the sidebar's padding; the site's focus ring on Tab from
+  search; visible without JavaScript; not printed; and axe).
+
+## 2026-10-12: Note images open in a lightbox
+
+- **Change:** every image in a note opens, enlarged up to its file's size,
+  in a modal dialog over a 90% black backdrop (`scripts/imageLightbox.ts`,
+  `styles/components/lightbox.css`; design in
+  https://claude.ai/artifact/5PL4WNCU8XZpMRcxq7n18G). The script wraps the
+  image in a button named "Enlarge image: {alt}" (or "Enlarge image" with no
+  alt) that has a `zoom-in` cursor and a badge in the image's bottom-right
+  corner, shown at rest and brighter on hover and keyboard focus. The dialog
+  shows the same image, with its `srcset` read as a full viewport width so
+  the browser can fetch the largest file, but never drawn wider than that
+  file (a small image stays small), inside 16px of padding (32px from `md`
+  up), and a 44px close button at the top right. Each picture gets a fresh
+  image, so the previous picture never shows while the next one loads.
+  Escape, the close button, or a click on the backdrop or the padding closes
+  it, and focus returns to the button (the script focuses it, since Safari
+  has restored focus only after a keyboard open). Holding Enter does not
+  toggle it open and shut. A click on the image, the second click of a
+  double-click on the button, and a press that starts or ends on the image
+  or the close button and ends or starts on the backdrop do not close it.
+  After a click closes it, the rest of a double-click or double-tap (a
+  second click on Close, or on the backdrop) is swallowed instead of
+  pressing whatever lies under it. Opening search (Ctrl+K, the only way in
+  while the page is inert) closes the lightbox first, so only search is
+  open, and closing search puts focus back on the image's button. The page
+  behind does not scroll while the lightbox is open, and keeps its scroll
+  position (and, with a classic scrollbar, its width) while it is open and
+  after it closes. Images inside a link, a label (task items), a button, a
+  summary, or a `role="button"` element (collapsible callout titles) are
+  left as they were; diagrams are SVG, not images, and get none. The button
+  lays out as the bare image did: it keeps the image's size, place, and
+  rounded corners wherever the image sits, and centers a lone image as
+  before. The badge and dialog are not printed, and printing with the
+  lightbox open prints every page. Without JavaScript nothing changes. Live
+  had no lightbox. Today one published note has an image.
+- **Why:** on a phone, and in a narrow column, images are shown smaller than
+  their files, and readers had no way to look closer.
+- **Evidence:** `test/browser/imageLightbox.test.ts` (with fixture markup:
+  which images get a button and its name, and which are left alone; one
+  dialog with the same alt, src, and wider srcset, and its name; a fresh
+  image for each open; every way of closing, a double-click, and presses
+  that cross between elements, with focus returning to the button and the
+  script itself focusing it on every close path; with the real reset, base,
+  and content stylesheets: a wrapped image keeping its box and radius when
+  alone, in a sentence, beside another, after a line break, in a list item,
+  in a table cell, and in a callout; the badge's place, size, and colors at
+  rest and on hover; the enlarged image inside the viewport padding on a
+  phone and a desktop and no wider than its file; the close button's size
+  and corner; the backdrop; and the scroll position unchanged while open and
+  after closing), `test/browser/searchDialog.test.ts` (search closes an open
+  lightbox, and Escape returns focus to its button), and
+  `test/layout/lightbox.test.ts` (a fixture site, at 390px and 1440px unless
+  noted: in a note with images in a sentence, two on a line, apart by a soft
+  break, in a list item, in a table cell, alone, and in a callout, the boxes
+  of every `img`, `p`, `li`, and `td` before the first callout are identical
+  with JavaScript off and on, and the boxes of those and of the callouts are
+  identical on the same page with and without the buttons; images in a task
+  item and a collapsible callout's title are not wrapped; the enlarged image
+  is inside the viewport with no sideways scroll and never wider than its
+  file; the scroll position and the button's place are unchanged with the
+  dialog open and after Escape, the close button, and a backdrop click; with
+  a classic scrollbar, at 1024px, the note's place and width and the scroll
+  position are unchanged while open and after closing; a PDF has the same
+  page count with the dialog open and closed; a double-click, a crossing
+  press, and a held Enter leave it open, a held Enter on Close leaves it
+  shut; the second click of a double-click on Close or on the backdrop over
+  a link, and the second tap of a double-tap on Close, reach nothing, and
+  only for 600ms; search closes it; axe passes closed and open; and the
+  badge and dialog are hidden in print).
+
+## 2026-10-12: Sized images enlarge to their full file
+
+- **Change:** an image with an Obsidian size (`![[shot.png|300]]`) also
+  offers its file's own width in its srcset, beside the size and twice it
+  (`plugins/hast/imageSizes.ts`, which reads the file's width with
+  `image-size`, upright for a photo turned by its EXIF orientation, as Astro
+  sizes it). The note still shows it at the size; the lightbox, which
+  enlarges up to the widest candidate, now shows the whole file instead of
+  stopping at twice the size. A crop (`|300x200`) keeps its shape at full
+  width. A remote image, or a file that can't be read, keeps Astro's srcset.
+- **Why:** a size is often a big screenshot shown small, and the lightbox is
+  where a reader looks at it whole.
+- **Evidence:** `test/images-build.test.ts` (on a 400px file, `|300` and
+  `|200` give the size, twice it where it fits, and 400w; `|400` gives 400w
+  once; `|300x100` gives a 400 by 133 full file; no width twice; photos
+  stored on their side get their upright width), `test/image-sizes.test.ts`
+  (no widths when the file can't be read; none on a remote image), and
+  `test/layout/lightbox.test.ts` (a `|200` 1200px image opens past 400px,
+  filling the viewport at 1440px).
+
+## 2026-10-12: Notes end with comments and reactions
+
+- **Change:** every published article ends with a "Comments & Discussion"
+  section after the sign-off (`components/Comments.astro`; ADR 0008; design
+  in https://claude.ai/artifact/5PL4WNCU8XZpMRcxq7n18G). In Vercel's
+  production build it loads giscus: a reaction bar (the upvote), the comment
+  box at the top, and the comments, oldest first, stored in this repo's
+  GitHub Discussions. A note's thread is named by its permalink, so `/x`,
+  `/x/`, and `/x/index.html` share one. Its theme, `/giscus-theme.css`, is
+  built from `tokens.css` and Instrument Sans (with its italic), and the
+  widget stays dark whatever the reader's system setting
+  (`styles/components/comments.css` keeps giscus's iframe dark against
+  giscus's own page stylesheet). Without JavaScript the section shows
+  "Enable JavaScript to comment and react" and a link to the discussions. On
+  previews and localhost it loads nothing and says "Comments only load on
+  thunk.blog." Home and hidden notes have no section; it is not printed and
+  stays out of the search preview, and its heading is set like "Mentioned
+  in". Live had no comments.
+- **Why:** readers had no way to respond to a note or upvote it.
+- **Evidence:** `test/giscus.test.ts` (the widget's settings and the
+  permalink term, production only, the theme's colors from the tokens and
+  its dark scheme, font, and italic, `giscus.json`'s origin and order, and
+  `vercel.json`'s CORS headers for the theme and fonts),
+  `test/components/comments.test.ts` (the heading, the widget in production,
+  the no-JavaScript message, nothing outside production), and
+  `test/layout/comments.test.ts` (fixture builds as production and as a
+  preview, in Chrome with giscus.app blocked: after the sign-off at 390px
+  and 1440px, none on Home or a hidden note, the message only without
+  JavaScript, nothing on a preview, not printed, the frame kept dark against
+  a stand-in for giscus's page stylesheet, the heading in the text face,
+  none in the search preview, the permalink as the term, axe in each state,
+  and the theme in the build). The iframe itself is out of the tests' reach.

@@ -508,6 +508,188 @@ describe("search button", () => {
   });
 });
 
+describe("random note link", () => {
+  // The link sits beside a search button in two places: the navbar below
+  // 1000px and the sidebar from there up (below 1000px the sidebar is the
+  // opened file tree, which has its own copy).
+  const places = [
+    { name: "the navbar at 390px", width: 390, scope: "nav.navbar" },
+    {
+      name: "the sidebar at 1440px",
+      width: 1440,
+      scope: ".filetree-sidebar",
+    },
+    {
+      name: "the sidebar at 1100px",
+      width: 1100,
+      scope: ".filetree-sidebar",
+    },
+    {
+      name: "the opened file tree at 390px",
+      width: 390,
+      scope: ".filetree-sidebar",
+      open: true,
+    },
+  ];
+
+  // Why: the link is the search button's companion, so it has to read as
+  // one: a 36px square (the button's height), on the button's row at the
+  // same top, 8px to its right, drawn in the same border, fill, and
+  // corners. In the sidebar the search button gives up width to make room:
+  // it fills the row up to the link, and the row must stay inside the
+  // sidebar's padding, including at 1100px where the sidebar keeps a margin
+  // beside the button.
+  for (const place of places) {
+    it(`sits beside the search button as a matching 36px square in ${place.name}`, async () => {
+      await withPage(place.width, async page => {
+        await page.goto(origin + "/", { waitUntil: "load" });
+        if (place.open) await page.click(".hamburger-btn");
+        const link = `${place.scope} a[href="/random/"]`;
+        assert.equal(await page.locator(link).isVisible(), true);
+        const m = await page.evaluate(
+          ([scope, link]) => {
+            const linkElement = document.querySelector(link!)!;
+            const search = document.querySelector(`${scope} .search-button`)!;
+            const rect = (element: Element) => element.getBoundingClientRect();
+            const style = (element: Element) => getComputedStyle(element);
+            const icon = rect(linkElement.querySelector("svg")!);
+            const sidebar = document.querySelector(".filetree-sidebar")!;
+            const edge =
+              rect(sidebar).right - parseFloat(style(sidebar).paddingRight);
+            return {
+              row: rect(linkElement.parentElement!).toJSON() as DOMRect,
+              link: rect(linkElement).toJSON() as DOMRect,
+              search: rect(search).toJSON() as DOMRect,
+              iconCenter: [
+                icon.left + icon.width / 2 - rect(linkElement).left,
+                icon.top + icon.height / 2 - rect(linkElement).top,
+              ],
+              edge,
+              look: [linkElement, search].map(element => ({
+                border: style(element).borderColor,
+                width: style(element).borderTopWidth,
+                background: style(element).backgroundColor,
+                radius: style(element).borderTopLeftRadius,
+              })),
+              color: [style(linkElement).color, style(search).color],
+            };
+          },
+          [place.scope, link]
+        );
+        assert.deepEqual([m.link.width, m.link.height], [36, 36]);
+        assert.equal(m.link.top, m.search.top);
+        assert.equal(m.link.height, m.search.height);
+        assert.ok(
+          Math.abs(m.link.left - m.search.right - 8) < 0.5,
+          `gap ${m.link.left - m.search.right}px`
+        );
+        assert.deepEqual(m.iconCenter, [18, 18]);
+        assert.deepEqual(m.look[0], m.look[1]);
+        assert.equal(m.color[0], m.color[1]);
+        if (place.scope === ".filetree-sidebar") {
+          assert.ok(
+            m.link.right <= m.edge + 0.5,
+            `link ends at ${m.link.right}px, sidebar content at ${m.edge}px`
+          );
+          assert.ok(
+            Math.abs(m.search.left - m.row.left) < 0.5 &&
+              Math.abs(m.link.right - m.row.right) < 0.5,
+            `search starts at ${m.search.left}px and the link ends at ${m.link.right}px in a row from ${m.row.left}px to ${m.row.right}px`
+          );
+        }
+      });
+    });
+  }
+
+  // Why: keyboard users reach the link from the search button, and, like
+  // every other control, it shows the site's one focus ring. A new ring or
+  // none at all would lose them there.
+  it("shows the site's focus ring when reached with Tab from search", async () => {
+    await withPage(1440, async page => {
+      await page.goto(origin + "/", { waitUntil: "load" });
+      await page.locator(".filetree-sidebar .search-button").focus();
+      const ring = () =>
+        page.evaluate(() => {
+          const element = document.activeElement!;
+          const style = getComputedStyle(element);
+          return {
+            href: element.getAttribute("href"),
+            ring: [
+              style.outlineStyle,
+              style.outlineWidth,
+              style.outlineColor,
+              style.outlineOffset,
+            ],
+          };
+        });
+      await page.keyboard.press("Tab");
+      const link = await ring();
+      assert.equal(link.href, "/random/");
+      assert.deepEqual(link.ring.slice(0, 2), ["solid", "2px"]);
+      // The ring matches the one on the controls beside it.
+      await page.keyboard.press("Shift+Tab");
+      assert.deepEqual(link.ring, (await ring()).ring);
+    });
+  });
+
+  // Why: unlike search, the link needs no JavaScript: it is a plain link to
+  // a page that redirects. Without JavaScript the search buttons are hidden
+  // and the link must stay, in the navbar and in the sidebar.
+  for (const width of [390, 1440]) {
+    it(`shows the link without JavaScript at ${width}px`, async () => {
+      await withPage(
+        width,
+        async page => {
+          await page.goto(origin + "/", { waitUntil: "load" });
+          assert.equal(await page.locator(".search-button:visible").count(), 0);
+          assert.equal(
+            await page.locator('a[href="/random/"]:visible').count(),
+            1
+          );
+        },
+        { javaScriptEnabled: false }
+      );
+    });
+  }
+
+  // Why: the navigation is chrome and is hidden when printing, and the
+  // link lives inside it. The page-level print test only sees the top-level
+  // elements, so this checks the link itself is not drawn.
+  it("is not printed", async () => {
+    for (const width of [720, 1440]) {
+      await withPage(width, async page => {
+        await page.emulateMedia({ media: "print" });
+        await page.goto(origin + "/", { waitUntil: "load" });
+        const links = await page.$$eval('a[href="/random/"]', links =>
+          links.map(link => link.getClientRects().length)
+        );
+        // Both copies are in the page; neither is drawn.
+        assert.deepEqual(links, [0, 0], `${width}px`);
+      });
+    }
+  });
+
+  // Why: the page-wide axe check runs on every page, but a link with no
+  // accessible name or poor contrast would be easy to miss among its other
+  // results. This names the link's page and widths, and requires the link to
+  // be there, so the check cannot pass by running on a page without it.
+  for (const width of [390, 1440]) {
+    it(`finds no new axe violations with the link present at ${width}px`, async () => {
+      await withPage(width, async page => {
+        await page.goto(origin + "/", { waitUntil: "load" });
+        assert.equal(
+          await page.locator('a[href="/random/"]:visible').count(),
+          1
+        );
+        const unexpected = (await axeViolations(page)).filter(
+          violation => !isKnown(violation)
+        );
+        assert.deepEqual(unexpected, []);
+      });
+    });
+  }
+});
+
 describe("search dialog", () => {
   // Why: utility classes that set `display` on a <dialog> beat the
   // browser's rule that hides a closed dialog, so a styling slip shows an

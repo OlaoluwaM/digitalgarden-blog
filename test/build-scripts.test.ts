@@ -64,10 +64,19 @@ describe("vercel.json", () => {
   // Why: Astro names everything under /_astro/ by a hash of its content,
   // so a file there never changes; browsers may keep it a year without
   // asking the server again. Vercel otherwise has them revalidate on every
-  // page. Nothing else is cached this way: fonts, the search index, and
-  // the feed keep their names when their content changes.
+  // page. Nothing else is cached this way: fonts, the search index, the
+  // feed, and the giscus theme keep their names when their content changes.
+  // (The other header rules let giscus.app read the theme and fonts;
+  // test/giscus.test.ts checks them.)
   it("caches only Astro's hashed assets as immutable", () => {
-    assert.deepEqual(vercel.headers, [
+    const rules = (vercel.headers ?? []) as {
+      source: string;
+      headers: { key: string; value: string }[];
+    }[];
+    const caching = rules.filter(rule =>
+      rule.headers.some(header => header.key === "Cache-Control")
+    );
+    assert.deepEqual(caching, [
       {
         source: "/_astro/(.*)",
         headers: [

@@ -25,7 +25,17 @@ export function initializeSearchDialog() {
   initialized.add(dialog);
 
   const open = () => {
-    if (!dialog.open) dialog.showModal();
+    if (dialog.open) return;
+    // One modal at a time. While another modal dialog is open (the image
+    // lightbox) the page behind it is inert, so Ctrl+K is the way in, and it
+    // would stack search over it. Closing the other one first also leaves
+    // focus on what opened it, so that search gives it back there.
+    for (const other of document.querySelectorAll<HTMLDialogElement>(
+      "dialog[open]"
+    )) {
+      other.close();
+    }
+    dialog.showModal();
   };
   /** Open the dialog and search for `query`, as if it had been typed. */
   const searchFor = (query: string) => {

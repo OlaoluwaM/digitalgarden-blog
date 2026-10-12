@@ -1,0 +1,15 @@
+/*
+ * The comments section (Comments.astro, ADR 0008). Rules that utilities
+ * cannot express.
+ */
+@layer components {
+  /* giscus's client adds its own stylesheet to the page, with
+     `.giscus-frame { color-scheme: light dark }`, so the iframe would follow
+     the reader's system setting while the theme keeps giscus's document
+     dark. An iframe whose scheme differs from its document's is painted
+     opaque: a dark box on the page in light mode. That stylesheet is
+     unlayered, so only `!important` wins from a layer. */
+  .comments .giscus-frame {
+    color-scheme: dark !important;
+  }
+}

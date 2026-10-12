@@ -2,7 +2,7 @@
 
 ## Site features
 
-- [ ] Add a "collapse all folders" button to the file tree once the vault has more than one folder ([mockups](https://claude.ai/artifact/VnPJxBcZ2LEPgo6ZtNjpD8); leaning toward a square button beside the search button).
+- [ ] After the Giscus comments deploy (ADR 0008), check the widget on a note in light and dark mode.
 
 ## Upstream
 
@@ -20,6 +20,11 @@
 - Local and global graph views
 - Link previews
 - Note icons.
+- Webmentions through webmention.io. First add the endpoint and `rel="me"` links, and see whether mentions arrive.
+- Add a "collapse all folders" button to the file tree once the vault has more than one folder ([mockups](https://claude.ai/artifact/VnPJxBcZ2LEPgo6ZtNjpD8); leaning toward a square button beside the search button).
+- Heading folding (client-side using Javascript, with `hidden="until-found"`).
+- Related notes, once the link graph is dense enough.
+- Lightbox and raw HTML images: the lightbox's button wrapper re-lays out a hand-written `<img>` that sizes or floats itself (`style="width:50%"` shrinks to the image's natural width; `align="right"` stops floating). Fix it when a note uses raw `<img>`.
 - Eleventy Markdown behavior not ported, since no published note used it when the Eleventy site was removed. Port each when a note needs it:
   - Body hashtags (`taggify`): `#tag` in the text became a tag-search link.
   - Obsidian Bases

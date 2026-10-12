@@ -1,3 +1,6 @@
+import { closeSync, openSync, readSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { imageSize } from "image-size";
 import { defineHastPlugin } from "satteri";
 
 export interface ImageSize {
@@ -32,6 +35,58 @@ export function parseImageSize(alt: string): ImageSize | undefined {
   };
 }
 
+// The srcset widths for an image sized `width` from a file `fileWidth` wide:
+// the size and twice it, as Astro offers, plus the file's own width, never
+// past the file and each once. They must be exact: satteri passes the list to
+// getImage() as strings, and Astro, finding one wider than the file, would
+// add the file's width as a number beside an equal string, so the srcset
+// would offer that width twice, from two emitted files.
+export function srcsetWidths(width: number, fileWidth: number): number[] {
+  return [...new Set([width, width * 2, fileWidth])]
+    .filter(candidate => candidate <= fileWidth)
+    .sort((a, b) => a - b);
+}
+
+// A URL with a scheme and host (`https://…`) or protocol-relative (`//…`).
+const REMOTE_URL = /^(?:[a-z][a-z\d+.-]*:)?\/\//i;
+
+// The width of a local image's file as Astro sizes it, read from its header.
+// `src` is relative to the note (plugins/mdast/images.ts resolves the
+// publisher's URLs so). A photo stored on its side with an EXIF orientation
+// of 5 or more is shown, and sized by Astro, upright: its width is the stored
+// height, as in Astro's own imageMetadata.
+function localFileWidth(
+  src: unknown,
+  noteUrl: URL | undefined
+): number | undefined {
+  if (typeof src !== "string" || REMOTE_URL.test(src) || !noteUrl) return;
+  try {
+    const { width, height, orientation } = imageSize(
+      readHeader(fileURLToPath(new URL(src, noteUrl)))
+    );
+    const upright = (orientation ?? 0) >= 5 ? height : width;
+    return isDimension(upright) ? upright : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+// The start of a file, as much as image-size's own fromFile reads (512 KiB),
+// without reading a large image whole on every render. It holds the
+// dimensions of all but files with very large metadata (a JPEG with an
+// embedded depth map, say); image-size throws on those, and they keep
+// Astro's widths, so the lightbox stops at twice the size.
+const HEADER_BYTES = 512 * 1024;
+function readHeader(path: string): Uint8Array {
+  const fd = openSync(path, "r");
+  try {
+    const buffer = new Uint8Array(HEADER_BYTES);
+    return buffer.subarray(0, readSync(fd, buffer, 0, HEADER_BYTES, 0));
+  } finally {
+    closeSync(fd);
+  }
+}
+
 function isDimension(value: number): boolean {
   return Number.isSafeInteger(value) && value > 0;
 }
@@ -55,6 +110,17 @@ export const hastImageSizesPlugin = defineHastPlugin({
       ctx.setProperty(node, "width", size.width);
       if (size.height !== undefined) {
         ctx.setProperty(node, "height", size.height);
+      }
+
+      // A size makes Astro's srcset stop at twice that width, so the image
+      // lightbox (scripts/imageLightbox.ts), which enlarges up to the widest
+      // candidate, could never show the full file. Offer the size, twice it,
+      // and the file's own width, none past the file. Without the file (a
+      // remote image, which never reaches the image service, or one that
+      // can't be read) the widths are left to Astro.
+      const fileWidth = localFileWidth(node.properties.src, ctx.fileURL);
+      if (fileWidth !== undefined) {
+        ctx.setProperty(node, "widths", srcsetWidths(size.width, fileWidth));
       }
     },
   },

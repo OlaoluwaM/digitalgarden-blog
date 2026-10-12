@@ -7,9 +7,11 @@
 // Both copies point at the one SearchDialog; the search script opens it.
 //
 // Styling (ADR 0003 phase 2): the box is the same in both places; the
-// placement sets how it sits in its parent. The button's `color` is
-// inherited, so it is the sidebar's muted gray there and the body text color
-// in the navbar, as on the live site.
+// placement sets how it sits in its parent: in the sidebar it shares a row
+// with the random link (NavShell) and fills what the link leaves, and the row
+// carries the side margins. The button's `color` is inherited, so it is the
+// sidebar's muted gray there and the body text color in the navbar, as on
+// the live site.
 import Icon from "./Icon.astro";
 import Key from "./Key.astro";
 
@@ -27,9 +29,7 @@ const navbar = placement === "navbar";
     // Search needs JavaScript; without it the button would do nothing.
     "search-button align-icon noscript:hidden",
     "my-2.5 flex h-9 cursor-pointer appearance-none items-center justify-evenly gap-2 rounded-lg border border-gray-700 bg-gray-950 px-2.5 py-0 text-left font-sans text-sm font-normal whitespace-nowrap text-inherit transition-none select-none hover:border-gray-100",
-    navbar
-      ? "mx-0 max-md:min-w-9 md:w-46"
-      : "mx-0 w-full shrink-0 max-xl:mr-2.5 max-md:mx-0.5",
+    navbar ? "mx-0 max-md:min-w-9 md:w-46" : "mx-0 min-w-0 flex-1",
   ]}
   aria-label="Search"
   aria-haspopup="dialog"
