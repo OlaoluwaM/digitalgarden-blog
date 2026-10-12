@@ -535,9 +535,10 @@ describe("random note link", () => {
   // Why: the link is the search button's companion, so it has to read as
   // one: a 36px square (the button's height), on the button's row at the
   // same top, 8px to its right, drawn in the same border, fill, and
-  // corners. In the sidebar the search button gives up width to make room,
-  // so the row must also stay inside the sidebar's padding, including at
-  // 1100px where the sidebar keeps a margin beside the button.
+  // corners. In the sidebar the search button gives up width to make room:
+  // it fills the row up to the link, and the row must stay inside the
+  // sidebar's padding, including at 1100px where the sidebar keeps a margin
+  // beside the button.
   for (const place of places) {
     it(`sits beside the search button as a matching 36px square in ${place.name}`, async () => {
       await withPage(place.width, async page => {
@@ -547,29 +548,30 @@ describe("random note link", () => {
         assert.equal(await page.locator(link).isVisible(), true);
         const m = await page.evaluate(
           ([scope, link]) => {
-            const link_ = document.querySelector(link!)!;
+            const linkElement = document.querySelector(link!)!;
             const search = document.querySelector(`${scope} .search-button`)!;
             const rect = (element: Element) => element.getBoundingClientRect();
             const style = (element: Element) => getComputedStyle(element);
-            const icon = rect(link_.querySelector("svg")!);
+            const icon = rect(linkElement.querySelector("svg")!);
             const sidebar = document.querySelector(".filetree-sidebar")!;
             const edge =
               rect(sidebar).right - parseFloat(style(sidebar).paddingRight);
             return {
-              link: rect(link_).toJSON() as DOMRect,
+              row: rect(linkElement.parentElement!).toJSON() as DOMRect,
+              link: rect(linkElement).toJSON() as DOMRect,
               search: rect(search).toJSON() as DOMRect,
               iconCenter: [
-                icon.left + icon.width / 2 - rect(link_).left,
-                icon.top + icon.height / 2 - rect(link_).top,
+                icon.left + icon.width / 2 - rect(linkElement).left,
+                icon.top + icon.height / 2 - rect(linkElement).top,
               ],
               edge,
-              look: [link_, search].map(element => ({
+              look: [linkElement, search].map(element => ({
                 border: style(element).borderColor,
                 width: style(element).borderTopWidth,
                 background: style(element).backgroundColor,
                 radius: style(element).borderTopLeftRadius,
               })),
-              color: [style(link_).color, style(search).color],
+              color: [style(linkElement).color, style(search).color],
             };
           },
           [place.scope, link]
@@ -584,11 +586,17 @@ describe("random note link", () => {
         assert.deepEqual(m.iconCenter, [18, 18]);
         assert.deepEqual(m.look[0], m.look[1]);
         assert.equal(m.color[0], m.color[1]);
-        if (place.scope === ".filetree-sidebar")
+        if (place.scope === ".filetree-sidebar") {
           assert.ok(
             m.link.right <= m.edge + 0.5,
             `link ends at ${m.link.right}px, sidebar content at ${m.edge}px`
           );
+          assert.ok(
+            Math.abs(m.search.left - m.row.left) < 0.5 &&
+              Math.abs(m.link.right - m.row.right) < 0.5,
+            `search starts at ${m.search.left}px and the link ends at ${m.link.right}px in a row from ${m.row.left}px to ${m.row.right}px`
+          );
+        }
       });
     });
   }
