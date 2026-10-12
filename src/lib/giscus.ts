@@ -67,8 +67,12 @@ export function giscusAttributes(permalink: string): Record<string, string> {
  * GitHub's. giscus replaces its whole default theme with this file, so every
  * variable the dark theme sets is set here. Code highlighting and the
  * success, attention, and danger colors keep GitHub's dark values.
+ * `reactionFont` (reaction-icons.ts) draws the reactions as Lucide icons.
  */
-export function giscusThemeCss(tokens: Map<string, string>): string {
+export function giscusThemeCss(
+  tokens: Map<string, string>,
+  reactionFont: ArrayBuffer
+): string {
   const gray = (step: number) => tokenValue(tokens, `--color-gray-${step}`);
   const mix = (step: number, percent: number) =>
     withAlpha(`--color-gray-${step}`, gray(step), percent);
@@ -140,6 +144,10 @@ export function giscusThemeCss(tokens: Map<string, string>): string {
     " * (src/lib/giscus.ts). Based on giscus's dark theme: code colors",
     " * MIT License, Copyright (c) 2018 GitHub Inc.,",
     " * https://github.com/primer/primitives/blob/main/LICENSE",
+    " * Reaction icons from Lucide: ISC License, Copyright (c) 2026 Lucide",
+    " * Icons and Contributors; face-slightly-frowning from Feather: MIT",
+    " * License, Copyright (c) 2013-present Cole Bemis,",
+    " * https://github.com/lucide-icons/lucide/blob/main/LICENSE",
     " */",
     "",
     // The page is always dark. An iframe whose color scheme differs from
@@ -170,6 +178,33 @@ export function giscusThemeCss(tokens: Map<string, string>): string {
     "",
     "main .gsc-loading-image {",
     '  background-image: url("https://github.githubassets.com/images/mona-loading-dark.gif");',
+    "}",
+    "",
+    // The reactions as Lucide icons, the site's icon set, in the text's
+    // gray. The font is a few kilobytes, so it travels inside the theme.
+    // If it fails to load, the reader's emoji show instead.
+    "@font-face {",
+    '  font-family: "Reaction Icons";',
+    `  src: url("data:font/otf;base64,${Buffer.from(reactionFont).toString("base64")}") format("opentype");`,
+    "}",
+    "",
+    // 14px keeps the icons' strokes inside the 16px box giscus gives each
+    // emoji.
+    "main .gsc-direct-reaction-button-emoji,",
+    "main .gsc-emoji {",
+    '  font-family: "Reaction Icons", sans-serif;',
+    "  font-size: 14px;",
+    "}",
+    "",
+    // The buttons line up with the comments below them; giscus centers
+    // them. The pills carry their counts, so the "N reactions" heading
+    // goes, and the comment count still links to the discussion.
+    "main .gsc-reactions {",
+    "  align-items: flex-start;",
+    "}",
+    "",
+    "main .gsc-reactions-count {",
+    "  display: none;",
     "}",
     "",
   ].join("\n");

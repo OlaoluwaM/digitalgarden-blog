@@ -1172,3 +1172,27 @@ https://claude.ai/artifact/AezzrntfR1ZLK4WXrF4x9n.
   a stand-in for giscus's page stylesheet, the heading in the text face,
   none in the search preview, the permalink as the term, axe in each state,
   and the theme in the build). The iframe itself is out of the tests' reach.
+
+## 2026-10-12: Reactions as Lucide icons, left-aligned, with no total
+
+- **Change:** giscus's reactions are drawn with the site's Lucide icons in
+  the theme's grays instead of the reader's color emoji: 👍 `thumbs-up`, 👎
+  `thumbs-down`, 😄 `face-grinning`, 🎉 `party-popper`, 😕
+  `face-slightly-frowning`, ❤️ `heart`, 🚀 `rocket`, 👀 `eye`. The bar, the
+  picker, and the reactions on each comment all change. The reaction
+  buttons line up with the comments instead of being centered, and the
+  "N reactions" heading above them is gone. The theme carries a font of the
+  eight icons (`lib/reaction-icons.ts`), built from `lucide-static`'s font,
+  which is pinned to `lucide`'s version. Design in
+  https://claude.ai/artifact/Xuk1RxmRPoGb7sahjtJ9ve.
+- **Why:** the emoji were the only color in a gray site, and the centered
+  bar was the only element off the column's left edge. Each reaction shows
+  its own count, and the comment count still links to the discussion, so
+  the total added little.
+- **Evidence:** `test/giscus.test.ts` (the font covers every character of
+  giscus's eight reactions, U+FE0F included, and each icon is a color glyph
+  drawn in the text color). By hand, in Chrome: giscus.app's real widget
+  for a note, with the built theme injected, shows no heading, the bar's
+  icons centered on their counts (reaction pills added with giscus's own
+  markup, since no note has reactions yet), and all eight icons in the
+  picker, ❤️ included. Not yet seen in Firefox or Safari.

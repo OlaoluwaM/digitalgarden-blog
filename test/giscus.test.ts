@@ -11,6 +11,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { describe, it } from "node:test";
+import opentype from "opentype.js";
 import postcss from "postcss";
 import {
   giscus,
@@ -18,9 +19,11 @@ import {
   giscusEnabled,
   giscusThemeCss,
 } from "../src/lib/giscus.ts";
+import { lucideFont, reactionIconsFont } from "../src/lib/reaction-icons.ts";
 import { parseTokens } from "../src/lib/tokens.ts";
 
 const tokens = parseTokens(readFileSync("src/styles/tokens.css", "utf8"));
+const reactionFont = reactionIconsFont(lucideFont());
 
 describe("giscusEnabled", () => {
   // Why: a note's thread is found by its permalink, which previews and
@@ -88,8 +91,42 @@ describe("giscusAttributes", () => {
   });
 });
 
+describe("reactionIconsFont", () => {
+  // Why: the theme draws giscus's reactions with Lucide icons by giving the
+  // emoji this font. A character the font lacks falls back to the reader's
+  // color emoji with no error, and the iframe is out of our tests' reach,
+  // so a gap would ship unseen. ❤️ is U+2764 then U+FE0F, which asks for
+  // color; the font must cover both, or browsers may draw the color heart.
+  it("covers every character of giscus's eight reactions", () => {
+    const font = opentype.parse(reactionFont);
+    for (const reaction of GISCUS_REACTIONS) {
+      for (const char of reaction) {
+        const codePoint = char.codePointAt(0)!.toString(16).toUpperCase();
+        assert.ok(font.hasChar(char), `${reaction} lacks U+${codePoint}`);
+      }
+    }
+  });
+
+  // Why: covering U+FE0F is not enough. Chrome draws a character followed
+  // by U+FE0F only from a color font, so a plain font loses ❤️ to the
+  // color emoji, as the real widget showed. Each icon must be a color
+  // glyph, and its one layer must be in the text color, or the icons would
+  // stop taking the theme's grays.
+  it("is a color font drawn in the text color", () => {
+    const font = opentype.parse(reactionFont);
+    for (const reaction of GISCUS_REACTIONS) {
+      const layers = font.layers.get(font.charToGlyph(reaction).index);
+      assert.deepEqual(
+        layers.map(layer => layer.paletteIndex),
+        [0xffff],
+        reaction
+      );
+    }
+  });
+});
+
 describe("giscusThemeCss", () => {
-  const css = giscusThemeCss(tokens);
+  const css = giscusThemeCss(tokens, reactionFont);
   const root = postcss.parse(css);
   const variables = new Map<string, string>();
   root.walkRules("main", rule =>
@@ -155,7 +192,10 @@ describe("giscusThemeCss", () => {
   it("fails on a gray it can't mix with transparency", () => {
     const changed = new Map(tokens);
     changed.set("--color-gray-200", "oklch(70% 0 0)");
-    assert.throws(() => giscusThemeCss(changed), /--color-gray-200/);
+    assert.throws(
+      () => giscusThemeCss(changed, reactionFont),
+      /--color-gray-200/
+    );
   });
 
   // Why: comments use Markdown, so *emphasis* needs the italic face, or
@@ -214,6 +254,10 @@ describe("vercel.json", () => {
     }
   });
 });
+
+// The reactions giscus shows, as it writes them (`Reactions` in
+// lib/reactions.ts, giscus main branch, 2026-10-12).
+const GISCUS_REACTIONS = ["👍", "👎", "😄", "🎉", "😕", "❤️", "🚀", "👀"];
 
 // The variables in giscus's dark theme (styles/themes/dark.css, giscus
 // main branch, 2026-10-12).
