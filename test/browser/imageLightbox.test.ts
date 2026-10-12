@@ -318,6 +318,44 @@ describe("closing", () => {
     expect(isOpen()).toBe(true);
   });
 
+  // Why: after a click closes the dialog, the rest of a double-click is
+  // swallowed for 600ms so it can't press what lay under the dialog. The
+  // window must close again: a double-click on the page afterwards is the
+  // reader's own and must arrive, and no listener may be left behind.
+  it("swallows a follow-up double-click for 600ms only", async () => {
+    // Earlier tests close the dialog with real clicks, and their windows
+    // run on real timers; let them end so only this test's window counts.
+    await new Promise(resolve => setTimeout(resolve, 650));
+    await open();
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+    try {
+      closeButton().click();
+      expect(isOpen()).toBe(false);
+      const target = document.createElement("button");
+      document.body.append(target);
+      const arrived = vi.fn();
+      target.addEventListener("click", arrived);
+      const secondClick = () =>
+        target.dispatchEvent(
+          new MouseEvent("click", { bubbles: true, detail: 2 })
+        );
+
+      vi.advanceTimersByTime(599);
+      secondClick();
+      expect(arrived).not.toHaveBeenCalled();
+
+      vi.advanceTimersByTime(2);
+      secondClick();
+      expect(arrived).toHaveBeenCalledTimes(1);
+      target.remove();
+    } finally {
+      // Ends this window even if an assertion failed, so its listener can't
+      // swallow clicks in later tests.
+      vi.runAllTimers();
+      vi.useRealTimers();
+    }
+  });
+
   // Why: a double-click on the trigger is two clicks. The first opens the
   // dialog, and the second lands wherever the trigger was, which is now the
   // backdrop. That second click must not undo the first.

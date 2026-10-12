@@ -1052,8 +1052,8 @@ https://claude.ai/artifact/AezzrntfR1ZLK4WXrF4x9n.
 
 ## 2026-10-12: Note images open in a lightbox
 
-- **Change:** every image in a note opens, enlarged up to its file's size, in
-  a modal dialog over a 90% black backdrop (`scripts/imageLightbox.ts`,
+- **Change:** every image in a note opens, enlarged up to its file's size,
+  in a modal dialog over a 90% black backdrop (`scripts/imageLightbox.ts`,
   `styles/components/lightbox.css`; design in
   https://claude.ai/artifact/5PL4WNCU8XZpMRcxq7n18G). The script wraps the
   image in a button named "Enlarge image: {alt}" (or "Enlarge image" with no
@@ -1067,25 +1067,24 @@ https://claude.ai/artifact/AezzrntfR1ZLK4WXrF4x9n.
   Escape, the close button, or a click on the backdrop or the padding closes
   it, and focus returns to the button (the script focuses it, since Safari
   has restored focus only after a keyboard open). Holding Enter does not
-  toggle it open and shut. A click on the image, the second
-  click of a double-click on the button, and a press that starts or ends on
-  the image or the close button and ends or starts on the backdrop do not
-  close it. After a click closes it, the rest of a double-click or
-  double-tap (a second click on Close, or on the backdrop) is swallowed
-  instead of pressing whatever lies under it. Opening search (Ctrl+K, the
-  only way in while the page is inert) closes the lightbox first, so only
-  search is open, and closing search puts focus back on the image's button.
-  The page behind does not scroll while the lightbox is open, and keeps its
-  scroll position (and, with a classic scrollbar, its width) while it is open
-  and after it closes.
-  Images inside a link, a label (task items), a button, a summary, or a
-  `role="button"` element (collapsible callout titles) are left as they were;
-  diagrams are SVG, not images, and get none. The button lays out as the bare
-  image did: it keeps the image's size, place, and rounded corners wherever
-  the image sits, and centers a lone image as before. The badge and dialog
-  are not printed, and printing with the lightbox open prints every page.
-  Without JavaScript nothing changes. Live had no lightbox. Today one
-  published note has an image.
+  toggle it open and shut. A click on the image, the second click of a
+  double-click on the button, and a press that starts or ends on the image
+  or the close button and ends or starts on the backdrop do not close it.
+  After a click closes it, the rest of a double-click or double-tap (a
+  second click on Close, or on the backdrop) is swallowed instead of
+  pressing whatever lies under it. Opening search (Ctrl+K, the only way in
+  while the page is inert) closes the lightbox first, so only search is
+  open, and closing search puts focus back on the image's button. The page
+  behind does not scroll while the lightbox is open, and keeps its scroll
+  position (and, with a classic scrollbar, its width) while it is open and
+  after it closes. Images inside a link, a label (task items), a button, a
+  summary, or a `role="button"` element (collapsible callout titles) are
+  left as they were; diagrams are SVG, not images, and get none. The button
+  lays out as the bare image did: it keeps the image's size, place, and
+  rounded corners wherever the image sits, and centers a lone image as
+  before. The badge and dialog are not printed, and printing with the
+  lightbox open prints every page. Without JavaScript nothing changes. Live
+  had no lightbox. Today one published note has an image.
 - **Why:** on a phone, and in a narrow column, images are shown smaller than
   their files, and readers had no way to look closer.
 - **Evidence:** `test/browser/imageLightbox.test.ts` (with fixture markup:
@@ -1093,15 +1092,15 @@ https://claude.ai/artifact/AezzrntfR1ZLK4WXrF4x9n.
   dialog with the same alt, src, and wider srcset, and its name; a fresh
   image for each open; every way of closing, a double-click, and presses
   that cross between elements, with focus returning to the button and the
-  script itself focusing it on every close path; with the
-  real reset, base, and content stylesheets: a wrapped image keeping its box
-  and radius when alone, in a sentence, beside another, after a line break,
-  in a list item, in a table cell, and in a callout; the badge's place, size,
-  and colors at rest and on hover; the enlarged image inside the viewport
-  padding on a phone and a desktop and no wider than its file; the close
-  button's size and corner; the backdrop; and the scroll position unchanged
-  while open and after closing), `test/browser/searchDialog.test.ts` (search
-  closes an open lightbox, and Escape returns focus to its button), and
+  script itself focusing it on every close path; with the real reset, base,
+  and content stylesheets: a wrapped image keeping its box and radius when
+  alone, in a sentence, beside another, after a line break, in a list item,
+  in a table cell, and in a callout; the badge's place, size, and colors at
+  rest and on hover; the enlarged image inside the viewport padding on a
+  phone and a desktop and no wider than its file; the close button's size
+  and corner; the backdrop; and the scroll position unchanged while open and
+  after closing), `test/browser/searchDialog.test.ts` (search closes an open
+  lightbox, and Escape returns focus to its button), and
   `test/layout/lightbox.test.ts` (a fixture site, at 390px and 1440px unless
   noted: in a note with images in a sentence, two on a line, apart by a soft
   break, in a list item, in a table cell, alone, and in a callout, the boxes
@@ -1115,10 +1114,11 @@ https://claude.ai/artifact/AezzrntfR1ZLK4WXrF4x9n.
   a classic scrollbar, at 1024px, the note's place and width and the scroll
   position are unchanged while open and after closing; a PDF has the same
   page count with the dialog open and closed; a double-click, a crossing
-  press, and a held Enter leave it open; the second click of a double-click on Close or on the
-  backdrop over a link, and the second tap of a double-tap on Close, reach
-  nothing; search closes it; axe passes closed and open; and the badge and
-  dialog are hidden in print).
+  press, and a held Enter leave it open, a held Enter on Close leaves it
+  shut; the second click of a double-click on Close or on the backdrop over
+  a link, and the second tap of a double-tap on Close, reach nothing, and
+  only for 600ms; search closes it; axe passes closed and open; and the
+  badge and dialog are hidden in print).
 
 ## 2026-10-12: Sized images enlarge to their full file
 

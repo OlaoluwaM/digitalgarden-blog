@@ -1,8 +1,9 @@
 import { createElement, Maximize2, X, type IconNode } from "lucide";
 
-// Image lightbox: every note image that is not a link opens, enlarged, in one
-// shared modal <dialog>. Without JavaScript the page is unchanged. The markup
-// the script builds is styled by class in styles/components/lightbox.css:
+// Image lightbox: every note image that is not inside a link or another
+// control opens, enlarged, in one shared modal <dialog>. Without JavaScript
+// the page is unchanged. The markup the script builds is styled by class in
+// styles/components/lightbox.css:
 //
 //   <button class="lightbox-trigger" aria-haspopup="dialog" aria-label="Enlarge image: …">
 //     <img …> <span class="lightbox-badge" aria-hidden="true"><svg …></svg></span>
@@ -18,8 +19,8 @@ import { createElement, Maximize2, X, type IconNode } from "lucide";
 // back on the button that opened it (not every browser focuses a button on
 // click, or restores focus after a click opened the dialog, so the script
 // focuses it first and again on close). A held Enter does not toggle the
-// dialog open and shut. Search closes
-// the dialog itself when it opens (searchDialog.ts): one modal at a time.
+// dialog open and shut. Search closes the dialog itself when it opens
+// (searchDialog.ts): one modal at a time.
 
 const TRIGGER_CLASS_NAME = "lightbox-trigger";
 const DIALOG_CLASS_NAME = "image-lightbox";
@@ -65,6 +66,7 @@ export function initializeImageLightbox() {
       target.replaceWith(button);
       button.append(target, badge);
       button.addEventListener("click", () => open(image, alt, button));
+      button.addEventListener("keydown", ignoreHeldEnter);
     });
 }
 
@@ -73,15 +75,15 @@ function open(
   alt: string,
   trigger: HTMLButtonElement
 ) {
-  const dialog = ensureDialog();
+  const shared = ensureDialog();
 
   // A fresh image for each picture. An <img> given a new src keeps showing
   // the old picture (and reporting its old currentSrc) until the new file
   // arrives, which would show the last picture under the new one's alt text.
   const enlarged = document.createElement("img");
   enlarged.decoding = "async";
-  dialog.querySelector(":scope > img")?.remove();
-  dialog.prepend(enlarged);
+  shared.querySelector(":scope > img")?.remove();
+  shared.prepend(enlarged);
 
   // The same picture, with the original's candidates and a size of the whole
   // viewport so that the browser can choose a larger file than the note used.
@@ -100,12 +102,12 @@ function open(
   if (fileWidth > 0) {
     enlarged.style.setProperty("--lightbox-file-width", `${fileWidth}px`);
   }
-  dialog.setAttribute("aria-label", alt || "Image");
+  shared.setAttribute("aria-label", alt || "Image");
 
-  if (!dialog.open) {
+  if (!shared.open) {
     // Not every browser focuses a button on click (Safari). The dialog gives
     // focus back to what had it when it opened, so make sure that is the
-    // trigger: the same goes for any other dialog opened over this one.
+    // trigger.
     trigger.focus({ preventScroll: true });
     opener = trigger;
     // The lock removes the page's scrollbar. With a classic scrollbar that
@@ -116,9 +118,10 @@ function open(
     // to lose, in Chrome's headless mode.)
     document.documentElement.style.setProperty(
       "--lightbox-scrollbar",
-      `${window.innerWidth - document.documentElement.clientWidth}px`
+      // Never negative (pinch zoom can make the viewport the wider one).
+      `${Math.max(0, window.innerWidth - document.documentElement.clientWidth)}px`
     );
-    dialog.showModal();
+    shared.showModal();
   }
 }
 
@@ -162,14 +165,7 @@ function ensureDialog() {
     opener = undefined;
   });
 
-  // Enter opens the dialog on its first keydown and puts focus on Close, so
-  // a held Enter's auto-repeat would press Close, then the trigger again, and
-  // the dialog would flicker open and shut. Repeats do nothing here.
-  created.addEventListener("keydown", event => {
-    if (event.repeat && (event.key === "Enter" || event.key === " ")) {
-      event.preventDefault();
-    }
-  });
+  created.addEventListener("keydown", ignoreHeldEnter);
 
   // A click on the backdrop lands on the dialog itself, and so does one in
   // the padding around the image. But a click is a press and a release, and
@@ -224,6 +220,15 @@ function swallowFollowUpClicks() {
     () => document.removeEventListener("click", swallow, true),
     DOUBLE_CLICK_WINDOW_MS
   );
+}
+
+// Enter presses a button on keydown, and each auto-repeat of a held Enter
+// presses it again. Opening moves focus to Close and closing moves it back
+// to the image's button, so a held Enter would toggle the dialog open and
+// shut. Repeats do nothing on either. (Space presses a button on keyup, so
+// holding it presses once.)
+function ignoreHeldEnter(event: KeyboardEvent) {
+  if (event.repeat && event.key === "Enter") event.preventDefault();
 }
 
 function copyAttribute(from: Element, to: Element, name: string) {

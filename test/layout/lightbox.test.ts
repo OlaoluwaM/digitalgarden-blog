@@ -428,6 +428,25 @@ describe("image lightbox", () => {
     });
   });
 
+  // Why: the mirror case. Enter on Close closes the dialog and puts focus
+  // back on the image's button, where the held key's auto-repeat would open
+  // it again. Repeats on the button do nothing either.
+  it("stays closed while Enter is held down on Close", async () => {
+    await withPage(VIEWPORTS[1], async page => {
+      await open(page);
+      await page
+        .locator("dialog.image-lightbox button[aria-label='Close']")
+        .focus();
+      const states: number[] = [];
+      for (let press = 0; press < 4; press++) {
+        await page.keyboard.down("Enter");
+        states.push(await page.locator("dialog.image-lightbox[open]").count());
+      }
+      await page.keyboard.up("Enter");
+      assert.deepEqual(states, [0, 0, 0, 0]);
+    });
+  });
+
   // Why: print shows the note's pictures, not UI for enlarging them. The
   // badge and an open dialog are hidden, and the image prints at the size it
   // has without the wrapper.
