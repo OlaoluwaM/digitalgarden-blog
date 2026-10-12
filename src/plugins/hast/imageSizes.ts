@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { closeSync, openSync, readSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { imageSize } from "image-size";
 import { defineHastPlugin } from "satteri";
@@ -50,20 +50,40 @@ export function srcsetWidths(width: number, fileWidth: number): number[] {
 // A URL with a scheme and host (`https://…`) or protocol-relative (`//…`).
 const REMOTE_URL = /^(?:[a-z][a-z\d+.-]*:)?\/\//i;
 
-// The width of a local image's file, read from its header. `src` is relative
-// to the note (plugins/mdast/images.ts resolves the publisher's URLs so).
+// The width of a local image's file as Astro sizes it, read from its header.
+// `src` is relative to the note (plugins/mdast/images.ts resolves the
+// publisher's URLs so). A photo stored on its side with an EXIF orientation
+// of 5 or more is shown, and sized by Astro, upright: its width is the stored
+// height, as in Astro's own imageMetadata.
 function localFileWidth(
   src: unknown,
   noteUrl: URL | undefined
 ): number | undefined {
   if (typeof src !== "string" || REMOTE_URL.test(src) || !noteUrl) return;
   try {
-    const { width } = imageSize(
-      readFileSync(fileURLToPath(new URL(src, noteUrl)))
+    const { width, height, orientation } = imageSize(
+      readHeader(fileURLToPath(new URL(src, noteUrl)))
     );
-    return isDimension(width) ? width : undefined;
+    const upright = (orientation ?? 0) >= 5 ? height : width;
+    return isDimension(upright) ? upright : undefined;
   } catch {
     return undefined;
+  }
+}
+
+// The start of a file, as much as image-size's own fromFile reads (512 KiB),
+// without reading a large image whole on every render. It holds the
+// dimensions of all but files with very large metadata (a JPEG with an
+// embedded depth map, say); image-size throws on those, and they keep
+// Astro's widths, so the lightbox stops at twice the size.
+const HEADER_BYTES = 512 * 1024;
+function readHeader(path: string): Uint8Array {
+  const fd = openSync(path, "r");
+  try {
+    const buffer = new Uint8Array(HEADER_BYTES);
+    return buffer.subarray(0, readSync(fd, buffer, 0, HEADER_BYTES, 0));
+  } finally {
+    closeSync(fd);
   }
 }
 

@@ -8,10 +8,14 @@
  * getImage(). test/images-build.test.ts checks the resized files.
  */
 import assert from "node:assert/strict";
+import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { describe, it } from "node:test";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { validateConfig } from "astro/config";
 import { parse } from "node-html-parser";
+import sharp from "sharp";
 import siteConfig from "../astro.config.ts";
 import { parseImageSize } from "../src/plugins/hast/imageSizes.ts";
 
@@ -22,14 +26,16 @@ const { markdown } = await validateConfig(
 );
 const renderer = await markdown.processor.createRenderer(markdown);
 
-async function render(source: string) {
-  const { code } = await renderer.render(source);
+async function render(source: string, fileURL?: URL) {
+  const { code } = await renderer.render(source, { fileURL });
   return parse(code);
 }
 
-// The options Astro's image marker collected for the page's one local image.
-async function imageOptions(source: string) {
-  const images = (await render(source)).querySelectorAll("img");
+// The options Astro's image marker collected for the page's one local image,
+// rendered as the note at `fileURL` when given (the plugin resolves the
+// image's file against it).
+async function imageOptions(source: string, fileURL?: URL) {
+  const images = (await render(source, fileURL)).querySelectorAll("img");
   assert.equal(images.length, 1, source);
   const marker = images[0]!.getAttribute("__ASTRO_IMAGE_");
   assert.ok(marker, `Expected a local image marker for ${source}`);
@@ -118,11 +124,35 @@ describe("image sizes plugin", () => {
 
   // Why: the srcset widths that reach the full file are read from the file
   // (test/images-build.test.ts checks them). When the file can't be read,
-  // as here with no file at all, the widths must be left to Astro, which
-  // then offers the 1x and 2x sizes as it did before.
+  // missing or not an image, the widths must be left to Astro, which then
+  // offers the 1x and 2x sizes as it did before; a readable image beside
+  // the same note is the control, so the read itself is reached.
   it("leaves the srcset widths to Astro when it can't read the file", async () => {
-    const { widths } = await imageOptions("![photo.png\\|300](./photo.png)");
-    assert.equal(widths, undefined);
+    const directory = await mkdtemp(join(tmpdir(), "image-sizes-"));
+    try {
+      const note = pathToFileURL(join(directory, "Note.md"));
+      await writeFile(join(directory, "notes.txt"), "not an image");
+      await sharp({
+        create: { width: 400, height: 200, channels: 3, background: "#c00" },
+      })
+        .png()
+        .toFile(join(directory, "photo.png"));
+
+      const readable = await imageOptions(
+        "![photo.png\\|300](./photo.png)",
+        note
+      );
+      assert.ok(readable.widths, "a readable file gets widths");
+      for (const file of ["missing.png", "notes.txt"]) {
+        const { widths } = await imageOptions(
+          `![${file}\\|300](./${file})`,
+          note
+        );
+        assert.equal(widths, undefined, file);
+      }
+    } finally {
+      await rm(directory, { recursive: true, force: true });
+    }
   });
 
   // Why: `![[photo.png|300x200]]` sets both dimensions.

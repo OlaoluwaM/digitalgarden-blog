@@ -265,6 +265,50 @@ for (const [size, descriptors, fullHeight] of [
   });
 }
 
+// Why: a phone photo is often stored on its side with an EXIF orientation
+// that turns it upright. Astro sizes it upright, so the file's width for
+// the srcset is the upright one: read raw, a stored-landscape portrait
+// offered its width twice, and a stored-portrait landscape never offered
+// its full width to the lightbox.
+for (const [stored, size, descriptors, uprightWidth] of [
+  [{ width: 400, height: 300 }, "150", ["150w", "300w"], 300],
+  [{ width: 400, height: 300 }, "300", ["300w"], 300],
+  [{ width: 300, height: 400 }, "100", ["100w", "200w", "400w"], 400],
+] as const) {
+  it(`offers |${size} of a ${stored.width}x${stored.height} photo turned by EXIF up to its upright width`, async t => {
+    const { project, imageDirectory, writeNote } = await fixture(t);
+    await sharp({ create: { ...stored, channels: 3, background: "#c00" } })
+      .jpeg()
+      .withMetadata({ orientation: 6 })
+      .toFile(join(imageDirectory, "Extras/Assets/photo.jpg"));
+    await writeNote(
+      `![photo.jpg\\|${size}](/img/user/Extras/Assets/photo.jpg)`
+    );
+
+    const result = await build(project);
+    assert.equal(result.status, 0, result.output);
+    const { image } = await emittedImage(project, "photo.jpg");
+    const candidates = (image.getAttribute("srcset") ?? "")
+      .split(",")
+      .map(candidate => candidate.trim().split(/\s+/))
+      .filter(([url]) => url);
+    assert.deepEqual(
+      candidates.map(([, descriptor]) => descriptor),
+      descriptors
+    );
+    const full = await sharp(
+      await readFile(
+        join(
+          project,
+          "dist",
+          decodeURIComponent(candidates.at(-1)![0]!).slice(1)
+        )
+      )
+    ).metadata();
+    assert.equal(full.width, uprightWidth);
+  });
+}
+
 it("fails an Astro build when a note references a missing image", async t => {
   const { project, notePath, writeNote } = await fixture(t);
   await writeNote("A note without an image.");
