@@ -1,0 +1,177 @@
+/*
+ * Image lightbox (scripts/imageLightbox.ts, which describes the markup it
+ * builds): the button around a note image, its badge, and the shared dialog
+ * that shows the enlarged image. The script adds all of it, so the rules
+ * have nothing to style without JavaScript. They apply to the note column
+ * (`main.content`) and to a dialog the script appends to the body.
+ *
+ * The button must leave the image exactly as it was: same box, same place,
+ * same corners. The typography rules that size and center an image
+ * (`p > img:only-child`) stop matching once the image is inside the button,
+ * so the button takes over their job below.
+ */
+@layer components {
+  /* The button is a transparent box around the image, and lays out as the
+     bare image did. Tailwind's reset makes every image a block (that is
+     also what puts two images in a paragraph on separate lines), as wide as
+     its own width and no wider than its container, so the button is that
+     block. An inline-block would move an image into the line of text, put
+     two side by side, and add a line's descender space under it. */
+  main.content .lightbox-trigger {
+    position: relative;
+    display: block;
+    width: fit-content;
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    /* The image's corners, so the focus ring follows them. */
+    border-radius: var(--radius-lg);
+    corner-shape: var(--corner-shape-soft);
+    background: none;
+    color: inherit;
+    font: inherit;
+    cursor: zoom-in;
+  }
+
+  /* A picture has no box of its own: its image is the block. */
+  main.content .lightbox-trigger > picture {
+    display: contents;
+  }
+
+  /* An image alone in its paragraph is centered (typography.css); so is its
+     button. */
+  main.content p > .lightbox-trigger:only-child {
+    margin-inline: auto;
+  }
+
+  /* The badge says the image can be enlarged, so it shows at rest (a phone
+     has no hover). It is decoration inside the button: clicks pass through. */
+  main.content .lightbox-badge {
+    position: absolute;
+    right: --spacing(2);
+    bottom: --spacing(2);
+    display: grid;
+    place-items: center;
+    width: --spacing(7);
+    height: --spacing(7);
+    border: 1px solid --alpha(var(--color-white) / 12%);
+    border-radius: var(--radius-md);
+    background-color: --alpha(var(--color-gray-950) / 75%);
+    color: var(--color-gray-50);
+    pointer-events: none;
+    transition-property: border-color, background-color;
+    transition-duration: var(--default-transition-duration);
+    transition-timing-function: var(--default-transition-timing-function);
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+    }
+  }
+
+  main.content .lightbox-trigger:is(:hover, :focus-visible) .lightbox-badge {
+    border-color: --alpha(var(--color-white) / 30%);
+    background-color: --alpha(var(--color-gray-950) / 90%);
+  }
+
+  /* The dialog fills the viewport and is see-through; only its backdrop
+     darkens the page. It pads the image by --lightbox-inset, and a click in
+     that padding or on the backdrop lands on the dialog, which closes it.
+     The UA sizes a modal dialog to its content and caps it; `inset: 0` with
+     automatic sizes stretches it instead. */
+  dialog.image-lightbox {
+    --lightbox-inset: --spacing(4);
+    inset: 0;
+    width: auto;
+    height: auto;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    padding: var(--lightbox-inset);
+    border: 0;
+    background: transparent;
+    color: inherit;
+    overflow: hidden;
+
+    @variant md {
+      --lightbox-inset: --spacing(8);
+    }
+
+    &[open] {
+      display: grid;
+      /* A track that may shrink below the image, so that its percentage
+         limits below resolve against the space inside the padding. */
+      grid-template: minmax(0, 1fr) / minmax(0, 1fr);
+      place-items: center;
+    }
+
+    &::backdrop {
+      background-color: --alpha(var(--color-black) / 90%);
+    }
+
+    /* Fit inside the padded viewport, in proportion, and no wider than the
+       file (the script sets --lightbox-file-width). The image asks for the
+       whole viewport's width so the browser fetches the largest file, which
+       would otherwise stretch a small one. The script's inline value
+       replaces the default, which is no cap beyond the padded viewport. */
+    & > img {
+      --lightbox-file-width: 100%;
+      max-width: min(100%, var(--lightbox-file-width));
+      max-height: 100%;
+      border-radius: var(--radius-lg);
+      corner-shape: var(--corner-shape-soft);
+      object-fit: contain;
+    }
+  }
+
+  /* Top-right of the viewport, a 44px target. */
+  dialog.image-lightbox > .image-lightbox-close {
+    position: fixed;
+    top: --spacing(3);
+    right: --spacing(3);
+    display: grid;
+    place-items: center;
+    width: --spacing(11);
+    height: --spacing(11);
+    border: 1px solid var(--color-gray-700);
+    border-radius: var(--radius-lg);
+    background-color: --alpha(var(--color-gray-800) / 85%);
+    color: var(--color-gray-50);
+    cursor: pointer;
+
+    @variant md {
+      top: --spacing(6);
+      right: --spacing(6);
+    }
+
+    &:hover {
+      border-color: var(--color-gray-100);
+    }
+  }
+
+  /* The page behind a modal dialog stays scrollable by default; hold it
+     still. The site has no pattern for this yet (the search dialog sets no
+     such rule), so this is the minimal one. It goes on the body, not on
+     `html`: the page already hands the body's `overflow-x: hidden` to the
+     viewport, and with `overflow` on `html` instead, the body (`height:
+     100%`) would become a scroller of its own and clamp the page to the top.
+     The margin keeps the page's width: with a classic scrollbar, losing it
+     would widen the page and shift it sideways (the script measures the
+     scrollbar when it opens the dialog; it is 0 for overlay scrollbars). */
+  html {
+    --lightbox-scrollbar: 0;
+  }
+
+  body:has(dialog.image-lightbox[open]) {
+    margin-right: var(--lightbox-scrollbar);
+    overflow: hidden;
+  }
+
+  /* Print shows the note's images, not controls for enlarging them. */
+  @media print {
+    main.content .lightbox-badge,
+    dialog.image-lightbox[open] {
+      display: none;
+    }
+  }
+}

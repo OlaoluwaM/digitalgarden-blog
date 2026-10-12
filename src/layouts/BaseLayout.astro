@@ -49,6 +49,7 @@ const canonical = canonicalUrl(Astro.url.pathname);
       import { initializeCopyButtons } from "../scripts/copyCode";
       import { initializeCalloutToggles } from "../scripts/callouts";
       import { initializeFolderState } from "../scripts/folderState";
+      import { initializeImageLightbox } from "../scripts/imageLightbox";
       import { initializeMobileNavigation } from "../scripts/mobileNavigation";
       import { initializeScrollRegions } from "../scripts/scrollRegions";
       import { initializeSearch } from "../scripts/search";
@@ -57,7 +58,10 @@ const canonical = canonicalUrl(Astro.url.pathname);
       import { initializeTableOfContents } from "../scripts/tableOfContents";
 
       initializeCopyButtons();
+      // After initializeCalloutToggles(): a folded callout's title is made a
+      // role=button there, and the lightbox skips images inside buttons.
       initializeCalloutToggles();
+      initializeImageLightbox();
       initializeScrollRegions();
       initializeMobileNavigation();
       initializeFolderState();

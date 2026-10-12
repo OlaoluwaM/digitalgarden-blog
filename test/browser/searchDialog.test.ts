@@ -18,6 +18,7 @@ import {
   type MockInstance,
 } from "vitest";
 import { userEvent } from "vitest/browser";
+import { initializeImageLightbox } from "../../src/scripts/imageLightbox.ts";
 import { initializeSearch } from "../../src/scripts/search.ts";
 import { initializeSearchDialog } from "../../src/scripts/searchDialog.ts";
 import { initializeSearchPreview } from "../../src/scripts/searchPreview.ts";
@@ -73,6 +74,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  document.querySelectorAll("dialog.image-lightbox").forEach(d => d.remove());
   root?.querySelector<HTMLDialogElement>("dialog")?.close();
   root?.remove();
   fetchSpy.mockRestore();
@@ -150,6 +152,35 @@ it("toggles with Ctrl+K or ⌘+K", async () => {
   expect(dialog.open).toBe(false);
   await userEvent.keyboard("{Meta>}k{/Meta}");
   expect(dialog.open).toBe(true);
+});
+
+// Why: the image lightbox is a modal too, and while it is open the page
+// behind it is inert, so Ctrl+K is the one way to reach search. Two modals
+// stacked would leave the lightbox's backdrop and dialog under search, and
+// Escape would close search and then need a second press for the lightbox.
+// Search opens alone: the lightbox closes first, and when search closes
+// focus is back on the picture's button, which is where it would have
+// returned from the lightbox.
+it("closes an open image lightbox when it opens, and returns focus to the lightbox's trigger", async () => {
+  const { dialog } = mount();
+  const note = document.createElement("main");
+  note.className = "content";
+  note.innerHTML =
+    '<p><img src="/pic.png" width="40" height="30" alt="A picture"></p>';
+  root.append(note);
+  initializeImageLightbox();
+  const trigger = note.querySelector<HTMLButtonElement>("button")!;
+  await userEvent.click(trigger);
+  expect(document.querySelectorAll("dialog[open]")).toHaveLength(1);
+
+  await userEvent.keyboard("{Control>}k{/Control}");
+  expect([...document.querySelectorAll("dialog[open]")]).toEqual([dialog]);
+  expect(dialog.matches(":modal")).toBe(true);
+  expect(document.activeElement).toBe(root.querySelector("#term"));
+
+  await userEvent.keyboard("{Escape}");
+  expect(document.querySelectorAll("dialog[open]")).toHaveLength(0);
+  expect(document.activeElement).toBe(trigger);
 });
 
 // Why: `/?q=…` links open search with that query (the note header's tag
