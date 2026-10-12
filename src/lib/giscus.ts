@@ -208,6 +208,23 @@ export function giscusThemeCss(
     "  display: none;",
     "}",
     "",
+    // giscus opens the reaction picker 6px left of its button, which now
+    // sits at the frame's left edge, so the frame would clip the picker.
+    // It opens flush with the button instead, and its arrow moves 6px left
+    // to stay under the button.
+    "main .gsc-reactions-popover.top,",
+    "main .gsc-reactions-popover.bottom {",
+    "  left: 0;",
+    "}",
+    "",
+    "main .gsc-reactions-popover.open.left::before {",
+    "  left: 3px;",
+    "}",
+    "",
+    "main .gsc-reactions-popover.open.left::after {",
+    "  left: 4px;",
+    "}",
+    "",
   ].join("\n");
 }
 

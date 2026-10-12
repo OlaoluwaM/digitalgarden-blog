@@ -1183,7 +1183,9 @@ https://claude.ai/artifact/AezzrntfR1ZLK4WXrF4x9n.
   `face-slightly-frowning`, ❤️ `heart`, 🚀 `rocket`, 👀 `eye`. The bar, the
   picker, and the reactions on each comment all change. The reaction
   buttons line up with the comments instead of being centered, and the
-  "N reactions" heading above them is gone. The theme carries a font of the
+  "N reactions" heading above them is gone. The reaction picker opens
+  flush with its button, not 6px left of it, so the frame's edge does not
+  clip it. The theme carries a font of the
   eight icons (`lib/reaction-icons.ts`), built from `lucide-static`'s font,
   which is pinned to `lucide`'s version. Design in
   https://claude.ai/artifact/Xuk1RxmRPoGb7sahjtJ9ve.
@@ -1197,4 +1199,6 @@ https://claude.ai/artifact/AezzrntfR1ZLK4WXrF4x9n.
   for a note, with the built theme injected, shows no heading, the bar's
   icons centered on their counts (reaction pills added with giscus's own
   markup, since no note has reactions yet), and all eight icons in the
-  picker, ❤️ included. Not yet seen in Firefox or Safari.
+  picker, ❤️ included. Playwright's Chromium, on thunk.blog with the picker
+  rule injected: the picker's left edge at the frame's (it was at -6px),
+  its arrow under the button. Not yet seen in Firefox or Safari.
