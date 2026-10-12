@@ -1,6 +1,7 @@
 // /giscus-theme.css: the giscus comments widget's theme (ADR 0008), built
-// from tokens.css at build time so it cannot drift from the site. giscus.app
-// loads it cross-origin; vercel.json allows that.
+// at build time from tokens.css and from lucide-static's icons, so it
+// cannot drift from the site. giscus.app loads it cross-origin; vercel.json
+// allows that.
 import type { APIRoute } from "astro";
 import { giscusThemeCss } from "../lib/giscus";
 import { lucideFont, reactionIconsFont } from "../lib/reaction-icons";

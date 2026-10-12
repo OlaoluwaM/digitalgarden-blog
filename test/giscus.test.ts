@@ -1,7 +1,7 @@
 /**
  * Giscus comments (ADR 0008): the settings the widget is given, when it is
- * allowed to load, the theme built from the site's tokens, and the two
- * config files giscus.app and Vercel read.
+ * allowed to load, the font that draws its reactions, the theme built from
+ * the site's tokens, and the two config files giscus.app and Vercel read.
  *
  * Why this level: each is a value or a pure function, so it is checked
  * without a build. The page side (where the section sits, which pages get
@@ -109,9 +109,8 @@ describe("reactionIconsFont", () => {
 
   // Why: covering U+FE0F is not enough. Chrome draws a character followed
   // by U+FE0F only from a color font, so a plain font loses ❤️ to the
-  // color emoji, as the real widget showed. Each icon must be a color
-  // glyph, and its one layer must be in the text color, or the icons would
-  // stop taking the theme's grays.
+  // color emoji. Each icon must be a color glyph, and its one layer must be
+  // in the text color, or the icons would stop taking the theme's grays.
   it("is a color font drawn in the text color", () => {
     const font = opentype.parse(reactionFont);
     for (const reaction of GISCUS_REACTIONS) {

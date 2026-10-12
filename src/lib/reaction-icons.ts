@@ -85,9 +85,11 @@ export function reactionIconsFont(lucide: ArrayBuffer): ArrayBuffer {
   const outlines = Object.entries(reactionIcons).map(([emoji, name]) => {
     const icon = byName.get(name);
     if (!icon) throw new Error(`lucide-static has no "${name}" icon`);
+    const unicode = emoji.codePointAt(0);
+    if (unicode === undefined) throw new Error(`"${name}" has no emoji`);
     return {
       name,
-      unicode: emoji.codePointAt(0) ?? 0,
+      unicode,
       advanceWidth: icon.advanceWidth ?? source.unitsPerEm,
       path: lowered(icon.path, drop),
     };

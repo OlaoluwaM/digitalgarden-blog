@@ -181,8 +181,9 @@ export function giscusThemeCss(
     "}",
     "",
     // The reactions as Lucide icons, the site's icon set, in the text's
-    // gray. The font is a few kilobytes, so it travels inside the theme.
-    // If it fails to load, the reader's emoji show instead.
+    // gray. The font travels inside the theme, so it needs no file, route,
+    // or CORS rule of its own. If it fails to load, the reader's emoji show
+    // instead.
     "@font-face {",
     '  font-family: "Reaction Icons";',
     `  src: url("data:font/otf;base64,${Buffer.from(reactionFont).toString("base64")}") format("opentype");`,
