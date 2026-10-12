@@ -17,7 +17,6 @@
 @import "./content/typography.css";
 @import "./content/code.css";
 @import "./content/callouts.css";
-@import "./content/lightbox.css";
 @import "./content/transclusions.css";
 /* Chrome: utilities in the templates; these hold what utilities cannot. */
 @import "./components/header.css";
@@ -25,6 +24,7 @@
 @import "./components/recent-posts.css";
 @import "./components/backlinks.css";
 @import "./components/comments.css";
+@import "./components/lightbox.css";
 @import "./components/not-found.css";
 @import "./components/navigation.css";
 @import "./components/search.css";

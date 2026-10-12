@@ -2,7 +2,7 @@ import { createElement, Maximize2, X, type IconNode } from "lucide";
 
 // Image lightbox: every note image that is not a link opens, enlarged, in one
 // shared modal <dialog>. Without JavaScript the page is unchanged. The markup
-// the script builds is styled by class in styles/content/lightbox.css:
+// the script builds is styled by class in styles/components/lightbox.css:
 //
 //   <button class="lightbox-trigger" aria-haspopup="dialog" aria-label="Enlarge image: …">
 //     <img …> <span class="lightbox-badge" aria-hidden="true"><svg …></svg></span>

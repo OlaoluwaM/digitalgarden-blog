@@ -2,14 +2,7 @@
 
 ## Site features
 
-- [x] Add a random note button to the navigation that links to `/random/`, beside the search button.
-- [x] Round image corners. Already done: note images keep live's rounded corners (`styles/content/typography.css`); diagrams stay square.
-- [x] Add an image lightbox: click a note image to open it full size in a `<dialog>`.
-- [x] Add Giscus comments under each note (ADR 0008):
-  - [x] Enable Discussions on the repo and install the giscus app.
-  - [x] Write an ADR for the choice.
-  - [x] Turn on reactions (`data-reactions-enabled="1"`) for upvotes.
-  - [ ] After deploy, check the widget on a note in light and dark mode.
+- [ ] After the Giscus comments deploy (ADR 0008), check the widget on a note in light and dark mode.
 
 ## Upstream
 

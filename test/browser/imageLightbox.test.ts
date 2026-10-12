@@ -25,7 +25,7 @@ import {
 import { page, userEvent } from "vitest/browser";
 import { initializeImageLightbox } from "../../src/scripts/imageLightbox.ts";
 import baseCss from "../../src/styles/base.css?raw";
-import lightboxCss from "../../src/styles/content/lightbox.css?raw";
+import lightboxCss from "../../src/styles/components/lightbox.css?raw";
 import preflightCss from "tailwindcss/preflight.css?raw";
 import tokensCss from "../../src/styles/tokens.css?raw";
 import typographyCss from "../../src/styles/content/typography.css?raw";

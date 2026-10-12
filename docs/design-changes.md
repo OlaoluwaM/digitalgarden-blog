@@ -1054,7 +1054,7 @@ https://claude.ai/artifact/AezzrntfR1ZLK4WXrF4x9n.
 
 - **Change:** every image in a note opens, enlarged up to its file's size, in
   a modal dialog over a 90% black backdrop (`scripts/imageLightbox.ts`,
-  `styles/content/lightbox.css`; design in
+  `styles/components/lightbox.css`; design in
   https://claude.ai/artifact/5PL4WNCU8XZpMRcxq7n18G). The script wraps the
   image in a button named "Enlarge image: {alt}" (or "Enlarge image" with no
   alt) that has a `zoom-in` cursor and a badge in the image's bottom-right

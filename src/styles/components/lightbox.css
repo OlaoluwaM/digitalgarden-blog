@@ -7,8 +7,8 @@
  *
  * The button must leave the image exactly as it was: same box, same place,
  * same corners. The typography rules that size and center an image
- * (`p > img:only-child`) stop matching once the image is inside the button,
- * so the button takes over their job below.
+ * (`p > img:only-child`, content/typography.css) stop matching once the
+ * image is inside the button, so the button takes over their job below.
  */
 @layer components {
   /* The button is a transparent box around the image, and lays out as the
