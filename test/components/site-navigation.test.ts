@@ -136,6 +136,8 @@ describe("search buttons", () => {
   // `<button>` gets focus and keyboard activation for free and needs no
   // hand-rolled keydown handler. Both the navbar and sidebar copies must be
   // real buttons with an accessible name, even while search itself is inert.
+  // The name comes from the content, not `aria-label`, so it always holds
+  // the visible text (WCAG 2.5.3).
   it("renders both search triggers as real buttons with an accessible name", async () => {
     const root = await renderNav("/");
     const buttons = root.querySelectorAll("button.search-button");
@@ -143,7 +145,7 @@ describe("search buttons", () => {
     for (const button of buttons) {
       expect(button.tagName).toBe("BUTTON");
       expect(button.getAttribute("type")).toBe("button");
-      expect(button.getAttribute("aria-label")).toBe("Search");
+      expect(button.hasAttribute("aria-label")).toBe(false);
       expect(button.querySelector(".search-icon svg")).not.toBeNull();
       expect(button.querySelector(".search-text")?.text).toBe("Search");
     }

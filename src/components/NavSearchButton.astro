@@ -12,6 +12,12 @@
 // carries the side margins. The button's `color` is inherited, so it is the
 // sidebar's muted gray there and the body text color in the navbar, as on
 // the live site.
+//
+// The button takes its name from its content, so the name always holds the
+// visible text, including the shortcut hint and its ⌘ swap on Macs (WCAG
+// 2.5.3; axe's label-content-name-mismatch). On narrow screens the navbar
+// copy shows only the icon, so its "Search" text is visually hidden there,
+// not removed, and still names the button.
 import Icon from "./Icon.astro";
 import Key from "./Key.astro";
 
@@ -31,7 +37,6 @@ const navbar = placement === "navbar";
     "my-2.5 flex h-9 cursor-pointer appearance-none items-center justify-evenly gap-2 rounded-lg border border-gray-700 bg-gray-950 px-2.5 py-0 text-left font-sans text-sm font-normal whitespace-nowrap text-inherit transition-none select-none hover:border-gray-100",
     navbar ? "mx-0 max-md:min-w-9 md:w-46" : "mx-0 min-w-0 flex-1",
   ]}
-  aria-label="Search"
   aria-haspopup="dialog"
   aria-controls="globalsearch"
 >
@@ -41,7 +46,7 @@ const navbar = placement === "navbar";
   <span
     class:list={[
       "search-text flex-1",
-      navbar && "flex justify-center max-md:hidden",
+      navbar && "flex justify-center max-md:sr-only",
     ]}
   >
     Search
