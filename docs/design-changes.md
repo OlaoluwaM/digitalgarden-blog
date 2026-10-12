@@ -1170,8 +1170,10 @@ https://claude.ai/artifact/AezzrntfR1ZLK4WXrF4x9n.
   and 1440px, none on Home or a hidden note, the message only without
   JavaScript, nothing on a preview, not printed, the frame kept dark against
   a stand-in for giscus's page stylesheet, the heading in the text face,
-  none in the search preview, the permalink as the term, axe in each state,
-  and the theme in the build). The iframe itself is out of the tests' reach.
+  the permalink as the term, axe in each state, and the theme in the
+  build). The iframe itself is out of the tests' reach. Keeping the section
+  out of the search preview is untested: the check was removed for
+  depending on the order of two equally ranked results.
 
 ## 2026-10-12: Reactions as Lucide icons, left-aligned, with no total
 
