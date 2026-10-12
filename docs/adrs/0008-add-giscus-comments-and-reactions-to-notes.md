@@ -116,7 +116,11 @@ own ending down. A `Comments.astro` component renders it:
   both (Vercel sends `Access-Control-Allow-Origin: *` on static files today;
   the rules make it explicit). It restyles giscus's own classes and variables, so a
   giscus update can break it. Its colors are read from `tokens.css` at build
-  time (`src/pages/giscus-theme.css.ts`), so they cannot drift.
+  time (`src/pages/giscus-theme.css.ts`), so they cannot drift. It also
+  carries a font that draws the reactions as Lucide icons, built from
+  `lucide-static` (`src/lib/reaction-icons.ts`; design-changes.md,
+  2026-10-12): that package must stay on `lucide`'s version, and a Lucide
+  rename of one of the eight icons fails the build.
 - **No preview check:** the widget can't be seen before a release, and a
   theme change shows only once it is live.
 

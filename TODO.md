@@ -3,6 +3,7 @@
 ## Site features
 
 - [ ] After the Giscus comments deploy (ADR 0008), check the widget on a note in light and dark mode.
+- [ ] After the reaction icons deploy, check the reaction bar and picker in Firefox and Safari: Lucide icons in gray, ❤️ included.
 
 ## Upstream
 

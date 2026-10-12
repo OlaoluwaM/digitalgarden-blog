@@ -18,6 +18,12 @@ updates:
     # Astro update fails CI until patches/ is updated for it; that is the
     # reminder to do so.
     groups:
+      # The giscus reaction icons come from lucide-static and the site's
+      # icons from lucide, so the two move together, majors included.
+      # Dependabot puts a dependency in the first group it matches, so this
+      # group comes first.
+      lucide:
+        patterns: ["lucide", "lucide-static"]
       minor-and-patch:
         update-types: ["minor", "patch"]
 
