@@ -31,6 +31,7 @@
 import type { FileTreeNode } from "../content/file-tree.ts";
 import { site } from "../lib/site.ts";
 import FileTreeEntry from "./FileTreeEntry.astro";
+import NavRandomLink from "./NavRandomLink.astro";
 import NavSearchButton from "./NavSearchButton.astro";
 import SearchDialog from "./SearchDialog.astro";
 import Icon from "./Icon.astro";
@@ -82,7 +83,10 @@ const { tree, activePathname } = Astro.props;
       </span>
     </a>
   </div>
-  <NavSearchButton placement="navbar" />
+  <div class="flex shrink-0 items-center gap-2">
+    <NavSearchButton placement="navbar" />
+    <NavRandomLink />
+  </div>
 </nav>
 
 <div
@@ -103,7 +107,13 @@ const { tree, activePathname } = Astro.props;
         {site.name}
       </span>
     </a>
-    <NavSearchButton placement="sidebar" />
+    {/* The search button grows to fill the row; the random link keeps its
+         36px at the right. The row, not the button, carries the side
+         margins. */}
+    <div class="flex items-center gap-2 max-xl:mr-2.5 max-md:mx-0.5">
+      <NavSearchButton placement="sidebar" />
+      <NavRandomLink />
+    </div>
     <div class="folder flex-1 overflow-auto [scrollbar-width:thin]">
       {tree.map(node => (
         <FileTreeEntry node={node} depth={0} activePathname={activePathname} />

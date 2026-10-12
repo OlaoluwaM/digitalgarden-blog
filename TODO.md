@@ -2,7 +2,7 @@
 
 ## Site features
 
-- [ ] Add a random note button to the navigation that links to `/random/`, beside the search button.
+- [x] Add a random note button to the navigation that links to `/random/`, beside the search button.
 - [x] Round image corners. Already done: note images keep live's rounded corners (`styles/content/typography.css`); diagrams stay square.
 - [ ] Add an image lightbox: click a note image to open it full size in a `<dialog>`.
 - [ ] Add Giscus comments under each note:

@@ -1029,3 +1029,23 @@ https://claude.ai/artifact/AezzrntfR1ZLK4WXrF4x9n.
   site: placement before the sign-off, no Markdown list indent, "Show
   more" without JavaScript, nothing on an unmentioned note, and axe);
   screenshots in https://claude.ai/artifact/YNEXAzL6Z2TBJnjnRtYsQA.
+
+## 2026-10-12: Random note link beside search
+
+- **Change:** a "Random note" link sits beside the search button, in the
+  mobile navbar and in the sidebar (`components/NavRandomLink.astro`; design
+  in https://claude.ai/artifact/5PL4WNCU8XZpMRcxq7n18G). It is a 36px square
+  with the Lucide `dices` icon, drawn like the search button, 8px to its
+  right; in the sidebar the search button shrinks to share the row. It goes
+  to `/random/`, works without JavaScript, and is hidden in print. Live had
+  no such link.
+- **Why:** readers can jump to a random note; `/random/` already existed,
+  but nothing linked to it.
+- **Evidence:** `test/components/site-navigation.test.ts` (one link to
+  `/random/` per place, named "Random note", an `aria-hidden` dice icon,
+  right after the search button, not hidden without JavaScript) and
+  `test/layout/site-layout.test.ts` ("random note link": a 36px square on
+  the search button's row with an 8px gap and its border, fill, and corners
+  in the navbar at 390px and the sidebar at 1440px, at 1100px, and opened at
+  390px, inside the sidebar's padding; the site's focus ring on Tab from
+  search; visible without JavaScript; not printed; and axe).

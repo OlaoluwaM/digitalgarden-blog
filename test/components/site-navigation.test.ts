@@ -187,6 +187,56 @@ describe("search buttons", () => {
   });
 });
 
+describe("random note links", () => {
+  // Why: both places the navigation shows search (the navbar and the
+  // sidebar) get a way to jump to a random note, and each must be the same
+  // plain link: it navigates to `/random/`, so it is an <a>, not a button,
+  // and its icon is decoration beside the name in `aria-label`. Counting
+  // exactly one per place catches a copy rendered twice or dropped from one.
+  for (const [place, selector] of [
+    ["navbar", "nav.navbar"],
+    ["sidebar", "nav.filetree-sidebar"],
+  ] as const) {
+    it(`renders one named link to /random/ in the ${place}`, async () => {
+      const root = await renderNav("/");
+      const links = root.querySelectorAll(`${selector} a[href="/random/"]`);
+      expect(links).toHaveLength(1);
+      const link = links[0]!;
+      expect(link.getAttribute("aria-label")).toBe("Random note");
+      // The tooltip for pointer users; the icon-only link has no text.
+      expect(link.getAttribute("title")).toBe("Random note");
+      expect(link.text.trim()).toBe("");
+      const icon = link.querySelectorAll("svg");
+      expect(icon).toHaveLength(1);
+      expect(icon[0]!.classList.contains("lucide-dices")).toBe(true);
+      expect(icon[0]!.getAttribute("aria-hidden")).toBe("true");
+    });
+
+    // Why: the layout puts the link on the search button's row, to its
+    // right. Markup order is that order, and it is the tab order too, so
+    // the link must directly follow the search button.
+    it(`places the ${place} link right after the search button`, async () => {
+      const root = await renderNav("/");
+      const search = root.querySelector(`${selector} button.search-button`)!;
+      const next = search.nextElementSibling;
+      expect(next?.tagName).toBe("A");
+      expect(next?.getAttribute("href")).toBe("/random/");
+    });
+  }
+
+  // Why: searching needs JavaScript, so the search buttons are hidden
+  // without it (`noscript:hidden`). The random link is plain navigation to
+  // a page that works without scripts, so it must not be hidden with them.
+  it("does not hide the links when JavaScript is off", async () => {
+    const root = await renderNav("/");
+    const links = root.querySelectorAll('a[href="/random/"]');
+    expect(links).toHaveLength(2);
+    for (const link of links) {
+      expect(link.getAttribute("class")).not.toContain("noscript:hidden");
+    }
+  });
+});
+
 describe("folders", () => {
   // Why: the live " Posts" folder starts collapsed until a visitor clicks
   // it (Alpine's `$persist(false)` default). A native <details> without an
