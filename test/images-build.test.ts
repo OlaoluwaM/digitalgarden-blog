@@ -217,6 +217,54 @@ for (const [size, width, height] of [
   });
 }
 
+// Why: a size alone makes Astro's srcset stop at twice that width, so the
+// image lightbox, which enlarges up to the widest candidate, could never show
+// the full file. The srcset must offer the size, twice it, and the file's own
+// width, each once and never past the file (here 400px wide). Each width
+// must appear once: a file exactly 1x or 2x the size once got the file's
+// width twice, as two emitted files. A crop keeps its shape at full size.
+for (const [size, descriptors, fullHeight] of [
+  ["300", ["300w", "400w"], 200],
+  ["200", ["200w", "400w"], 200],
+  ["400", ["400w"], 200],
+  ["300x100", ["300w", "400w"], 133],
+] as const) {
+  it(`offers |${size} up to the file's full width, once each`, async t => {
+    const { project, imageDirectory, writeNote } = await fixture(t);
+    await sharp({
+      create: { width: 400, height: 200, channels: 3, background: "#c00" },
+    })
+      .png()
+      .toFile(join(imageDirectory, "Extras/Assets/photo.png"));
+    await writeNote(
+      `![photo.png\\|${size}](/img/user/Extras/Assets/photo.png)`
+    );
+
+    const result = await build(project);
+    assert.equal(result.status, 0, result.output);
+    const { image } = await emittedImage(project, "photo.png");
+    const candidates = (image.getAttribute("srcset") ?? "")
+      .split(",")
+      .map(candidate => candidate.trim().split(/\s+/))
+      .filter(([url]) => url);
+    assert.deepEqual(
+      candidates.map(([, descriptor]) => descriptor),
+      descriptors
+    );
+    const full = await sharp(
+      await readFile(
+        join(
+          project,
+          "dist",
+          decodeURIComponent(candidates.at(-1)![0]!).slice(1)
+        )
+      )
+    ).metadata();
+    assert.equal(full.width, 400);
+    assert.equal(full.height, fullHeight);
+  });
+}
+
 it("fails an Astro build when a note references a missing image", async t => {
   const { project, notePath, writeNote } = await fixture(t);
   await writeNote("A note without an image.");

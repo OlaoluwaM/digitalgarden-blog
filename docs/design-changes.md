@@ -1119,3 +1119,21 @@ https://claude.ai/artifact/AezzrntfR1ZLK4WXrF4x9n.
   backdrop over a link, and the second tap of a double-tap on Close, reach
   nothing; search closes it; axe passes closed and open; and the badge and
   dialog are hidden in print).
+
+## 2026-10-12: Sized images enlarge to their full file
+
+- **Change:** an image with an Obsidian size (`![[shot.png|300]]`) also
+  offers its file's own width in its srcset, beside the size and twice it
+  (`plugins/hast/imageSizes.ts`, which reads the file's width with
+  `image-size`). The note still shows it at the size; the lightbox, which
+  enlarges up to the widest candidate, now shows the whole file instead of
+  stopping at twice the size. A crop (`|300x200`) keeps its shape at full
+  width. A remote image, or a file that can't be read, keeps Astro's srcset.
+- **Why:** a size is often a big screenshot shown small, and the lightbox
+  is where a reader looks at it whole.
+- **Evidence:** `test/images-build.test.ts` (on a 400px file, `|300` and
+  `|200` give the size, twice it where it fits, and 400w; `|400` gives 400w
+  once; `|300x100` gives a 400 by 133 full file; no width twice),
+  `test/image-sizes.test.ts` (no widths when the file can't be read; none
+  on a remote image), and `test/layout/lightbox.test.ts` (a `|200` 1200px
+  image opens past 400px, filling the viewport at 1440px).

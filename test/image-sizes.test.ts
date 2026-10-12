@@ -37,6 +37,7 @@ async function imageOptions(source: string) {
     alt: string;
     width?: number;
     height?: number;
+    widths?: unknown;
   };
 }
 
@@ -115,6 +116,15 @@ describe("image sizes plugin", () => {
     });
   });
 
+  // Why: the srcset widths that reach the full file are read from the file
+  // (test/images-build.test.ts checks them). When the file can't be read,
+  // as here with no file at all, the widths must be left to Astro, which
+  // then offers the 1x and 2x sizes as it did before.
+  it("leaves the srcset widths to Astro when it can't read the file", async () => {
+    const { widths } = await imageOptions("![photo.png\\|300](./photo.png)");
+    assert.equal(widths, undefined);
+  });
+
   // Why: `![[photo.png|300x200]]` sets both dimensions.
   it("gives getImage() the width and height of a WxH size", async () => {
     const options = await imageOptions("![photo.png\\|300x200](./photo.png)");
@@ -151,6 +161,9 @@ describe("image sizes plugin", () => {
     assert.equal(image?.getAttribute("alt"), "A photo");
     assert.equal(image?.getAttribute("width"), "300");
     assert.equal(image?.getAttribute("height"), "200");
+    // Srcset widths are for Astro's image service, which never sees a
+    // remote image; on the <img> they would be a stray attribute.
+    assert.equal(image?.getAttribute("widths"), undefined);
   });
 
   // Why: an image without a size must reach getImage() unchanged, so

@@ -36,6 +36,7 @@ let axeSource: string;
 const NOTE = "/posts/lightbox/";
 const CASES = "/posts/lightbox-cases/";
 const SCROLL = "/posts/lightbox-scroll/";
+const SIZED = "/posts/lightbox-sized/";
 const IMAGE = "/img/user/Extras/Assets/harbour.png";
 const SMALL = "/img/user/Extras/Assets/buoy.png";
 const VIEWPORTS = [
@@ -125,6 +126,12 @@ before(async () => {
       `![A harbour far down](${IMAGE})`,
       ...filler(60),
     ].join("\n\n"),
+  });
+  // An Obsidian size (`![[harbour.png|200]]`) on the 1200px harbour.
+  await fixture.writeNote("Posts/Lightbox sized.md", {
+    title: "Lightbox sized",
+    permalink: SIZED,
+    body: `![A sized harbour.png\\|200](${IMAGE})`,
   });
   const { status, output } = await buildFixture(fixture.project);
   assert.equal(status, 0, output);
@@ -318,6 +325,40 @@ describe("image lightbox", () => {
         });
       }
     });
+
+    // Why: an Obsidian size shows a big file small in the note; the
+    // lightbox is where a reader looks at it whole. A `|200` size once
+    // capped the srcset at 400px, so the enlarged 1200px harbour stopped
+    // there. It must grow to fit the viewport (its height is the limit
+    // here), as if it had no size. Only a desktop is wider than the old
+    // 400px cap; on a phone the viewport is the limit either way.
+    it(
+      `enlarges a sized image past twice its size at ${viewport.width}px`,
+      {
+        skip: viewport.width - 2 * viewport.padding <= 400,
+      },
+      async () => {
+        await withPage(
+          viewport,
+          async page => {
+            await open(page);
+            const width = await page
+              .locator("dialog.image-lightbox img")
+              .evaluate(image => image.getBoundingClientRect().width);
+            const fit = Math.min(
+              1200,
+              viewport.width - 2 * viewport.padding,
+              ((viewport.height - 2 * viewport.padding) * 1200) / 1500
+            );
+            assert.ok(
+              Math.abs(width - fit) <= 1,
+              `Expected ${fit}px, got ${width}px`
+            );
+          },
+          { path: SIZED }
+        );
+      }
+    );
 
     // Why: axe sees the page differently with a modal open (everything
     // behind it is inert, and the dialog must be named), so both states need
