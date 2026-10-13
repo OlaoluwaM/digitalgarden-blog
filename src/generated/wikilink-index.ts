@@ -15,7 +15,7 @@ export const wikilinkIndex: WikilinkIndex = Object.fromEntries([
     "/posts/docker-compose-variable-interpolation-weirdness/",
   ],
   [
-    "Outbox/Digital Garden & Blog/Content/Blogposts/Dotfiles Reorg",
+    "Outbox/Digital Garden & Blog/Content/Blogposts/Dotfiles Reorg - A Journey",
     "/posts/dotfiles-reorg-a-journey/",
   ],
   [
@@ -55,6 +55,10 @@ export const wikilinkIndex: WikilinkIndex = Object.fromEntries([
     "/posts/on-maths-and-engineering/",
   ],
   [
+    "Outbox/Digital Garden & Blog/Content/Blogposts/Types of types - Haskell's Kind system",
+    "/posts/types-of-types-haskell-kind-system/",
+  ],
+  [
     "Outbox/Digital Garden & Blog/Content/Blogposts/Yes - Cabal custom scripts do have uses",
     "/posts/yes-cabal-custom-scripts-do-have-uses/",
   ],
@@ -75,7 +79,7 @@ export const noteTitles: NoteTitles = Object.fromEntries([
     "Docker Compose variable interpolation...weirdness",
   ],
   [
-    "Outbox/Digital Garden & Blog/Content/Blogposts/Dotfiles Reorg",
+    "Outbox/Digital Garden & Blog/Content/Blogposts/Dotfiles Reorg - A Journey",
     "Dotfiles Reorg: A Journey",
   ],
   [
@@ -113,6 +117,10 @@ export const noteTitles: NoteTitles = Object.fromEntries([
   [
     "Outbox/Digital Garden & Blog/Content/Blogposts/On maths and engineering",
     "On maths and engineering",
+  ],
+  [
+    "Outbox/Digital Garden & Blog/Content/Blogposts/Types of types - Haskell's Kind system",
+    "Types of types: Haskell's Kind system",
   ],
   [
     "Outbox/Digital Garden & Blog/Content/Blogposts/Yes - Cabal custom scripts do have uses",

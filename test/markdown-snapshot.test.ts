@@ -12,8 +12,8 @@
  * here, not taken from the vault, so publishing never changes it. Its
  * wikilinks are in the publisher's form (full path, `\|` before the alias,
  * which the publisher always adds) and point at two real notes (Home and
- * Dotfiles Reorg) through the real index. Diagrams come from the local
- * fake Kroki.
+ * Dotfiles Reorg - A Journey) through the real index. Diagrams come from
+ * the local fake Kroki.
  *
  * Update deliberately, after reading the diff:
  * node --test --test-update-snapshots test/markdown-snapshot.test.ts
@@ -29,7 +29,7 @@ import { publisherEmbed } from "./support/publisher-embed.ts";
 
 const HOME = "Outbox/Digital Garden & Blog/Home";
 const DOTFILES =
-  "Outbox/Digital Garden & Blog/Content/Blogposts/Dotfiles Reorg";
+  "Outbox/Digital Garden & Blog/Content/Blogposts/Dotfiles Reorg - A Journey";
 
 const NOTE = [
   "Plain text with *emphasis*, **bold**, `inline code`, ~~struck~~ text, and a line  ",

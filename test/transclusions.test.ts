@@ -20,7 +20,7 @@ import siteConfig from "../astro.config.ts";
 import { publisherEmbed } from "./support/publisher-embed.ts";
 
 // A published note in the real wikilink index. Its title differs from its
-// file name ("Dotfiles Reorg"), which the header must not show.
+// file name ("Dotfiles Reorg - A Journey"), which the header must not show.
 const SOURCE_URL = "/posts/dotfiles-reorg-a-journey/";
 const SOURCE_TITLE = "Dotfiles Reorg: A Journey";
 

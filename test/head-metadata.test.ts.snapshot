@@ -3,9 +3,11 @@ exports[`head snapshots > matches the reviewed head for index.html 1`] = `
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Home</title>
+<meta name="description" content="Home">
 <link rel="canonical" href="https://thunk.blog/">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Home">
+<meta property="og:description" content="Home">
 <meta property="og:url" content="https://thunk.blog/">
 <meta property="og:site_name" content="Thunks &amp; Thoughts">
 <meta property="og:locale" content="en">
