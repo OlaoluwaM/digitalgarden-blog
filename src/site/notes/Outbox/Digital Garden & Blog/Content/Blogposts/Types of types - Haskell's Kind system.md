@@ -1,5 +1,5 @@
 ---
-{"dg-publish":true,"dg-path":" Posts/Types of types - Haskell's Kind system.md","dg-permalink":"/posts/types-of-types-haskell-kind-system","permalink":"/posts/types-of-types-haskell-kind-system/","title":"Types of types: Haskell's Kind system","tags":["haskell","software-engineering"],"dg-note-properties":{"title":"Types of types: Haskell's Kind system","description":"Kinda?","tags":["haskell","software-engineering"],"published":"2026-10-12T13:15:00","last_updated":"2026-10-12T13:18"}}
+{"dg-publish":true,"dg-path":" Posts/Types of types - Haskell's Kind system.md","dg-permalink":"/posts/types-of-types-haskell-kind-system","permalink":"/posts/types-of-types-haskell-kind-system/","title":"Types of types: Haskell's Kind system","tags":["haskell","software-engineering"],"dg-note-properties":{"title":"Types of types: Haskell's Kind system","description":"Kinda?","tags":["haskell","software-engineering"],"published":"2026-10-13T12:30:00","last_updated":"2026-10-13T12:30"}}
 ---
 
 While working to add [typed configuration](https://github.com/OlaoluwaM/redis-haskell/pull/2) to my Haskell Redis server clone, I found myself learning some new tricks, all of them stemming from Haskell's Kind system. In this article, we're gonna discuss what I learned and the things I managed to build with it.
