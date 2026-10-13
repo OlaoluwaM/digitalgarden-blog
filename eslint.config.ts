@@ -23,6 +23,9 @@ export default defineConfig(
     ".astro/",
     ".vercel/",
     ".browser-artifacts/",
+    // Browser profiles for scripts/giscus-preview.ts; Firefox's holds
+    // prefs.js and user.js.
+    ".cache/",
     // Written by scripts/generate-wikilink-index.ts before each build.
     "src/generated/",
     // Published notes and images; the Digital Garden plugin owns them.

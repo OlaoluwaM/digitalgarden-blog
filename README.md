@@ -83,7 +83,7 @@ Plugin changes during `npm run dev` need a restart with `npm run dev -- --force`
 | `src/plugins/`       | Markdown plugins ([pipeline](docs/markdown-pipeline.md))  |
 | `src/styles/`        | Design tokens and styles ([README](src/styles/README.md)) |
 | `src/scripts/`       | Client scripts (search, file tree, copy buttons)          |
-| `scripts/`           | Wikilink index and callout sync                           |
+| `scripts/`           | Wikilink index, callout sync, and the comments preview    |
 | `docs/`              | Architecture decisions and the design-change log          |
 
 The dev server also serves a style guide at `/style-guide/`.
@@ -100,6 +100,23 @@ It reads the Admonition plugin's settings and the enabled CSS snippets and
 writes `src/styles/content/callouts.css` and
 `src/plugins/hast/callout-icons.ts`. If a type cannot be resolved, it writes
 nothing and ends by listing the `--icon` or `--color` option that fixes it.
+
+## Comments preview
+
+The giscus comments widget loads only on thunk.blog
+([ADR 0008](docs/adrs/0008-add-giscus-comments-and-reactions-to-notes.md)).
+To see it with the working tree's theme and styles:
+
+```sh
+npm run dev:giscus -- /posts/<note>             # Chromium
+npm run dev:giscus -- --firefox /posts/<note>   # the Firefox on PATH
+```
+
+It starts `astro dev` and opens a browser in which thunk.blog is answered by
+the dev server, so giscus accepts the page. Style changes apply as you save;
+reload the page for a theme change (`src/lib/giscus.ts`). The threads are
+the real ones: signed in, a comment or reaction lands in the live
+discussion. Close the browser to stop.
 
 ## Testing
 

@@ -1,26 +1,37 @@
 /**
  * See the giscus widget with this working tree's theme and styles (ADR 0008).
  *
- *   npm run dev:giscus [-- <path>]
+ *   npm run dev:giscus [-- [--firefox] <path>]
  *
  * giscus.json lets only https://thunk.blog load the discussions, so the
  * widget never shows on `astro dev`. This starts `astro dev` with
  * GISCUS_PREVIEW set, which loads the widget (lib/giscus.ts), then opens
  * Chromium with every https://thunk.blog request answered by the dev
- * server. The browser sees thunk.blog, so giscus accepts it, and the page,
+ * server. `--firefox` opens the Firefox on PATH instead, through
+ * Playwright's WebDriver BiDi channel, as giscus can behave differently
+ * there (design-changes.md, 2026-10-13). The browser sees thunk.blog, so giscus accepts it, and the page,
  * the theme giscus.app loads, and its fonts all come from the working tree.
  * Reload the page to see a theme change.
  *
  * The threads are the real ones: signed in, a comment or reaction lands in
- * the live discussion. The browser profile, and so the giscus sign-in, is
- * kept in .cache/giscus-preview.
+ * the live discussion. Each browser's profile, and so its giscus sign-in,
+ * is kept in .cache/giscus-preview (Chromium) or
+ * .cache/giscus-preview-firefox.
  */
 import { spawn } from "node:child_process";
-import { stripVTControlCharacters } from "node:util";
-import { chromium } from "playwright";
+import { accessSync, constants } from "node:fs";
+import { delimiter, join } from "node:path";
+import { parseArgs, stripVTControlCharacters } from "node:util";
+import { chromium, firefox } from "playwright";
 
 const SITE = "https://thunk.blog";
-const path = process.argv[2] ?? "/";
+const { values, positionals } = parseArgs({
+  allowPositionals: true,
+  options: { firefox: { type: "boolean", default: false } },
+});
+const path = positionals[0] ?? "/";
+// Found before the dev server starts, so a missing Firefox fails at once.
+const firefoxPath = values.firefox ? onPath("firefox") : undefined;
 
 const dev = spawn("npm", ["run", "dev"], {
   // Astro backgrounds the server when it detects an AI agent, and would
@@ -49,20 +60,30 @@ const local = await new Promise<string>((resolve, reject) => {
   dev.on("exit", code => reject(new Error(`astro dev exited (${code})`)));
 });
 
-const context = await chromium.launchPersistentContext(
-  ".cache/giscus-preview",
-  {
-    headless: false,
-    executablePath: process.env.AGENT_BROWSER_EXECUTABLE_PATH || undefined,
-    viewport: null,
-  }
-);
+const context = firefoxPath
+  ? await firefox.launchPersistentContext(".cache/giscus-preview-firefox", {
+      headless: false,
+      channel: "moz-firefox",
+      executablePath: firefoxPath,
+      viewport: null,
+    })
+  : await chromium.launchPersistentContext(".cache/giscus-preview", {
+      headless: false,
+      executablePath: process.env.AGENT_BROWSER_EXECUTABLE_PATH || undefined,
+      viewport: null,
+    });
 await context.route(`${SITE}/**`, async route => {
   const url = new URL(route.request().url());
   // A request the dev server drops, as when it restarts, fails on its own
   // instead of ending the preview.
   const response = await route
-    .fetch({ url: `${local}${url.pathname}${url.search}`, maxRedirects: 0 })
+    .fetch({
+      url: `${local}${url.pathname}${url.search}`,
+      // Only Accept: Firefox's Host (thunk.blog) and Sec-Fetch-Site
+      // (cross-site, from giscus.app) would make Vite refuse the request.
+      headers: { accept: route.request().headers().accept ?? "*/*" },
+      maxRedirects: 0,
+    })
     .catch(() => undefined);
   if (!response) return route.abort();
   const headers = response.headers();
@@ -107,3 +128,18 @@ console.log(
     "\nSigned in, comments and reactions land in the real discussion." +
     "\nClose the browser to stop."
 );
+
+/** `name`'s path on PATH. Playwright looks for Firefox only at fixed
+ * system paths (/snap/bin/firefox on Linux). */
+function onPath(name: string): string {
+  for (const directory of (process.env.PATH ?? "").split(delimiter)) {
+    const file = join(directory, name);
+    try {
+      accessSync(file, constants.X_OK);
+      return file;
+    } catch {
+      // Not in this directory.
+    }
+  }
+  throw new Error(`${name} is not on PATH`);
+}

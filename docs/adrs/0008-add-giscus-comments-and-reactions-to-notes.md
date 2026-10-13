@@ -124,9 +124,9 @@ own ending down. A `Comments.astro` component renders it:
 - **Preview only through a proxy:** previews and `astro dev` don't load
   the widget. `npm run dev:giscus` (`scripts/giscus-preview.ts`) is the
   exception: it runs `astro dev` with `GISCUS_PREVIEW` set and opens
-  Chromium with thunk.blog answered by the dev server, so giscus accepts
-  the origin and the theme comes from the working tree. Its threads are the
-  real ones.
+  Chromium, or Firefox with `--firefox`, with thunk.blog answered by the
+  dev server, so giscus accepts the origin and the theme comes from the
+  working tree. Its threads are the real ones.
 
 **Operational**
 
