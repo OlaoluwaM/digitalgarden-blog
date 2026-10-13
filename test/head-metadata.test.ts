@@ -77,13 +77,6 @@ describe("descriptions", () => {
       "You're INFO a treat"
     );
   });
-
-  // Why: Home's description is still the vault placeholder, so Home must not
-  // publish one (and neither should its Open Graph tags).
-  it("omits Home's placeholder description", () => {
-    assert.equal(meta("index.html", "description"), undefined);
-    assert.equal(meta("index.html", "og:description"), undefined);
-  });
 });
 
 describe("Open Graph and Twitter tags", () => {

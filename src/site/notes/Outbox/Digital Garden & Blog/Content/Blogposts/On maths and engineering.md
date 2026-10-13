@@ -1,5 +1,5 @@
 ---
-{"dg-publish":true,"dg-path":" Posts/On maths and engineering.md","permalink":"/posts/on-maths-and-engineering/","metatags":{"description":"Computer science is applied maths or some such"},"tags":["computer-science","mathematics"],"created":"2026-03-22T12:59","updated":"2026-08-12T13:49","dg-note-properties":{"tags":["computer-science","mathematics"],"created":"2026-03-22T12:59","updated":"2026-08-12T13:49","title":"On maths and engineering","description":"Computer science is applied maths or some such","published":"2026-03-22T12:59","last_updated":"2026-08-12T13:49"},"dg-permalink":"/posts/on-maths-and-engineering"}
+{"dg-publish":true,"dg-path":" Posts/On maths and engineering.md","dg-permalink":"/posts/on-maths-and-engineering","permalink":"/posts/on-maths-and-engineering/","title":"On maths and engineering","tags":["computer-science","mathematics"],"dg-note-properties":{"title":"On maths and engineering","description":"Computer science is applied maths or some such","tags":["computer-science","mathematics"],"published":"2026-03-22T12:59","last_updated":"2026-10-09T14:36"}}
 ---
 
 

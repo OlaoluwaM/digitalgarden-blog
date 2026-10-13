@@ -140,14 +140,10 @@ describe("RecentPosts", () => {
     expect(para).toBeNull();
   });
 
-  // Why: the teaser must follow the same rule as the meta description. A
-  // post published with the vault placeholder ("PLACEHOLDER: reword me")
-  // must not show it on Home, even though its own page correctly omits it.
-  it("omits placeholder and blank descriptions", async () => {
-    const doc = await renderRecentPosts([
-      fakePost({ description: "PLACEHOLDER: reword me" }),
-      fakePost({ description: "   " }),
-    ]);
+  // Why: the teaser follows the same rule as the meta description, so a
+  // whitespace-only description leaves no empty paragraph either.
+  it("omits blank descriptions", async () => {
+    const doc = await renderRecentPosts([fakePost({ description: "   " })]);
     expect(doc.querySelector("li p")).toBeNull();
   });
 

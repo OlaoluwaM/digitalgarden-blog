@@ -51,10 +51,10 @@ describe("Backlinks", () => {
   });
 
   // Why: each entry is what a reader needs to decide whether to follow it:
-  // the note's title as a link, then its description. A vault placeholder
-  // description is left out, as it is in Recent Posts.
+  // the note's title as a link, then its description. A blank description
+  // is left out, as it is in Recent Posts.
   it("lists each note's title and description", async () => {
-    const html = await render([post(1), post(2, "PLACEHOLDER: reword me")]);
+    const html = await render([post(1), post(2, "   ")]);
     const items = html.querySelectorAll("li");
     expect(
       items.map(item => ({

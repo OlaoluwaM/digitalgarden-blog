@@ -1,7 +1,8 @@
 /**
  * Check, in Chrome, the behavior that the content stylesheets own: a
- * collapsed callout hides its body, and a code block's copy button stays
- * hidden until the block is hovered or holds focus.
+ * collapsed callout hides its body, a code block's copy button stays
+ * hidden until the block is hovered or holds focus, long code lines scroll
+ * inside the block, and long inline code wraps.
  *
  * Why this level: the toggle and copy scripts only change classes and add
  * the button (test/browser/callouts.test.ts, copyCode.test.ts); whether
@@ -81,18 +82,19 @@ it("turns only the collapsed callout's chevron", async () => {
   );
 });
 
-function codeBlock() {
+function codeBlock(line = "echo hi") {
   mount(
-    '<pre class="astro-code shiki" tabindex="0" data-language="bash"><code class="language-bash"><span class="line" data-line="1"><span>echo hi</span></span></code></pre>'
+    `<pre class="astro-code shiki" data-language="bash"><code class="language-bash" tabindex="0"><span class="line" data-line="1"><span>${line}</span></span></code></pre>`
   );
   initializeCopyButtons();
   const pre = root.querySelector("pre")!;
+  const code = pre.querySelector("code")!;
   const button = root.querySelector<HTMLButtonElement>(".copy-code-btn")!;
   const shown = () =>
     getComputedStyle(button).opacity === "1" &&
     getComputedStyle(button).pointerEvents === "auto";
   const label = () => getComputedStyle(pre, "::before").opacity;
-  return { pre, button, shown, label };
+  return { pre, code, button, shown, label };
 }
 
 // Why: the button must not cover code at rest, yet mouse users need it on
@@ -111,17 +113,67 @@ it("shows the copy button and hides the language label on hover", async () => {
 // see it as soon as focus enters the block, and it must stay usable once
 // it has focus itself.
 it("shows the copy button to keyboard users and lets Tab reach it", async () => {
-  const { pre, button, shown } = codeBlock();
+  const { code, button, shown } = codeBlock();
   const before = document.createElement("button");
   before.textContent = "before";
   root.prepend(before);
   before.focus();
 
   await userEvent.tab();
-  expect(document.activeElement).toBe(pre);
+  expect(document.activeElement).toBe(code);
   await expect.poll(shown).toBe(true);
 
   await userEvent.tab();
   expect(document.activeElement).toBe(button);
   await expect.poll(shown).toBe(true);
+});
+
+// Why: wrapping a long code line makes it read as two lines and loses its
+// indentation, which changes the meaning of YAML or Haskell. The line
+// scrolls instead, inside the `code`, so the copy button and language
+// label on the `pre` stay in view and the page never scrolls sideways.
+it("scrolls a long code line inside the block, keeping its controls in place", async () => {
+  const { pre, code, button } = codeBlock(
+    "echo " + "a-very-long-argument ".repeat(20)
+  );
+  root.style.width = "320px";
+
+  expect(code.getClientRects()).toHaveLength(1);
+  expect(code.scrollWidth).toBeGreaterThan(code.clientWidth);
+  expect(pre.scrollWidth).toBe(pre.clientWidth);
+
+  const buttonLeft = button.getBoundingClientRect().left;
+  code.scrollLeft = 200;
+  expect(code.scrollLeft).toBe(200);
+  expect(button.getBoundingClientRect().left).toBe(buttonLeft);
+});
+
+// Why: the `code` holds the tab stop, but the reader sees the block as the
+// thing in focus, so the ring goes around the block's border, as it did
+// when the `pre` held the tab stop.
+it("rings the whole block while its code has keyboard focus", async () => {
+  const { pre, code } = codeBlock();
+  // The theme's tokens aren't loaded here, and an undefined color drops
+  // the whole outline declaration.
+  root.style.setProperty("--color-gray-200", "white");
+  const before = document.createElement("button");
+  before.textContent = "before";
+  root.prepend(before);
+  before.focus();
+
+  await userEvent.tab();
+  expect(document.activeElement).toBe(code);
+  expect(getComputedStyle(code).outlineStyle).toBe("none");
+  await expect.poll(() => getComputedStyle(pre).outlineStyle).toBe("solid");
+});
+
+// Why: inline code used to stay on one line, so a span wider than a phone
+// screen pushed the page sideways. It breaks at a space instead.
+it("wraps inline code wider than the line at a space", () => {
+  mount("<p><code>'Person :: Symbol -> Symbol -> Nat -> Person</code></p>");
+  root.style.width = "200px";
+  const code = root.querySelector("code")!;
+
+  expect(code.getClientRects().length).toBeGreaterThan(1);
+  expect(root.scrollWidth).toBe(root.clientWidth);
 });

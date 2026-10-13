@@ -971,10 +971,11 @@ describe("search", () => {
       await page.waitForSelector(".searchresult");
       const titles = await resultTitles(page);
       assert.deepEqual(
-        new Set(titles.slice(0, 2)),
+        new Set(titles.slice(0, 3)),
         new Set([
           "IO in Haskell, an epiphany",
           "Implementing Redis INFO in Haskell",
+          "Types of types: Haskell's Kind system",
         ])
       );
       assert.equal(

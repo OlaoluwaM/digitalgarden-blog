@@ -21,16 +21,11 @@
     color: var(--color-slate-300);
     font-family: var(--font-mono);
     font-size: 0.8em;
-    /* Keeps a code span on one line. */
-    white-space: nowrap;
-    /* Obsidian's: if a span ever breaks, each piece gets the full box. */
-    box-decoration-break: clone;
-  }
-
-  /* In a table cell, which stops at 30ch, a code span wraps instead of
-     running past the cell's edge. */
-  :is(.content, .preview-body) :is(th, td) code {
+    /* A span wider than the rest of the line breaks at a space instead of
+       running past the column on phones. */
     white-space: normal;
+    /* Obsidian's: when a span breaks, each piece gets the full box. */
+    box-decoration-break: clone;
   }
 
   /* Code blocks. The language label and copy button inherit the block's
@@ -42,29 +37,43 @@
     margin-block: 1em;
     font-family: var(--font-mono);
     min-height: --spacing(9.5);
-    /* The wide left padding holds the line numbers. */
-    padding: --spacing(4) --spacing(4) --spacing(4) --spacing(9);
+    /* With the `code`'s bottom padding, 1rem below the last line, split
+       around the scrollbar when there is one. */
+    padding-block: --spacing(4) --spacing(2);
     border: 1px solid var(--color-gray-700);
     border-radius: var(--radius-lg);
     corner-shape: var(--corner-shape-soft);
-    overflow-x: auto;
-    /* Long lines wrap instead of scrolling. */
-    white-space: pre-wrap;
+    white-space: pre;
     tab-size: 4;
   }
 
+  /* Long lines scroll instead of wrapping, so a wrapped line never reads
+     as two lines of code. */
   :is(.content, .preview-body) pre.astro-code > code {
-    padding: 0;
+    display: block;
+    overflow-x: auto;
+    padding: 0 --spacing(4) --spacing(2) 0;
     border: 0;
     background: none;
-    line-height: var(--leading-relaxed);
-    white-space: pre-wrap;
-    overflow-wrap: break-word;
+    /* The line spacing the block had while the `code` was inline: the
+       `pre`'s 1.5 at the code's 0.8em font size. */
+    line-height: calc(1.5 / 0.8);
+    white-space: pre;
     word-break: normal;
     word-spacing: normal;
     text-align: left;
     hyphens: none;
     direction: ltr;
+  }
+
+  /* The focus ring goes around the whole block, as it did when the `pre`
+     held the tab stop, not around the scrolling `code` inside its border. */
+  :is(.content, .preview-body) pre.astro-code > code:focus-visible {
+    outline: none;
+  }
+  :is(.content, .preview-body) pre.astro-code:has(> code:focus-visible) {
+    outline: 2px solid var(--color-gray-200);
+    outline-offset: --spacing(1);
   }
 
   /* Every Shiki block carries a `language-*` class. */
@@ -73,15 +82,18 @@
   }
 
   /* Line numbers: Shiki's transformer writes `data-line` on each line. The
-     number sits in the block's left padding. */
+     numbers stick to the left edge while the code scrolls, on the block's
+     background so scrolled code passes under them. */
   :is(.content, .preview-body) pre.astro-code .line[data-line]::before {
     content: attr(data-line);
+    position: sticky;
+    left: 0;
     display: inline-block;
-    width: --spacing(8);
-    margin-right: --spacing(2);
-    margin-left: --spacing(-10);
+    width: --spacing(9);
+    padding-right: --spacing(2);
+    background-color: var(--color-gray-900);
+    color: --alpha(currentColor / 30%);
     text-align: right;
-    opacity: 0.3;
   }
 
   /* Language label, top right. It gives way to the copy button. */
@@ -99,7 +111,7 @@
 
   /* Copy button (src/scripts/copyCode.ts adds it). Hidden until the block is
      hovered or holds focus, so it stays reachable by keyboard: tabbing into
-     the focusable `pre` or onto the button shows it. */
+     the focusable `code` or onto the button shows it. */
   :is(.content, .preview-body) pre.astro-code .copy-code-btn {
     position: absolute;
     top: --spacing(1.5);

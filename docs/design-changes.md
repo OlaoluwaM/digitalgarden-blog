@@ -59,7 +59,7 @@ comparisons, and the tests named per entry.
 
 - **Change:** every page has a canonical link and Open Graph and Twitter
   tags. Posts use their `description` property instead of repeating the
-  title; Home omits its placeholder description.
+  title. A blank description is omitted.
 - **Why:** search results and link previews.
 - **Evidence:** `test/metadata.test.ts`, `test/head-metadata.test.ts`.
 
@@ -1236,3 +1236,39 @@ https://claude.ai/artifact/AezzrntfR1ZLK4WXrF4x9n.
   `--color-gray-200`, 4px offset); with the rule, its outline style is
   `none`. In Playwright's Chromium, the iframe never matched `:focus` or
   `:focus-visible` after a click, Tab, or `iframe.focus()`.
+
+## 2026-10-13: Long code fits phones
+
+### Code blocks scroll instead of wrapping
+
+- **Change:** a code line wider than the block scrolls sideways instead
+  of wrapping onto the next line (`styles/content/code.css`). The block's
+  `code` scrolls, not the `pre`, so the language label and copy button
+  stay at the top right; line numbers stick to the left edge with the
+  code passing under them. The Shiki transformer in `astro.config.ts`
+  moves the tab stop from the `pre` to the `code` and drops Shiki's
+  inline `overflow-x` on the `pre`, and the focus ring still goes around
+  the whole block. The block's 1rem bottom padding is split around the
+  scrollbar, 0.5rem on each side; a block that doesn't scroll keeps 1rem
+  below its last line. Line spacing is unchanged. Live wrapped long lines.
+- **Why:** a wrapped line reads as two lines of code and loses its
+  indentation, which changes the meaning of YAML and Haskell. On the
+  Docker Compose post, line 14's `-` sat alone above its path.
+- **Evidence:** `test/browser/content-styles.test.ts` (a long line
+  scrolls in the `code` with the copy button in place, the ring around
+  the block, Tab reaching the `code`), the Markdown snapshot. Preview:
+  https://claude.ai/artifact/Q5Qrj37srni3vBTTWvjdGp.
+
+### Long inline code wraps at a space
+
+- **Change:** inline code can break at a space when it doesn't fit on the
+  line; each piece keeps its own border (`box-decoration-break: clone`).
+  It stayed on one line before, as on live, except in table cells. An
+  arrow such as `->` can split after its `-`, because a line may break
+  after a hyphen and CSS can't stop that for one pair of characters.
+- **Why:** on the Kind system post, a 362px span pushed the page 37px
+  sideways on a 390px phone.
+- **Evidence:** `test/browser/content-styles.test.ts` (a span wider than
+  the line wraps without overflow); `test/layout/site-layout.test.ts`
+  (no horizontal page scroll at 390px). Preview:
+  https://claude.ai/artifact/HzibBMR7UvrZhh7LGNkqnF.
