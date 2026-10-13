@@ -6,13 +6,13 @@ While working to add [typed configuration](https://github.com/OlaoluwaM/redis-ha
 
 We'll start from the beginning, with Values.
 
-# Values
+## Values
 
 These are the constructs we manipulate in our programs, things like `1`, `2`, `True`, `"hello"`, etc… In functional programming contexts, they're also called "*terms.*" They are the things we consume, create, compute with, and output. The management and manipulation of values is a big part of the practice of programming and software engineering.
 
 We all work with different values in our day to day. Like creatures in a fantasy setting, values that share certain characteristics – that are created, used, and manipulated in the same way – belong to the same species. Formally, these "species" are called *Types*.
 
-# Types
+## Types
 
 Types are groups of related values. Put another way, the notion of a type offers us a means of collectively referencing/referring to a group of related values. In many programming languages, we use words like `Int`, `string`, `Bool`, `Text`, etc… to denote a type.
 
@@ -20,7 +20,7 @@ The main benefit, in grouping values into types, IMO, is abstraction. Types info
 
 Taking this one step further, you might ask yourself, how do we classify types? Do we even need to do that? Why? To answer those questions, we must step into the realm of *Kinds.*
 
-# Kinds
+## Kinds
 
 Kinds are to types what types are to values. My intuition for the Kind system is that it is a means of classification for all things type level. You would think "all things type level" would simply refer to everyday types, but in Haskell (and a couple other languages), other type-level constructs exist, like type-level numbers (of Kind `Nat`), type-level strings (of Kind `Symbol`), or the constraints from Typeclasses (of Kind `Constraint`). We won't be going into much detail about any of those now, but `Nat`s and `Symbol`s do often appear in type-level programming contexts. On the other hand, entities of Kind `Constraint` are likely more familiar because they're just Typeclasses for the most part: fully applied Typeclasses, to be specific. For instance, the `Show` Typeclass belongs to the Kind `Type -> Constraint` and `Show Int` belongs to the Kind `Constraint`.
 
@@ -253,7 +253,7 @@ type RedisPort         = 'ConfigField "port"           Int
 
 Now each field's `redis.conf` key and its Haskell type live together in a single `ConfigField`, and with the use of some other type-level mechanisms, we can access that information at the term level, so there's no need to duplicate it. We do this in a couple spots using [`getConfigFieldName`](https://github.com/OlaoluwaM/redis-haskell/blob/f3839f961ee43c4d12f4f51272615c74abcb6b9f/codecrafters-redis/src/Redis/Server/Config/Types.hs#L221): the [command-line parser](https://github.com/OlaoluwaM/redis-haskell/blob/f3839f961ee43c4d12f4f51272615c74abcb6b9f/codecrafters-redis/src/Redis/Server/Config/CommandLine.hs#L37), where each key doubles as its flag name (`"dir"` becomes `--dir`), and the [`redis.conf` parser](https://github.com/OlaoluwaM/redis-haskell/blob/f3839f961ee43c4d12f4f51272615c74abcb6b9f/codecrafters-redis/src/Redis/Server/Config/Conf.hs#L90).
 
-# Conclusion
+## Conclusion
 
 So, to recap: values are grouped into types, and types are grouped into Kinds. Each pattern in this post builds on that. Higher-Kinded types let us define types that take other type constructors as arguments, like `Wrap` or `Compose`. The higher-Kinded data pattern gave me one config record type that could be partial or complete. And a custom Kind allowed me to keep each config field's `redis.conf` key with its type so the two couldn't drift apart.
 

@@ -1,5 +1,5 @@
 ---
-{"dg-publish":true,"dg-path":" Posts/Dotfiles Reorg - A Journey.md","dg-permalink":"/posts/dotfiles-reorg-a-journey","permalink":"/posts/dotfiles-reorg-a-journey/","title":"Dotfiles Reorg: A Journey","tags":["linux","software-engineering"],"created":"2026-10-09T08:36","updated":"2026-10-09T08:36","dg-note-properties":{"title":"Dotfiles Reorg: A Journey","description":"Onwards to NixOS","tags":["linux","software-engineering"],"published":"2026-05-03T17:12","last_updated":"2026-08-12T13:49","created":"2026-10-09T08:36","updated":"2026-10-09T08:36"}}
+{"dg-publish":true,"dg-path":" Posts/Dotfiles Reorg - A Journey.md","dg-permalink":"/posts/dotfiles-reorg-a-journey","permalink":"/posts/dotfiles-reorg-a-journey/","title":"Dotfiles Reorg: A Journey","tags":["linux","software-engineering"],"dg-note-properties":{"title":"Dotfiles Reorg: A Journey","description":"Onwards to NixOS","tags":["linux","software-engineering"],"published":"2026-05-03T17:12","last_updated":"2026-10-09T14:36"}}
 ---
 
 [I did some spring-cleaning on my dotfiles](https://github.com/OlaoluwaM/dotfiles/pull/3). Since I am planning on moving to NixOS, I figured now was as good a time as any to renovate. I've had my current setup for a long time. It has served me well, but nothing lasts forever, I suppose.

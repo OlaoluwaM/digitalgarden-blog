@@ -1,5 +1,5 @@
 ---
-{"dg-publish":true,"dg-path":"Home.md","dg-permalink":"/home","permalink":"/home/","title":"Home","tags":["gardenEntry"],"created":"2026-10-09T08:36","updated":"2026-10-09T08:36","dg-note-properties":{"title":"Home","description":"Home","published":"2026-03-20T10:00","last_updated":"2026-08-12T13:49","created":"2026-10-09T08:36","updated":"2026-10-09T08:36"}}
+{"dg-publish":true,"dg-path":"Home.md","dg-permalink":"/home","permalink":"/home/","title":"Home","tags":["gardenEntry"],"dg-note-properties":{"title":"Home","description":"Home","published":"2026-03-20T10:00","last_updated":"2026-10-09T14:36"}}
 ---
 
 
