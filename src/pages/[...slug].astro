@@ -57,10 +57,11 @@ const contents = contentsEntries(
   <PostFooter />
   {
     /* A hidden note opens only from a direct link, so it gets no thread.
-       The widget loads only in Vercel's production build (ADR 0008). */
+       The widget loads only in Vercel's production build and the giscus
+       preview (ADR 0008). */
     !isHiddenPost(post) && (
       <Comments
-        enabled={giscusEnabled(process.env)}
+        enabled={giscusEnabled(process.env, { dev: import.meta.env.DEV })}
         term={post.data.pluginProps.permalink}
       />
     )

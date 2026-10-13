@@ -23,11 +23,16 @@ export const giscus = {
  * A note's thread is found by its permalink, which previews and localhost
  * share with production, so a comment left there would land in the real
  * discussion. giscus.json refuses other origins too.
+ *
+ * The one exception is the giscus preview (scripts/giscus-preview.ts),
+ * which sets GISCUS_PREVIEW on `astro dev` (`dev`) and serves it as
+ * thunk.blog, so giscus accepts it. A build ignores the variable.
  */
 export function giscusEnabled(
-  env: Record<string, string | undefined>
+  env: Record<string, string | undefined>,
+  { dev = false }: { dev?: boolean } = {}
 ): boolean {
-  return env.VERCEL_ENV === "production";
+  return env.VERCEL_ENV === "production" || (dev && env.GISCUS_PREVIEW === "1");
 }
 
 /**
@@ -206,6 +211,20 @@ export function giscusThemeCss(
     "",
     "main .gsc-reactions-count {",
     "  display: none;",
+    "}",
+    "",
+    // giscus pads the pills 4px, with 4px more after the count. The pills
+    // get 8px before the icon and 10px after the count, which has a lighter
+    // edge than the icon; the count's own padding goes. giscus lines the
+    // icon and count up on their baselines; they are centered instead.
+    "main .gsc-direct-reaction-button,",
+    "main .gsc-upvote-button {",
+    "  align-items: center;",
+    "  padding-inline: 8px 10px;",
+    "}",
+    "",
+    "main .gsc-social-reaction-summary-item-count {",
+    "  padding-right: 0;",
     "}",
     "",
     // giscus opens the reaction picker 6px left of its button, which now

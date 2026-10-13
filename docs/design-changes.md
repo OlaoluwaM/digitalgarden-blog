@@ -1185,9 +1185,14 @@ https://claude.ai/artifact/AezzrntfR1ZLK4WXrF4x9n.
   buttons line up with the comments instead of being centered, and the
   "N reactions" heading above them is gone. The reaction picker opens
   flush with its button, not 6px left of it, so the frame's edge does not
-  clip it. The theme carries a font of the
-  eight icons (`lib/reaction-icons.ts`), built from `lucide-static`'s font,
-  which is pinned to `lucide`'s version. Design in
+  clip it. The reaction and upvote pills are padded 8px before the icon
+  and 10px after the count, not 4px and 8px, and center the icon on the
+  count instead of lining up their baselines. The theme carries a font of
+  the eight icons (`lib/reaction-icons.ts`), built from `lucide-static`'s
+  font, which is pinned to `lucide`'s version, with each icon lowered
+  0.12em so it sits centered in the picker's buttons. 👍 is then raised
+  0.08em and 👎 lowered 0.08em, because their ink sits in the lower or
+  upper two-thirds of their outlines and they looked a pixel off. Design in
   https://claude.ai/artifact/Xuk1RxmRPoGb7sahjtJ9ve.
 - **Why:** the emoji were the only color in a gray site, and the centered
   bar was the only element off the column's left edge. Each reaction shows
@@ -1201,4 +1206,33 @@ https://claude.ai/artifact/AezzrntfR1ZLK4WXrF4x9n.
   markup, since no note has reactions yet), and all eight icons in the
   picker, ❤️ included. Playwright's Chromium, on thunk.blog with the picker
   rule injected: the picker's left edge at the frame's (it was at -6px),
-  its arrow under the button. Not yet seen in Firefox or Safari.
+  its arrow under the button. `npm run dev:giscus`, in Playwright's
+  Chromium: the pills' padding is 8px before the icon and 10px after the
+  count. The drawn icons' vertical centers, measured in Playwright's
+  Chromium at 1x, 1.5x, and 2x: with the 0.12em drop, each picker icon is
+  within 0.67px of its button's center and each pill's icon within 0.67px
+  of its count's. With 0.2em the picker icons sat up to 1px low; with no
+  drop, up to 1.5px high. In Firefox, the pills are within 1px at 1x and
+  2x, as with 0.2em. The thumbs' ink-weighted centers, in Playwright's
+  Chromium at 2x: 👍 was 1.1px below 👀's and 👎 1.2px above; after the
+  0.08em move, both are within 0.07px of 👀's, in the bar and the picker.
+  Not yet seen in Safari.
+
+## 2026-10-13: No focus ring around the giscus widget in Firefox
+
+- **Change:** the site's focus ring no longer draws around the giscus
+  iframe (`styles/components/comments.css`). giscus still rings its own
+  controls.
+- **Why:** in Firefox, when the window becomes active again while focus is
+  inside giscus, Firefox restores focus to the iframe as keyboard focus.
+  The site's `:focus-visible` ring then boxed the whole widget and stayed
+  while the reader clicked inside giscus, since those clicks never reach
+  the page. Chrome never matches `:focus` on the iframe, so it never drew
+  the ring.
+- **Evidence:** by hand, in Firefox 157 behind the proxy of
+  `scripts/giscus-preview.ts` (a local copy driving Firefox): after
+  clicking into the comment box and switching windows and back, the
+  iframe matched `:focus-visible` with the site's ring (solid,
+  `--color-gray-200`, 4px offset); with the rule, its outline style is
+  `none`. In Playwright's Chromium, the iframe never matched `:focus` or
+  `:focus-visible` after a click, Tab, or `iframe.focus()`.

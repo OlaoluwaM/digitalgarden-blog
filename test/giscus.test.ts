@@ -19,7 +19,11 @@ import {
   giscusEnabled,
   giscusThemeCss,
 } from "../src/lib/giscus.ts";
-import { lucideFont, reactionIconsFont } from "../src/lib/reaction-icons.ts";
+import {
+  lucideFont,
+  reactionIcons,
+  reactionIconsFont,
+} from "../src/lib/reaction-icons.ts";
 import { parseTokens } from "../src/lib/tokens.ts";
 
 const tokens = parseTokens(readFileSync("src/styles/tokens.css", "utf8"));
@@ -39,6 +43,20 @@ describe("giscusEnabled", () => {
     ]) {
       assert.equal(giscusEnabled(env), false, JSON.stringify(env));
     }
+  });
+
+  // Why: the giscus preview (scripts/giscus-preview.ts) shows the widget
+  // on `astro dev`, which it serves as thunk.blog, and sets
+  // GISCUS_PREVIEW to load it there. A build must ignore the variable, or
+  // setting it on Vercel would load the widget on every preview.
+  it("lets the giscus preview load it on the dev server only", () => {
+    assert.equal(giscusEnabled({ GISCUS_PREVIEW: "1" }, { dev: true }), true);
+    assert.equal(giscusEnabled({ GISCUS_PREVIEW: "1" }), false);
+    assert.equal(
+      giscusEnabled({ VERCEL_ENV: "preview", GISCUS_PREVIEW: "1" }),
+      false
+    );
+    assert.equal(giscusEnabled({}, { dev: true }), false);
   });
 });
 
@@ -104,6 +122,31 @@ describe("reactionIconsFont", () => {
         const codePoint = char.codePointAt(0)!.toString(16).toUpperCase();
         assert.ok(font.hasChar(char), `${reaction} lacks U+${codePoint}`);
       }
+    }
+  });
+
+  // Why: the thumbs' ink sits in their lower (👍) or upper (👎) two-thirds,
+  // so with their outlines placed like the other icons, 👍 looks a pixel
+  // low and 👎 a pixel high. Each moves 0.08em toward center, about as far
+  // as its ink's centroid is off its outline's center; the rest keep
+  // Lucide's placement relative to one another.
+  it("moves the thumbs to center their ink", () => {
+    const font = opentype.parse(reactionFont);
+    const lucide = opentype.parse(lucideFont());
+    const center = (glyph: opentype.Glyph) => {
+      const box = glyph.getBoundingBox();
+      return (box.y1 + box.y2) / 2;
+    };
+    const moved = (emoji: keyof typeof reactionIcons) =>
+      center(font.charToGlyph(emoji)) -
+      center(lucide.nameToGlyph(reactionIcons[emoji]));
+    // In font units, against 👀. `+ 0` makes -0 a 0 for strict equality.
+    const lift = (emoji: keyof typeof reactionIcons) =>
+      Math.round(moved(emoji) - moved("👀")) + 0;
+    assert.equal(lift("👍"), 80);
+    assert.equal(lift("👎"), -80);
+    for (const emoji of ["😄", "🎉", "😕", "❤️", "🚀"] as const) {
+      assert.equal(lift(emoji), 0, emoji);
     }
   });
 
