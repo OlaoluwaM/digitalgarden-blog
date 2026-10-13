@@ -1217,3 +1217,22 @@ https://claude.ai/artifact/AezzrntfR1ZLK4WXrF4x9n.
   Chromium at 2x: 👍 was 1.1px below 👀's and 👎 1.2px above; after the
   0.08em move, both are within 0.07px of 👀's, in the bar and the picker.
   Not yet seen in Safari.
+
+## 2026-10-13: No focus ring around the giscus widget in Firefox
+
+- **Change:** the site's focus ring no longer draws around the giscus
+  iframe (`styles/components/comments.css`). giscus still rings its own
+  controls.
+- **Why:** in Firefox, when the window becomes active again while focus is
+  inside giscus, Firefox restores focus to the iframe as keyboard focus.
+  The site's `:focus-visible` ring then boxed the whole widget and stayed
+  while the reader clicked inside giscus, since those clicks never reach
+  the page. Chrome never matches `:focus` on the iframe, so it never drew
+  the ring.
+- **Evidence:** by hand, in Firefox 157 behind the proxy of
+  `scripts/giscus-preview.ts` (a local copy driving Firefox): after
+  clicking into the comment box and switching windows and back, the
+  iframe matched `:focus-visible` with the site's ring (solid,
+  `--color-gray-200`, 4px offset); with the rule, its outline style is
+  `none`. In Playwright's Chromium, the iframe never matched `:focus` or
+  `:focus-visible` after a click, Tab, or `iframe.focus()`.

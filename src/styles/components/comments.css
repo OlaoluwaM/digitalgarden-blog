@@ -12,4 +12,11 @@
   .comments .giscus-frame {
     color-scheme: dark !important;
   }
+
+  /* Firefox treats focus it restores to the giscus iframe, when the window
+     becomes active again, as keyboard focus, and the ring then stays while
+     the reader clicks inside giscus. giscus rings its own controls. */
+  .comments .giscus-frame:focus-visible {
+    outline: none;
+  }
 }
