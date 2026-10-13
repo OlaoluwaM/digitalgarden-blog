@@ -125,10 +125,15 @@ export default defineConfig({
             // raised gray, like inline code, instead of the theme's
             // #1e1e1e (the page's own color).
             const style = node.properties.style ?? "";
-            node.properties.style = style.replace(
-              /background-color:[^;]*/i,
-              "background-color:var(--color-gray-900)"
-            );
+            node.properties.style = style
+              .replace(
+                /background-color:[^;]*/i,
+                "background-color:var(--color-gray-900)"
+              )
+              // The `code` scrolls instead (see the `code` hook below), so
+              // the language label and copy button stay put.
+              .replace(/\s*overflow-x:\s*auto;?/i, "");
+            delete node.properties.tabindex;
             // Astro's own transformer runs first and labels unlabelled fences
             // "plaintext"; Eleventy labelled them "text".
             if (node.properties.dataLanguage === "plaintext") {
@@ -141,6 +146,9 @@ export default defineConfig({
             const language =
               this.options.lang === "plaintext" ? "text" : this.options.lang;
             this.addClassToHast(node, `language-${language}`);
+            // The scrolling box takes the tab stop Shiki gives the `pre`, so
+            // keyboard users can scroll long lines.
+            node.properties.tabindex = 0;
           },
           // Add line number data attributes for CSS counter styling
           line(node, line) {
