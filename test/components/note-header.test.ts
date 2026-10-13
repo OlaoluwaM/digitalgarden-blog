@@ -97,10 +97,8 @@ describe("NoteHeader", () => {
     const { root } = await renderHeader({
       post: fakePost({ published: "2026-03-20T15:42" }),
     });
-    const createdDiv = root.querySelector(
-      '.timestamps div[title="Created at"]'
-    );
-    expect(createdDiv?.getAttribute("aria-label")).toBe("Created at");
+    const createdDiv = root.querySelector('.timestamps div[title="Published"]');
+    expect(createdDiv?.getAttribute("aria-label")).toBe("Published");
     expect(
       createdDiv?.querySelector("svg.lucide-calendar-plus")
     ).not.toBeNull();
@@ -117,9 +115,9 @@ describe("NoteHeader", () => {
       post: fakePost({ last_updated: "2026-08-12T13:49" }),
     });
     const updatedDiv = root.querySelector(
-      '.timestamps div[title="Updated at"]'
+      '.timestamps div[title="Last updated"]'
     );
-    expect(updatedDiv?.getAttribute("aria-label")).toBe("Updated at");
+    expect(updatedDiv?.getAttribute("aria-label")).toBe("Last updated");
     expect(
       updatedDiv?.querySelector("svg.lucide-calendar-clock")
     ).not.toBeNull();
