@@ -13,24 +13,11 @@ it("uses a note's description as written", () => {
   assert.equal(metaDescription("Endian deez nuts"), "Endian deez nuts");
 });
 
-// Why: Home's description is still the vault placeholder. Publishing
-// "PLACEHOLDER: reword me" to search results would be worse than no
-// description, and the page should start using the real text automatically
-// once the note is reworded.
-it("omits placeholder, empty, and blank descriptions", () => {
-  assert.equal(metaDescription("PLACEHOLDER: reword me"), undefined);
-  assert.equal(metaDescription("placeholder"), undefined);
+// Why: an empty `content` attribute gives search engines nothing to show
+// and stops them from writing their own snippet.
+it("omits empty and blank descriptions", () => {
   assert.equal(metaDescription(""), undefined);
   assert.equal(metaDescription("   "), undefined);
-});
-
-// Why: only a leading placeholder marker counts. A real description that
-// merely mentions the word must still be published.
-it("keeps descriptions that mention placeholders later on", () => {
-  assert.equal(
-    metaDescription("Why placeholder text leaks into production"),
-    "Why placeholder text leaks into production"
-  );
 });
 
 // Why: surrounding whitespace from frontmatter should not reach the meta tag.

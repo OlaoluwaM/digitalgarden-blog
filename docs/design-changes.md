@@ -59,7 +59,7 @@ comparisons, and the tests named per entry.
 
 - **Change:** every page has a canonical link and Open Graph and Twitter
   tags. Posts use their `description` property instead of repeating the
-  title. A description that is still the vault placeholder is omitted.
+  title. A blank description is omitted.
 - **Why:** search results and link previews.
 - **Evidence:** `test/metadata.test.ts`, `test/head-metadata.test.ts`.
 
