@@ -38,9 +38,21 @@ export function lucideFont(): ArrayBuffer {
   return file.buffer.slice(file.byteOffset, file.byteOffset + file.byteLength);
 }
 
-/** How far below the baseline emoji reach, as a share of the em: about
- * what Apple's and Google's emoji fonts dip. */
-const EMOJI_DESCENT = 0.2;
+/** How far the icons are lowered, as a share of the em: measured in
+ * Chromium to center them in the reaction picker's buttons, to within a
+ * pixel (design-changes.md, 2026-10-12). */
+const ICON_DROP = 0.12;
+
+/** Icons whose ink sits well off their outline's center, raised (or, below
+ * zero, lowered) as a share of the em so the ink centers like the other
+ * icons'. Each value is about how far its ink's centroid is off center:
+ * the hand sits in 👍's lower two-thirds and 👎's upper. */
+const OPTICAL_LIFT: Partial<
+  Record<(typeof reactionIcons)[keyof typeof reactionIcons], number>
+> = {
+  "thumbs-up": 0.08,
+  "thumbs-down": -0.08,
+};
 
 /** A color layer's palette entry meaning "the text color" (COLR spec). */
 const TEXT_COLOR = 0xffff;
@@ -78,10 +90,11 @@ export function reactionIconsFont(lucide: ArrayBuffer): ArrayBuffer {
     if (glyph.name) byName.set(glyph.name, glyph);
   }
 
-  // Lucide's icons stand on the baseline; emoji dip below it, and giscus
-  // aligns each reaction to its count's baseline. Lowering the icons as
-  // far as emoji dip centers them on the count.
-  const drop = Math.round(source.unitsPerEm * EMOJI_DESCENT);
+  // Lucide's icons stand on the baseline, so set in a line of text they
+  // ride high. The picker sets them in its buttons' line, so it needs them
+  // lowered; the bar's pills center each icon's own box (giscus.ts), so the
+  // drop barely moves them there.
+  const drop = Math.round(source.unitsPerEm * ICON_DROP);
   const outlines = Object.entries(reactionIcons).map(([emoji, name]) => {
     const icon = byName.get(name);
     if (!icon) throw new Error(`lucide-static has no "${name}" icon`);
@@ -91,7 +104,10 @@ export function reactionIconsFont(lucide: ArrayBuffer): ArrayBuffer {
       name,
       unicode,
       advanceWidth: icon.advanceWidth ?? source.unitsPerEm,
-      path: lowered(icon.path, drop),
+      path: lowered(
+        icon.path,
+        drop - Math.round(source.unitsPerEm * (OPTICAL_LIFT[name] ?? 0))
+      ),
     };
   });
 
