@@ -2,9 +2,6 @@
 
 ## Site features
 
-- [ ] After the Giscus comments deploy (ADR 0008), check the widget on a note in light and dark mode.
-- [ ] After the reaction icons deploy, check the reaction bar and picker in Firefox and Safari: Lucide icons in gray, ❤️ included.
-
 ## Upstream
 
 - [ ] Astro: drop the [local patch](patches/astro+7.3.5.patch) and the 7.3.5 pin once [withastro/astro#18064](https://github.com/withastro/astro/pull/18064) ships. It fixes [#18054](https://github.com/withastro/astro/issues/18054) the same way (a failed Markdown render fails the build), with its own regression test; it was open and awaiting review on 2026-09-29.
