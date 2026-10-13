@@ -1,5 +1,5 @@
 ---
-{"dg-publish":true,"dg-path":" Posts/Types of types - Haskell's Kind system.md","dg-permalink":"/posts/types-of-types-haskell-kind-system","permalink":"/posts/types-of-types-haskell-kind-system/","title":"Types of types: Haskell's Kind system","tags":["haskell","software-engineering"],"dg-note-properties":{"title":"Types of types: Haskell's Kind system","description":"Kinda?","tags":["haskell","software-engineering"],"published":"2026-10-13T12:30:00","last_updated":"2026-10-13T14:41"}}
+{"dg-publish":true,"dg-path":" Posts/Types of types - Haskell's Kind system.md","dg-permalink":"/posts/types-of-types-haskell-kind-system","permalink":"/posts/types-of-types-haskell-kind-system/","title":"Types of types: Haskell's Kind system","tags":["haskell","software-engineering"],"dg-note-properties":{"title":"Types of types: Haskell's Kind system","description":"Kinda?","tags":["haskell","software-engineering"],"published":"2026-10-13T12:30:00","last_updated":"2026-10-13T14:51"}}
 ---
 
 While working to add [typed configuration](https://github.com/OlaoluwaM/redis-haskell/pull/2) to my Haskell Redis server clone, I found myself learning some new tricks, all of them stemming from Haskell's Kind system. In this article, we're gonna discuss what I learned and the things I managed to build with it.
@@ -117,7 +117,7 @@ The issue I first ran into was a case of duplication. My initial data type idea 
 - Default config where all the fields will be available, initialized to their official default values.
 - Command-line configs and `redis.conf` configs where fields would need to be nullable.
 
-My initial direction was to define two record types: one where the field types were bare, and another where they were wrapped in a `Last`.
+My initial direction was to define two record types: one where the field types were bare, and another where they were wrapped in a [`Last`](https://www.stackage.org/haddock/lts-24.63/base-4.20.2.0/Data-Monoid.html#t:Last).
 
 ```haskell
 data RedisConfig = RedisConfig
@@ -139,7 +139,7 @@ data PartialRedisConfig = PartialRedisConfig
     deriving stock (Generic)
 ```
 
-> [!aside] Why [`Last`](https://www.stackage.org/haddock/lts-24.63/base-4.20.2.0/Data-Monoid.html#t:Last)
+> [!aside] Why `Last`
 > `Maybe`'s `<>` defers to the `Semigroup` semantics of the type it contains, unless either operand is a `Nothing`. Moreover, for it to work, all our wrapped field types would need to have a `Semigroup` instance. `Bool` and `Int` don't have one. And even for types that do, `<>` would combine the two values instead of picking one. `Last` keeps the latest value that's present, letting later sources override earlier values.
 
 I wasn't a fan of this approach because I wanted to have a single source of truth for supported config field names and types. With two data types, it would have been easy to change one variant while forgetting to update the other. The type system could have caught any discrepancies, depending on how things are implemented, but that wasn't good enough.
