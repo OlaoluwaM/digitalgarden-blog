@@ -43,6 +43,7 @@
     "test:sync-callouts": "node --test --test-isolation=none test/sync-callouts.test.ts",
     "predev": "npm run patch-dependencies && npm run generate:wikilink-index",
     "dev": "astro dev",
+    "dev:giscus": "node --env-file-if-exists=.env.browser.local scripts/giscus-preview.ts",
     "prebuild": "npm run patch-dependencies && npm run generate:wikilink-index",
     "build": "astro build --force",
     "preview": "astro preview"

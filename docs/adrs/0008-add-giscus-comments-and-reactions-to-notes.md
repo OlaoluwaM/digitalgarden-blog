@@ -121,8 +121,12 @@ own ending down. A `Comments.astro` component renders it:
   `lucide-static` (`src/lib/reaction-icons.ts`; design-changes.md,
   2026-10-12): that package must stay on `lucide`'s version, and a Lucide
   rename of one of the eight icons fails the build.
-- **No preview check:** the widget can't be seen before a release, and a
-  theme change shows only once it is live.
+- **Preview only through a proxy:** previews and `astro dev` don't load
+  the widget. `npm run dev:giscus` (`scripts/giscus-preview.ts`) is the
+  exception: it runs `astro dev` with `GISCUS_PREVIEW` set and opens
+  Chromium with thunk.blog answered by the dev server, so giscus accepts
+  the origin and the theme comes from the working tree. Its threads are the
+  real ones.
 
 **Operational**
 

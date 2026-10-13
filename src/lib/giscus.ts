@@ -23,11 +23,16 @@ export const giscus = {
  * A note's thread is found by its permalink, which previews and localhost
  * share with production, so a comment left there would land in the real
  * discussion. giscus.json refuses other origins too.
+ *
+ * The one exception is the giscus preview (scripts/giscus-preview.ts),
+ * which sets GISCUS_PREVIEW on `astro dev` (`dev`) and serves it as
+ * thunk.blog, so giscus accepts it. A build ignores the variable.
  */
 export function giscusEnabled(
-  env: Record<string, string | undefined>
+  env: Record<string, string | undefined>,
+  { dev = false }: { dev?: boolean } = {}
 ): boolean {
-  return env.VERCEL_ENV === "production";
+  return env.VERCEL_ENV === "production" || (dev && env.GISCUS_PREVIEW === "1");
 }
 
 /**

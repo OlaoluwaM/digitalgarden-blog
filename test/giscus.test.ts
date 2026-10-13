@@ -40,6 +40,20 @@ describe("giscusEnabled", () => {
       assert.equal(giscusEnabled(env), false, JSON.stringify(env));
     }
   });
+
+  // Why: the giscus preview (scripts/giscus-preview.ts) shows the widget
+  // on `astro dev`, which it serves as thunk.blog, and sets
+  // GISCUS_PREVIEW to load it there. A build must ignore the variable, or
+  // setting it on Vercel would load the widget on every preview.
+  it("lets the giscus preview load it on the dev server only", () => {
+    assert.equal(giscusEnabled({ GISCUS_PREVIEW: "1" }, { dev: true }), true);
+    assert.equal(giscusEnabled({ GISCUS_PREVIEW: "1" }), false);
+    assert.equal(
+      giscusEnabled({ VERCEL_ENV: "preview", GISCUS_PREVIEW: "1" }),
+      false
+    );
+    assert.equal(giscusEnabled({}, { dev: true }), false);
+  });
 });
 
 describe("giscusAttributes", () => {
