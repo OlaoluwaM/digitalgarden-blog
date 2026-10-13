@@ -66,7 +66,10 @@ Kroki (default `https://kroki.io`), and `KROKI_CACHE_DIR` moves the cache
 of rendered diagrams (default `node_modules/.cache/kroki`).
 
 `dev` and `build` first apply the dependency patches in `patches/` and
-regenerate the wikilink index (`src/generated/wikilink-index.ts`). `build`
+regenerate the wikilink index (`src/generated/wikilink-index.ts`).
+`npm install` and `npm test` regenerate it too. The index is built from the
+notes and is not committed; after pulling new notes, run `npm test` or
+`npm run generate:wikilink-index` before running a single suite. `build`
 re-renders every note (`--force`), because Astro's content cache does not
 notice changes to the Markdown plugins.
 

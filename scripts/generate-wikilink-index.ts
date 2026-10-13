@@ -5,9 +5,11 @@
  * so [[Guides/My Note]] can link to /posts/my-note/.
  *
  * Run `npm run generate:wikilink-index` from the repository root with Node 24.
- * The npm commands for Astro dev and build run this first through their
- * predev and prebuild hooks. This script runs once and exits;
- * it doesn't watch for later note changes. Rerun it when the index needs updating.
+ * `npm install`, `npm test`, and the npm commands for Astro dev and build
+ * run this first through their postinstall, pretest, predev, and prebuild
+ * hooks. The generated file is not committed, so it can't fall behind the
+ * notes the publisher commits. This script runs once and exits; it doesn't
+ * watch for later note changes. Rerun it when the index needs updating.
  *
  * The same file also maps each target to its note's title, so the
  * transclusion plugin can name an embed's source note, and lists the URLs

@@ -8,3 +8,4 @@ dist
 .env.browser.local
 .browser-artifacts/
 .vitest/
+src/generated/
