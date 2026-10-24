@@ -47,7 +47,6 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
 
-      # `postinstall` applies the dependency patches.
       - run: npm ci
 
       # The layout and browser suites drive Chromium through Playwright.

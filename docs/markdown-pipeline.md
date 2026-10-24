@@ -68,5 +68,3 @@ These run inside the processor, around the plugins above.
   `headerToId`; the IDs match for the published notes. Tests:
   `heading-links.test.ts`.
 - **Image collection.** Local images become Astro image components.
-  [`patches/`](../patches/README.md) holds one fix to Astro's Markdown
-  rendering errors.
