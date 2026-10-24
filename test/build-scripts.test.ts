@@ -17,7 +17,7 @@ const vercel = JSON.parse(readFileSync("vercel.json", "utf8")) as Record<
   string,
   unknown
 >;
-const PREPARE = "npm run patch-dependencies && npm run generate:wikilink-index";
+const PREPARE = "npm run generate:wikilink-index";
 
 describe("npm scripts", () => {
   // Why: `dev`, `build`, and `preview` are the names Astro, Vercel, and
@@ -37,9 +37,9 @@ describe("npm scripts", () => {
     assert.equal(scripts.build, "astro build --force");
   });
 
-  // Why: both commands need the dependency patches applied and the
-  // wikilink index generated first; npm runs `pre<name>` automatically.
-  it("prepares the patches and the wikilink index before dev and build", () => {
+  // Why: both commands need the wikilink index generated first; npm runs
+  // `pre<name>` automatically.
+  it("generates the wikilink index before dev and build", () => {
     assert.equal(scripts.predev, PREPARE);
     assert.equal(scripts.prebuild, PREPARE);
   });

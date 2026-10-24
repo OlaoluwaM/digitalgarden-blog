@@ -4,7 +4,6 @@
 
 ## Upstream
 
-- [ ] Astro: drop the [local patch](patches/astro+7.3.5.patch) and the 7.3.5 pin once [withastro/astro#18064](https://github.com/withastro/astro/pull/18064) ships. It fixes [#18054](https://github.com/withastro/astro/issues/18054) the same way (a failed Markdown render fails the build), with its own regression test; it was open and awaiting review on 2026-09-29.
 - [ ] Sätteri (open focused issues; offer PRs after maintainers confirm the direction):
   - Preserve wikilink provenance without source-position slicing.
   - Fix the trailing backslash in escaped aliases (`[[Note\|Alias]]`).
