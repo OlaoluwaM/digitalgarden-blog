@@ -55,7 +55,7 @@
     "node": "24.x"
   },
   "devDependencies": {
-    "@astrojs/check": "0.9.10",
+    "@astrojs/check": "0.9.12",
     "@eslint/js": "^10.0.1",
     "@tailwindcss/vite": "4.3.3",
     "@types/mdast": "^4.0.4",
@@ -86,7 +86,7 @@
     "@astrojs/sitemap": "^3.7.4",
     "@vercel/analytics": "2.0.1",
     "@vercel/speed-insights": "2.0.0",
-    "astro": "7.4.0",
+    "astro": "7.4.2",
     "flexsearch": "0.8.212",
     "github-slugger": "^2.0.0",
     "gray-matter": "^4.0.3",
