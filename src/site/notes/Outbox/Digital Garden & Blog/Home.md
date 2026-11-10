@@ -7,7 +7,7 @@
 
 Lo there traveler, welcome to my space. Do enjoy your visit :)
 
-Also, if you're interested, you can find some of my work at [github.com/OlaoluwaM](https://github.com/OlaoluwaM). If you'd like to talk shop, have a chat, or are hiring, feel free to shoot me an email at olaolum@pm.me. I am generally backend-leaning, but don't mind doing _some_ frontend work. Work in fintech, cybersecurity, distributed systems, or healtech is of great interest to me. I am a lover of Haskell but can work with pretty much anything, so long as its got a type system.
+Also, if you're interested, you can find some of my work at [github.com/OlaoluwaM](https://github.com/OlaoluwaM). If you'd like to talk shop, have a chat, or are hiring, feel free to shoot me an email at olaolum@pm.me. I am generally backend-leaning, but don't mind doing _some_ frontend work. Work in fintech, cybersecurity, distributed systems, or healtech is of great interest to me. I am a lover of Haskell but can work with pretty much anything, so long as its got a type system :).
 
 Feel free to connect with me @ [linkedin.com/olaoluwam](https://www.linkedin.com/in/olaoluwam/)
 
